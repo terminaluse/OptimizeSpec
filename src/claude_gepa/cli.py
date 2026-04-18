@@ -20,17 +20,19 @@ def build_parser() -> argparse.ArgumentParser:
     eval_demo.add_argument("--run-dir", default="runs/eval-demo")
 
     optimize = subparsers.add_parser("optimize-demo", help="Run a GEPA optimization job from the weak demo seed.")
-    optimize.add_argument("--max-metric-calls", type=int, default=3)
+    optimize.add_argument("--max-metric-calls", type=int, default=24)
     optimize.add_argument("--reflection-model", default="anthropic/claude-opus-4-7")
     optimize.add_argument("--run-dir", default="runs/gepa-demo")
+    optimize.add_argument("--max-runtime-seconds", type=float, default=120.0)
 
     compare = subparsers.add_parser(
         "compare-demo",
         help="Show the input candidate, optimized candidate, and eval deltas on the widened benchmark.",
     )
-    compare.add_argument("--max-metric-calls", type=int, default=4)
+    compare.add_argument("--max-metric-calls", type=int, default=24)
     compare.add_argument("--reflection-model", default="anthropic/claude-opus-4-7")
     compare.add_argument("--run-dir", default="runs/compare-demo")
+    compare.add_argument("--max-runtime-seconds", type=float, default=120.0)
 
     show = subparsers.add_parser("show-seed", help="Print the default strong seed candidate.")
     show.add_argument("--pretty", action="store_true")
@@ -51,18 +53,29 @@ def cmd_eval_demo(run_dir: str) -> int:
     return 0
 
 
-def cmd_optimize_demo(max_metric_calls: int, reflection_model: str, run_dir: str) -> int:
+def cmd_optimize_demo(
+    max_metric_calls: int,
+    reflection_model: str,
+    run_dir: str,
+    max_runtime_seconds: float,
+) -> int:
     require_api_key()
     result = optimize_demo(
         max_metric_calls=max_metric_calls,
         reflection_model=reflection_model,
         run_dir=run_dir,
+        max_runtime_seconds=max_runtime_seconds,
     )
     print(json.dumps(result.best_candidate, indent=2, sort_keys=True))
     return 0
 
 
-def cmd_compare_demo(max_metric_calls: int, reflection_model: str, run_dir: str) -> int:
+def cmd_compare_demo(
+    max_metric_calls: int,
+    reflection_model: str,
+    run_dir: str,
+    max_runtime_seconds: float,
+) -> int:
     require_api_key()
     run_path = Path(run_dir)
     input_candidate = dict(DEMO_SEED_CANDIDATE)
@@ -71,11 +84,22 @@ def cmd_compare_demo(max_metric_calls: int, reflection_model: str, run_dir: str)
         reflection_model=reflection_model,
         run_dir=str(run_path / "optimize"),
         seed_candidate=input_candidate,
+        max_runtime_seconds=max_runtime_seconds,
     )
     final_candidate = dict(result.best_candidate)
 
-    baseline_eval = evaluate_candidate_suite(input_candidate, run_dir=str(run_path / "baseline-eval"), use_outcomes=False)
-    final_eval = evaluate_candidate_suite(final_candidate, run_dir=str(run_path / "final-eval"), use_outcomes=False)
+    baseline_eval = evaluate_candidate_suite(
+        input_candidate,
+        run_dir=str(run_path / "baseline-eval"),
+        use_outcomes=True,
+        max_runtime_seconds=max_runtime_seconds,
+    )
+    final_eval = evaluate_candidate_suite(
+        final_candidate,
+        run_dir=str(run_path / "final-eval"),
+        use_outcomes=True,
+        max_runtime_seconds=max_runtime_seconds,
+    )
 
     baseline_by_task = {item["task_id"]: item for item in baseline_eval["tasks"]}
     final_by_task = {item["task_id"]: item for item in final_eval["tasks"]}
@@ -130,9 +154,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "eval-demo":
         return cmd_eval_demo(args.run_dir)
     if args.command == "optimize-demo":
-        return cmd_optimize_demo(args.max_metric_calls, args.reflection_model, args.run_dir)
+        return cmd_optimize_demo(
+            args.max_metric_calls,
+            args.reflection_model,
+            args.run_dir,
+            args.max_runtime_seconds,
+        )
     if args.command == "compare-demo":
-        return cmd_compare_demo(args.max_metric_calls, args.reflection_model, args.run_dir)
+        return cmd_compare_demo(
+            args.max_metric_calls,
+            args.reflection_model,
+            args.run_dir,
+            args.max_runtime_seconds,
+        )
     if args.command == "show-seed":
         return cmd_show_seed(args.pretty)
 

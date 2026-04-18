@@ -12,7 +12,8 @@ DEFAULT_SEED_CANDIDATE: dict[str, str] = {
     "system_prompt": (
         "You are a careful autonomous file-processing agent. "
         "Read the provided task input, reason step by step, and write the final answer "
-        "exactly to the requested output path."
+        "exactly to the requested output path. The output file must contain only the exact final answer, "
+        "with no explanations, labels, or extra trailing newline unless the task explicitly requires one."
     ),
     "task_prompt": (
         "Task summary: {task_summary}\n\n"
@@ -22,7 +23,8 @@ DEFAULT_SEED_CANDIDATE: dict[str, str] = {
         "1. Read the input file.\n"
         "2. Produce only the requested final answer.\n"
         "3. Write the answer to the required output path.\n"
-        "4. Verify the file content matches the intended answer before stopping.\n"
+        "4. Do not add any trailing newline unless the task explicitly requires one.\n"
+        "5. Verify the file content matches the intended answer exactly before stopping.\n"
     ),
     "outcome_rubric": (
         "# Output Rubric\n\n"
@@ -130,20 +132,27 @@ class CandidateBundle:
 
 
 def _parse_yaml_text(text: str) -> Any:
-    data = yaml.safe_load(text)
+    try:
+        data = yaml.safe_load(text)
+    except yaml.YAMLError:
+        return None
     return data if data is not None else {}
 
 
 def _parse_skills(text: str) -> tuple[SkillRef, ...]:
     raw = _parse_yaml_text(text)
-    if raw == {}:
+    if raw in ({}, None, ""):
+        return ()
+    if isinstance(raw, dict):
         return ()
     if not isinstance(raw, list):
-        raise ValueError("skills must parse to a YAML list")
+        return ()
     refs: list[SkillRef] = []
     for item in raw:
         if not isinstance(item, dict):
-            raise ValueError("each skill entry must be a mapping")
+            continue
+        if "type" not in item or "skill_id" not in item:
+            continue
         refs.append(
             SkillRef(
                 type=str(item["type"]),
@@ -157,20 +166,22 @@ def _parse_skills(text: str) -> tuple[SkillRef, ...]:
 def _parse_environment_spec(text: str) -> dict[str, Any]:
     raw = _parse_yaml_text(text)
     if not isinstance(raw, dict):
-        raise ValueError("environment_spec must parse to a YAML mapping")
+        return _parse_environment_spec(DEFAULT_SEED_CANDIDATE["environment_spec"])
     return raw
 
 
 def _parse_subagents(text: str) -> tuple[SubagentSpec, ...]:
     raw = _parse_yaml_text(text)
-    if raw == {}:
+    if raw in ({}, None, ""):
         return ()
     if not isinstance(raw, list):
-        raise ValueError("subagent_specs must parse to a YAML list")
+        return ()
     specs: list[SubagentSpec] = []
     for item in raw:
         if not isinstance(item, dict):
-            raise ValueError("each subagent entry must be a mapping")
+            continue
+        if "name" not in item or "system_prompt" not in item:
+            continue
         skills = _parse_skills(yaml.safe_dump(item.get("skills", []), sort_keys=False))
         specs.append(
             SubagentSpec(

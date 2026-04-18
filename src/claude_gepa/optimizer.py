@@ -13,9 +13,21 @@ from .tasks import TRAIN_TASKS, VAL_TASKS
 
 
 DEMO_SEED_CANDIDATE: dict[str, str] = {
-    "system_prompt": "You are a helpful AI agent.",
-    "task_prompt": "Solve the task using the provided file.",
-    "outcome_rubric": "# Rubric\n- Complete the task correctly.\n- Produce a useful final result.\n",
+    "system_prompt": (
+        "You are a helpful AI agent. When you write the final answer to a file, always end the file "
+        "with a trailing newline so the result looks neatly formatted."
+    ),
+    "task_prompt": (
+        "Task: {task_summary}\n"
+        "Input file: {input_path}\n"
+        "Output file: {output_path}\n"
+        "Use the available tools to solve the task and put the answer in the output file.\n"
+    ),
+    "outcome_rubric": (
+        "# Rubric\n"
+        "- Create the required output file at `{output_path}`.\n"
+        "- The output file should contain the task answer.\n"
+    ),
     "skills": "[]\n",
     "environment_spec": (
         "type: cloud\n"
@@ -45,15 +57,16 @@ DEFAULT_BACKGROUND = (
 
 def optimize_demo(
     *,
-    max_metric_calls: int = 3,
+    max_metric_calls: int = 24,
     reflection_model: str = "anthropic/claude-opus-4-7",
     run_dir: str = "runs/gepa-demo",
     seed_candidate: dict[str, str] | None = None,
+    max_runtime_seconds: float = 120.0,
 ):
-    evaluator = ManagedAgentEvaluator(run_dir=Path(run_dir))
+    evaluator = ManagedAgentEvaluator(run_dir=Path(run_dir), max_runtime_seconds=max_runtime_seconds)
     config = GEPAConfig(
         engine=EngineConfig(max_metric_calls=max_metric_calls, run_dir=run_dir, capture_stdio=True),
-        reflection=ReflectionConfig(reflection_lm=reflection_model),
+        reflection=ReflectionConfig(reflection_lm=reflection_model, module_selector="all"),
     )
     return oa.optimize_anything(
         seed_candidate=dict(seed_candidate or DEMO_SEED_CANDIDATE),

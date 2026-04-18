@@ -22,7 +22,7 @@ class EvaluationResult:
 def compute_text_match_score(expected: str, actual: str | None) -> float:
     if actual is None:
         return 0.0
-    return 1.0 if actual.strip() == expected.strip() else 0.0
+    return 1.0 if actual == expected else 0.0
 
 
 class ManagedAgentEvaluator:
@@ -162,6 +162,7 @@ def build_side_info(
             "agent_version": artifacts.agent_version,
             "environment_id": artifacts.environment_id,
             "session_id": artifacts.session_id,
+            "session_status": artifacts.session_status,
             "event_types": artifacts.event_types,
             "tool_events": artifacts.tool_events,
             "usage": artifacts.usage,

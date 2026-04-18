@@ -30,6 +30,7 @@ class RunArtifacts:
     agent_version: int
     environment_id: str
     session_id: str
+    session_status: str | None
     output_text: str | None
     output_file_id: str | None
     outcome_result: str | None
@@ -88,41 +89,18 @@ class ManagedAgentRuntime:
         usage = {"input_tokens": 0, "output_tokens": 0}
         outcome_result: str | None = None
         outcome_explanation: str | None = None
+        session_status: str | None = "running"
         started_at = time.monotonic()
 
         with self.client.beta.sessions.events.stream(session_id=session.id, betas=STREAM_BETAS) as stream:
             if use_outcomes:
                 self._send_initial_events(session.id, bundle, task)
-            else:
-                self.client.beta.sessions.events.send(
-                    session_id=session.id,
-                    events=[
-                        {
-                            "type": "user.message",
-                            "content": [
-                                {
-                                    "type": "text",
-                                    "text": bundle.render_task_prompt(
-                                        task_summary=task.task_summary,
-                                        input_path=task.input_path,
-                                        output_path=task.output_path,
-                                    ),
-                                }
-                            ],
-                        }
-                    ],
-                )
+            self._send_user_message(session.id, bundle, task)
 
             for event in stream:
                 if time.monotonic() - started_at > max_runtime_seconds:
                     errors.append(f"session exceeded max_runtime_seconds={max_runtime_seconds}")
-                    try:
-                        self.client.beta.sessions.events.send(
-                            session_id=session.id,
-                            events=[{"type": "user.interrupt"}],
-                        )
-                    except Exception:
-                        pass
+                    self._interrupt_session(session.id)
                     break
                 event_types.append(event.type)
                 if event.type in {"agent.tool_use", "agent.tool_result"}:
@@ -139,19 +117,24 @@ class ManagedAgentRuntime:
                     message = getattr(event, "message", "unknown session error")
                     errors.append(str(message))
                 elif event.type in {"session.status_idle", "session.status_terminated"}:
+                    session_status = "idle" if event.type == "session.status_idle" else "terminated"
                     if event.type == "session.status_terminated":
                         break
                     stop_reason = getattr(event, "stop_reason", None)
                     if not stop_reason or getattr(stop_reason, "type", None) != "requires_action":
                         break
 
+        session_status = self._wait_for_settled_session(
+            session.id,
+            initial_status=session_status,
+            timeout_seconds=15.0,
+        )
         output_file_id, output_text = self._fetch_output_text(session.id, expected_output_path=Path(task.output_path).name)
-
-        self.client.beta.sessions.archive(session.id)
-        self.client.beta.agents.archive(agent.id)
-        self.client.beta.environments.archive(environment.id)
+        self._archive_session_if_idle(session.id, session_status=session_status, errors=errors)
+        self._best_effort_archive_agent(agent.id, errors=errors)
+        self._best_effort_archive_environment(environment.id, errors=errors)
         for subagent in subagent_records:
-            self.client.beta.agents.archive(subagent["id"])
+            self._best_effort_archive_agent(subagent["id"], errors=errors)
 
         return RunArtifacts(
             candidate_id=bundle.candidate_id,
@@ -160,6 +143,7 @@ class ManagedAgentRuntime:
             agent_version=agent.version,
             environment_id=environment.id,
             session_id=session.id,
+            session_status=session_status,
             output_text=output_text,
             output_file_id=output_file_id,
             outcome_result=outcome_result,
@@ -202,6 +186,26 @@ class ManagedAgentRuntime:
             timeout=60.0,
         )
         response.raise_for_status()
+
+    def _send_user_message(self, session_id: str, bundle: CandidateBundle, task: DummyTask) -> None:
+        self.client.beta.sessions.events.send(
+            session_id=session_id,
+            events=[
+                {
+                    "type": "user.message",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": bundle.render_task_prompt(
+                                task_summary=task.task_summary,
+                                input_path=task.input_path,
+                                output_path=task.output_path,
+                            ),
+                        }
+                    ],
+                }
+            ],
+        )
 
     def _build_agent_payload(
         self,
@@ -247,3 +251,87 @@ class ManagedAgentRuntime:
                     return file_meta.id, response.read().decode("utf-8")
             time.sleep(1.0)
         return None, None
+
+    def _interrupt_session(self, session_id: str) -> None:
+        try:
+            self.client.beta.sessions.events.send(
+                session_id=session_id,
+                events=[{"type": "user.interrupt"}],
+            )
+        except Exception:
+            return
+
+    def _wait_for_settled_session(
+        self,
+        session_id: str,
+        *,
+        initial_status: str | None,
+        timeout_seconds: float,
+        poll_interval_seconds: float = 1.0,
+    ) -> str | None:
+        status = initial_status
+        if status == "idle":
+            return status
+
+        deadline = time.monotonic() + timeout_seconds
+        while time.monotonic() < deadline:
+            try:
+                session = self.client.beta.sessions.retrieve(
+                    session_id,
+                    betas=["managed-agents-2026-04-01"],
+                )
+            except Exception:
+                return status
+
+            status = getattr(session, "status", status)
+            if status in {"idle", "terminated"}:
+                return status
+            time.sleep(poll_interval_seconds)
+        return status
+
+    def _archive_session_if_idle(self, session_id: str, *, session_status: str | None, errors: list[str]) -> None:
+        if session_status != "idle":
+            errors.append(
+                f"skipped session archive because session status was {session_status or 'unknown'}"
+            )
+            return
+        archive_error: Exception | None = None
+        for _ in range(3):
+            try:
+                session = self.client.beta.sessions.retrieve(
+                    session_id,
+                    betas=["managed-agents-2026-04-01"],
+                )
+            except Exception as exc:
+                archive_error = exc
+                break
+
+            latest_status = getattr(session, "status", None)
+            if latest_status != "idle":
+                errors.append(
+                    f"skipped session archive because session status was {latest_status or 'unknown'}"
+                )
+                return
+            try:
+                self.client.beta.sessions.archive(
+                    session_id,
+                    betas=["managed-agents-2026-04-01"],
+                )
+                return
+            except Exception as exc:
+                archive_error = exc
+                time.sleep(1.0)
+        if archive_error is not None:
+            errors.append(f"session archive failed: {archive_error}")
+
+    def _best_effort_archive_agent(self, agent_id: str, *, errors: list[str]) -> None:
+        try:
+            self.client.beta.agents.archive(agent_id)
+        except Exception as exc:
+            errors.append(f"agent archive failed: {exc}")
+
+    def _best_effort_archive_environment(self, environment_id: str, *, errors: list[str]) -> None:
+        try:
+            self.client.beta.environments.archive(environment_id)
+        except Exception as exc:
+            errors.append(f"environment archive failed: {exc}")
