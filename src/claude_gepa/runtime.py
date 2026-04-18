@@ -10,14 +10,18 @@ from uuid import uuid4
 import anthropic
 import httpx
 
-from .candidate import CandidateBundle, SubagentSpec
+from .candidate import CandidateBundle, CustomSkillSpec, SkillRef, SkillSpec, SubagentSpec
+from .skill_registry import LocalSkillRegistry
 from .tasks import DummyTask
 
 
 DEFAULT_MODEL = "claude-opus-4-7"
+MANAGED_AGENTS_BETA = "managed-agents-2026-04-01"
+RESEARCH_PREVIEW_BETA = "managed-agents-2026-04-01-research-preview"
+SKILLS_BETA = "skills-2025-10-02"
 STREAM_BETAS = [
-    "managed-agents-2026-04-01",
-    "managed-agents-2026-04-01-research-preview",
+    MANAGED_AGENTS_BETA,
+    RESEARCH_PREVIEW_BETA,
 ]
 OUTCOME_SEND_BETA = "agent-api-2026-03-01"
 
@@ -39,11 +43,20 @@ class RunArtifacts:
     event_types: list[str]
     usage: dict[str, int]
     errors: list[str]
+    resolved_skills: list[dict[str, Any]]
+    subagents: list[dict[str, Any]]
+    environment_config: dict[str, Any]
 
 
 class ManagedAgentRuntime:
-    def __init__(self, client: anthropic.Anthropic | None = None) -> None:
+    def __init__(
+        self,
+        client: anthropic.Anthropic | None = None,
+        *,
+        skill_registry_path: Path | None = None,
+    ) -> None:
         self.client = client or anthropic.Anthropic()
+        self.skill_registry = LocalSkillRegistry(skill_registry_path or Path(".claude_gepa") / "skill_registry.json")
 
     def run_task(
         self,
@@ -58,30 +71,35 @@ class ManagedAgentRuntime:
             file=(Path(task.input_path).name, task.input_text.encode("utf-8"), "text/plain")
         )
 
-        if bundle.subagents:
-            raise RuntimeError(
-                "subagent_specs is non-empty, but the installed anthropic Python SDK does not expose "
-                "typed callable_agents support for Managed Agents multi-agent sessions yet."
-            )
+        resolved_root_skills, root_skill_events = self._resolve_skills(bundle.skills)
+        subagent_records = self._create_subagents(bundle.subagents, suffix=suffix)
 
-        subagent_records = []
-        agent = self.client.beta.agents.create(**self._build_agent_payload(bundle, suffix, subagent_records))
+        agent = self._create_agent(
+            name=f"claude-gepa-agent-{suffix}",
+            system_prompt=bundle.system_prompt,
+            resolved_skills=resolved_root_skills,
+            description=None,
+            callable_agents=subagent_records,
+        )
         environment = self.client.beta.environments.create(
             name=f"claude-gepa-env-{suffix}",
             config=bundle.environment.config,
         )
-        session = self.client.beta.sessions.create(
-            agent={"type": "agent", "id": agent.id, "version": agent.version},
-            environment_id=environment.id,
-            resources=[
+        session_kwargs: dict[str, Any] = {
+            "agent": {"type": "agent", "id": agent.id, "version": agent.version},
+            "environment_id": environment.id,
+            "resources": [
                 {"type": "file", "file_id": uploaded_file.id, "mount_path": task.input_path},
             ],
-            title=f"claude-gepa-{task.task_id}",
-            metadata={
+            "title": f"claude-gepa-{task.task_id}",
+            "metadata": {
                 "candidate_id": bundle.candidate_id,
                 "task_id": task.task_id,
             },
-        )
+        }
+        if subagent_records:
+            session_kwargs["betas"] = [RESEARCH_PREVIEW_BETA]
+        session = self.client.beta.sessions.create(**session_kwargs)
 
         event_types: list[str] = []
         tool_events: list[dict[str, Any]] = []
@@ -104,7 +122,13 @@ class ManagedAgentRuntime:
                     break
                 event_types.append(event.type)
                 if event.type in {"agent.tool_use", "agent.tool_result"}:
-                    tool_events.append({"type": event.type, "tool_name": getattr(event, "tool_name", None)})
+                    tool_events.append(
+                        {
+                            "type": event.type,
+                            "tool_name": getattr(event, "tool_name", None),
+                            "session_thread_id": getattr(event, "session_thread_id", None),
+                        }
+                    )
                 elif event.type == "span.outcome_evaluation_end":
                     outcome_result = event.result
                     outcome_explanation = event.explanation
@@ -152,6 +176,9 @@ class ManagedAgentRuntime:
             event_types=event_types,
             usage=usage,
             errors=errors,
+            resolved_skills=root_skill_events,
+            subagents=subagent_records,
+            environment_config=bundle.environment.config,
         )
 
     def _send_initial_events(self, session_id: str, bundle: CandidateBundle, task: DummyTask) -> None:
@@ -207,43 +234,201 @@ class ManagedAgentRuntime:
             ],
         )
 
-    def _build_agent_payload(
-        self,
-        bundle: CandidateBundle,
-        suffix: str,
-        subagent_records: list[dict[str, Any]],
-    ) -> dict[str, Any]:
-        payload: dict[str, Any] = {
-            "name": f"claude-gepa-agent-{suffix}",
-            "model": DEFAULT_MODEL,
-            "system": bundle.system_prompt,
-            "tools": [
+    def _create_subagents(self, subagents: tuple[SubagentSpec, ...], *, suffix: str) -> list[dict[str, Any]]:
+        records: list[dict[str, Any]] = []
+        for index, subagent in enumerate(subagents, start=1):
+            resolved_skills, skill_events = self._resolve_skills(subagent.skills)
+            created = self._create_agent(
+                name=f"claude-gepa-subagent-{index}-{suffix}",
+                system_prompt=subagent.system_prompt,
+                resolved_skills=resolved_skills,
+                description=subagent.description,
+                callable_agents=None,
+            )
+            records.append(
                 {
-                    "type": "agent_toolset_20260401",
-                    "default_config": {
-                        "enabled": True,
-                        "permission_policy": {"type": "always_allow"},
-                    },
-                    "configs": [
-                        {"name": "web_search", "enabled": False},
-                        {"name": "web_fetch", "enabled": False},
-                    ],
+                    "id": created.id,
+                    "version": created.version,
+                    "name": subagent.name,
+                    "description": subagent.description,
+                    "resolved_skills": skill_events,
                 }
-            ],
+            )
+        return records
+
+    def _create_agent(
+        self,
+        *,
+        name: str,
+        system_prompt: str,
+        resolved_skills: list[SkillRef],
+        description: str | None,
+        callable_agents: list[dict[str, Any]] | None,
+    ):
+        kwargs: dict[str, Any] = {
+            "name": name,
+            "model": DEFAULT_MODEL,
+            "system": system_prompt,
+            "tools": self._build_agent_tools(),
         }
-        if bundle.skills:
-            payload["skills"] = [skill.to_api() for skill in bundle.skills]
-        if subagent_records:
-            payload["callable_agents"] = [
-                {"type": "agent", "id": record["id"]} for record in subagent_records
-            ]
-        return payload
+        if description is not None:
+            kwargs["description"] = description
+        if resolved_skills:
+            kwargs["skills"] = [skill.to_api() for skill in resolved_skills]
+        if callable_agents:
+            kwargs["extra_body"] = {
+                "callable_agents": [
+                    {"type": "agent", "id": record["id"], "version": record["version"]} for record in callable_agents
+                ]
+            }
+            kwargs["betas"] = [RESEARCH_PREVIEW_BETA]
+        return self.client.beta.agents.create(**kwargs)
+
+    def _build_agent_tools(self) -> list[dict[str, Any]]:
+        return [
+            {
+                "type": "agent_toolset_20260401",
+                "default_config": {
+                    "enabled": True,
+                    "permission_policy": {"type": "always_allow"},
+                },
+                "configs": [
+                    {"name": "web_search", "enabled": False},
+                    {"name": "web_fetch", "enabled": False},
+                ],
+            }
+        ]
+
+    def _resolve_skills(self, skills: tuple[SkillSpec, ...]) -> tuple[list[SkillRef], list[dict[str, Any]]]:
+        resolved: list[SkillRef] = []
+        events: list[dict[str, Any]] = []
+        for skill in skills:
+            if isinstance(skill, SkillRef):
+                resolved.append(skill)
+                events.append(
+                    {
+                        "resolution": "direct_ref",
+                        "type": skill.type,
+                        "skill_id": skill.skill_id,
+                        "version": skill.version,
+                    }
+                )
+                continue
+            resolved_ref, event = self._resolve_custom_skill(skill)
+            resolved.append(resolved_ref)
+            events.append(event)
+        return resolved, events
+
+    def _resolve_custom_skill(self, skill: CustomSkillSpec) -> tuple[SkillRef, dict[str, Any]]:
+        cached = self.skill_registry.find_by_fingerprint(skill.fingerprint)
+        if cached is not None:
+            return (
+                SkillRef(type="custom", skill_id=cached.skill_id, version=cached.version),
+                {
+                    "resolution": "registry_reuse",
+                    "skill_id": cached.skill_id,
+                    "version": cached.version,
+                    "logical_key": cached.logical_key,
+                    "fingerprint": cached.fingerprint,
+                    "display_title": cached.display_title,
+                },
+            )
+
+        lineage = self.skill_registry.find_latest_by_logical_key(skill.logical_key)
+        if lineage is not None:
+            created_version = self.client.beta.skills.versions.create(
+                lineage.skill_id,
+                files=skill.to_api_files(),
+                betas=[SKILLS_BETA],
+            )
+            entry = self.skill_registry.record(
+                fingerprint=skill.fingerprint,
+                logical_key=skill.logical_key,
+                skill_id=created_version.skill_id,
+                version=created_version.version,
+                display_title=skill.display_title,
+            )
+            return (
+                SkillRef(type="custom", skill_id=entry.skill_id, version=entry.version),
+                {
+                    "resolution": "created_version",
+                    "skill_id": entry.skill_id,
+                    "version": entry.version,
+                    "logical_key": entry.logical_key,
+                    "fingerprint": entry.fingerprint,
+                    "display_title": entry.display_title,
+                },
+            )
+
+        try:
+            created_skill = self.client.beta.skills.create(
+                display_title=skill.display_title,
+                files=skill.to_api_files(),
+                betas=[SKILLS_BETA],
+            )
+            return self._record_created_skill(
+                skill,
+                created_skill.id,
+                created_skill.latest_version or "latest",
+                "created_skill",
+            )
+        except Exception:
+            if skill.display_title is None:
+                raise
+            existing = self._find_custom_skill_by_display_title(skill.display_title)
+            if existing is None:
+                raise
+            created_version = self.client.beta.skills.versions.create(
+                existing.id,
+                files=skill.to_api_files(),
+                betas=[SKILLS_BETA],
+            )
+            return self._record_created_skill(
+                skill,
+                created_version.skill_id,
+                created_version.version,
+                "display_title_reuse",
+            )
+
+    def _record_created_skill(
+        self,
+        skill: CustomSkillSpec,
+        skill_id: str,
+        version: str,
+        resolution: str,
+    ) -> tuple[SkillRef, dict[str, Any]]:
+        entry = self.skill_registry.record(
+            fingerprint=skill.fingerprint,
+            logical_key=skill.logical_key,
+            skill_id=skill_id,
+            version=version,
+            display_title=skill.display_title,
+        )
+        return SkillRef(type="custom", skill_id=entry.skill_id, version=entry.version), {
+            "resolution": resolution,
+            "skill_id": entry.skill_id,
+            "version": entry.version,
+            "logical_key": entry.logical_key,
+            "fingerprint": entry.fingerprint,
+            "display_title": entry.display_title,
+        }
+
+    def _find_custom_skill_by_display_title(self, display_title: str) -> Any | None:
+        page = self.client.beta.skills.list(
+            source="custom",
+            limit=100,
+            betas=[SKILLS_BETA],
+        )
+        for item in getattr(page, "data", []):
+            if getattr(item, "display_title", None) == display_title:
+                return item
+        return None
 
     def _fetch_output_text(self, session_id: str, expected_output_path: str) -> tuple[str | None, str | None]:
         for _ in range(4):
             files = self.client.beta.files.list(
                 scope_id=session_id,
-                betas=["managed-agents-2026-04-01"],
+                betas=[MANAGED_AGENTS_BETA],
             )
             for file_meta in files.data:
                 if file_meta.filename == expected_output_path:
@@ -278,7 +463,7 @@ class ManagedAgentRuntime:
             try:
                 session = self.client.beta.sessions.retrieve(
                     session_id,
-                    betas=["managed-agents-2026-04-01"],
+                    betas=[MANAGED_AGENTS_BETA],
                 )
             except Exception:
                 return status
@@ -300,7 +485,7 @@ class ManagedAgentRuntime:
             try:
                 session = self.client.beta.sessions.retrieve(
                     session_id,
-                    betas=["managed-agents-2026-04-01"],
+                    betas=[MANAGED_AGENTS_BETA],
                 )
             except Exception as exc:
                 archive_error = exc
@@ -315,7 +500,7 @@ class ManagedAgentRuntime:
             try:
                 self.client.beta.sessions.archive(
                     session_id,
-                    betas=["managed-agents-2026-04-01"],
+                    betas=[MANAGED_AGENTS_BETA],
                 )
                 return
             except Exception as exc:

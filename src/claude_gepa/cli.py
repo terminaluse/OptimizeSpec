@@ -20,7 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
     eval_demo.add_argument("--run-dir", default="runs/eval-demo")
 
     optimize = subparsers.add_parser("optimize-demo", help="Run a GEPA optimization job from the weak demo seed.")
-    optimize.add_argument("--max-metric-calls", type=int, default=24)
+    optimize.add_argument("--max-metric-calls", type=int, default=48)
     optimize.add_argument("--reflection-model", default="anthropic/claude-opus-4-7")
     optimize.add_argument("--run-dir", default="runs/gepa-demo")
     optimize.add_argument("--max-runtime-seconds", type=float, default=120.0)
@@ -29,7 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
         "compare-demo",
         help="Show the input candidate, optimized candidate, and eval deltas on the widened benchmark.",
     )
-    compare.add_argument("--max-metric-calls", type=int, default=24)
+    compare.add_argument("--max-metric-calls", type=int, default=48)
     compare.add_argument("--reflection-model", default="anthropic/claude-opus-4-7")
     compare.add_argument("--run-dir", default="runs/compare-demo")
     compare.add_argument("--max-runtime-seconds", type=float, default=120.0)
