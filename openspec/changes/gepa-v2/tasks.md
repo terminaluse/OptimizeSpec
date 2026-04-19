@@ -13,6 +13,7 @@
 - [x] 2.3 Implement candidate-defined environment compilation into fresh Anthropic environments per evaluation
 - [x] 2.4 Replace the current subagent guardrail with real callable-agent creation and attachment from `subagent_specs`
 - [x] 2.5 Add runtime tests and smoke checks that verify non-prompt field changes alter the compiled execution path
+- [ ] 2.6 Remove or reduce misleading successful-run archive warnings such as `skipped session archive because session status was running` when the session later settles to `idle`
 
 ## 3. Evaluator feedback and reflection guidance
 
@@ -34,5 +35,5 @@
 
 - [x] 5.1 Run targeted live evaluations that change one structured field at a time and verify the runtime behavior changes accordingly, including create-versus-reuse behavior for candidate-defined skills
 - [ ] 5.2 Run an end-to-end `optimize_anything()` job on the expanded benchmark and verify GEPA accepts at least one non-seed candidate
-- [ ] 5.3 Capture and review the input candidate, final candidate, and evaluation deltas from the verification run
+- [ ] 5.3 Capture and review the input candidate, final candidate, and evaluation deltas from the verification run, incorporating the follow-up context recorded in `manual-test-findings.md`
 - [x] 5.4 Update project documentation to explain the structured-output compiler path, required Anthropic features, and operator workflow for full-surface runs
