@@ -115,8 +115,11 @@ The runtime now creates subagents as real Anthropic agents and wires them into t
 Important constraint:
 
 - multi-agent is still a research-preview Anthropic feature
+- multi-agent is disabled by default in this repo
+- enable it with `CLAUDE_GEPA_ENABLE_MULTI_AGENT=1` once your Anthropic account has access
 - the installed Python SDK does not type `callable_agents`, so the runtime sends that field through `extra_body`
-- if your account does not have multi-agent access, those evaluations will fail as scored runtime failures rather than crashing the loop
+- if `subagent_specs` is non-empty while the flag is off, the runtime fails early with a clear message instead of calling the preview API path
+- if the flag is on but your account still does not have multi-agent access, those evaluations fail as scored runtime failures rather than crashing the loop
 
 ## Quick start
 

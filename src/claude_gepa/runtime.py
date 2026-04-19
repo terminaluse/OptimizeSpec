@@ -24,6 +24,8 @@ STREAM_BETAS = [
     RESEARCH_PREVIEW_BETA,
 ]
 OUTCOME_SEND_BETA = "agent-api-2026-03-01"
+MULTI_AGENT_FLAG_ENV = "CLAUDE_GEPA_ENABLE_MULTI_AGENT"
+MAX_MANAGED_AGENT_SKILLS_PER_SESSION = 20
 
 
 @dataclass
@@ -54,9 +56,11 @@ class ManagedAgentRuntime:
         client: anthropic.Anthropic | None = None,
         *,
         skill_registry_path: Path | None = None,
+        enable_multi_agent: bool | None = None,
     ) -> None:
         self.client = client or anthropic.Anthropic()
         self.skill_registry = LocalSkillRegistry(skill_registry_path or Path(".claude_gepa") / "skill_registry.json")
+        self.enable_multi_agent = _resolve_feature_flag(enable_multi_agent, MULTI_AGENT_FLAG_ENV)
 
     def run_task(
         self,
@@ -71,7 +75,17 @@ class ManagedAgentRuntime:
             file=(Path(task.input_path).name, task.input_text.encode("utf-8"), "text/plain")
         )
 
+        total_skill_count = len(bundle.skills) + sum(len(subagent.skills) for subagent in bundle.subagents)
+        if total_skill_count > MAX_MANAGED_AGENT_SKILLS_PER_SESSION:
+            raise RuntimeError(
+                f"total skills across the managed-agent session must be <= {MAX_MANAGED_AGENT_SKILLS_PER_SESSION}"
+            )
+
         resolved_root_skills, root_skill_events = self._resolve_skills(bundle.skills)
+        if bundle.subagents and not self.enable_multi_agent:
+            raise RuntimeError(
+                f"subagent_specs requires {MULTI_AGENT_FLAG_ENV}=1 because multi-agent is a preview-gated feature"
+            )
         subagent_records = self._create_subagents(bundle.subagents, suffix=suffix)
 
         agent = self._create_agent(
@@ -378,6 +392,7 @@ class ManagedAgentRuntime:
             existing = self._find_custom_skill_by_display_title(skill.display_title)
             if existing is None:
                 raise
+            self._validate_existing_skill_lineage(skill, existing)
             created_version = self.client.beta.skills.versions.create(
                 existing.id,
                 files=skill.to_api_files(),
@@ -423,6 +438,23 @@ class ManagedAgentRuntime:
             if getattr(item, "display_title", None) == display_title:
                 return item
         return None
+
+    def _validate_existing_skill_lineage(self, skill: CustomSkillSpec, existing_skill: Any) -> None:
+        latest_version = getattr(existing_skill, "latest_version", None)
+        if not latest_version:
+            return
+        version = self.client.beta.skills.versions.retrieve(
+            latest_version,
+            skill_id=existing_skill.id,
+            betas=[SKILLS_BETA],
+        )
+        existing_name = getattr(version, "name", None)
+        if existing_name and existing_name != skill.skill_name:
+            raise RuntimeError(
+                "custom skill display_title collision cannot be reused because the existing skill lineage "
+                f"uses name {existing_name!r} but the candidate defines {skill.skill_name!r}. "
+                "Use a unique display_title or keep the same SKILL.md name when creating a new version."
+            )
 
     def _fetch_output_text(self, session_id: str, expected_output_path: str) -> tuple[str | None, str | None]:
         for _ in range(4):
@@ -520,3 +552,10 @@ class ManagedAgentRuntime:
             self.client.beta.environments.archive(environment_id)
         except Exception as exc:
             errors.append(f"environment archive failed: {exc}")
+
+
+def _resolve_feature_flag(explicit_value: bool | None, env_var: str) -> bool:
+    if explicit_value is not None:
+        return explicit_value
+    raw_value = os.environ.get(env_var, "")
+    return raw_value.strip().lower() in {"1", "true", "yes", "on"}

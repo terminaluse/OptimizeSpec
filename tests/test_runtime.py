@@ -1,6 +1,14 @@
 from types import SimpleNamespace
 
-from claude_gepa.candidate import CustomSkillSpec, SkillFile
+import pytest
+
+from claude_gepa.candidate import (
+    CandidateBundle,
+    CustomSkillSpec,
+    EnvironmentSpec,
+    SkillFile,
+    SubagentSpec,
+)
 from claude_gepa.runtime import ManagedAgentRuntime
 
 
@@ -52,6 +60,9 @@ class _FakeAgents:
 
 
 class _FakeEnvironments:
+    def create(self, *, name: str, config):
+        return SimpleNamespace(id="env_test", config=config)
+
     def archive(self, environment_id: str) -> None:
         return None
 
@@ -62,6 +73,7 @@ class _FakeBeta:
         self.skills = _FakeSkills()
         self.agents = _FakeAgents()
         self.environments = _FakeEnvironments()
+        self.files = SimpleNamespace(upload=lambda file: SimpleNamespace(id="file_test"))
 
 
 class _FakeClient:
@@ -89,6 +101,30 @@ def _make_custom_skill(*, fingerprint: str = "fp1") -> CustomSkillSpec:
         skill_description="Verification checklist for deterministic file-output tasks.",
         logical_key="exact-output-checklist:exact-output-checklist",
         fingerprint=fingerprint,
+    )
+
+
+def _make_bundle_with_subagent() -> CandidateBundle:
+    return CandidateBundle(
+        raw_fields={},
+        fields={
+            "system_prompt": "Coordinate work.",
+            "task_prompt": "Task {task_summary} {input_path} {output_path}",
+            "outcome_rubric": "Write to {output_path}",
+            "skills": "[]\n",
+            "environment_spec": "type: cloud\n",
+            "subagent_specs": "- name: verifier\n",
+        },
+        candidate_id="cand_test",
+        skills=(),
+        environment=EnvironmentSpec(
+            config={
+                "type": "cloud",
+                "networking": {"type": "limited", "allowed_hosts": [], "allow_mcp_servers": False, "allow_package_managers": False},
+                "packages": {"type": "packages", "apt": [], "cargo": [], "gem": [], "go": [], "npm": [], "pip": []},
+            }
+        ),
+        subagents=(SubagentSpec(name="verifier", system_prompt="Verify output."),),
     )
 
 
@@ -169,7 +205,11 @@ def test_resolve_custom_skill_creates_new_version_for_known_logical_key(tmp_path
 
 
 def test_create_agent_includes_callable_agents_extra_body(tmp_path) -> None:
-    runtime = ManagedAgentRuntime(client=_FakeClient(), skill_registry_path=tmp_path / "skills.json")
+    runtime = ManagedAgentRuntime(
+        client=_FakeClient(),
+        skill_registry_path=tmp_path / "skills.json",
+        enable_multi_agent=True,
+    )
 
     runtime._create_agent(
         name="main-agent",
@@ -184,3 +224,28 @@ def test_create_agent_includes_callable_agents_extra_body(tmp_path) -> None:
         "callable_agents": [{"type": "agent", "id": "agent_sub", "version": 7}]
     }
     assert create_call["betas"] == ["managed-agents-2026-04-01-research-preview"]
+
+
+def test_run_task_rejects_subagents_when_multi_agent_flag_is_disabled(tmp_path) -> None:
+    runtime = ManagedAgentRuntime(client=_FakeClient(), skill_registry_path=tmp_path / "skills.json")
+
+    with pytest.raises(RuntimeError) as excinfo:
+        runtime.run_task(
+            _make_bundle_with_subagent(),
+            SimpleNamespace(
+                task_id="task1",
+                input_path="/workspace/task_input.txt",
+                input_text="hello",
+                output_path="/mnt/session/outputs/result.txt",
+                task_summary="verify",
+            ),
+        )
+
+    assert "CLAUDE_GEPA_ENABLE_MULTI_AGENT=1" in str(excinfo.value)
+
+
+def test_runtime_reads_multi_agent_flag_from_env(monkeypatch, tmp_path) -> None:
+    monkeypatch.setenv("CLAUDE_GEPA_ENABLE_MULTI_AGENT", "1")
+    runtime = ManagedAgentRuntime(client=_FakeClient(), skill_registry_path=tmp_path / "skills.json")
+
+    assert runtime.enable_multi_agent is True

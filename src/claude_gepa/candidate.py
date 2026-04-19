@@ -15,6 +15,8 @@ import yaml
 
 DEFAULT_MODEL = "claude-opus-4-7"
 SKILL_NAME_RE = re.compile(r"^[a-z0-9-]{1,64}$")
+SKILL_DESCRIPTION_MAX_CHARS = 1024
+CUSTOM_SKILL_MAX_UPLOAD_BYTES = 30 * 1024 * 1024
 
 DEFAULT_SEED_CANDIDATE: dict[str, str] = {
     "system_prompt": (
@@ -512,6 +514,8 @@ def _skill_spec_from_model(model: _CompilerSkillSpec, *, field_name: str) -> Ski
     if skill_type == "anthropic":
         if not model.skill_id:
             raise ValueError(f"{field_name}: anthropic skill entries require skill_id")
+        if model.version is not None:
+            raise ValueError(f"{field_name}: anthropic managed-agent skill refs must not include version")
         if model.files:
             raise ValueError(f"{field_name}: anthropic skill entries must not include files")
         return SkillRef(type="anthropic", skill_id=model.skill_id, version=model.version)
@@ -558,6 +562,11 @@ def _custom_skill_from_models(
     file_by_path = {item.normalized_path: item for item in normalized_files}
     if skill_md_path not in file_by_path:
         raise ValueError(f"{field_name}: custom skill definitions must include {skill_md_path}")
+    total_upload_bytes = sum(len(item.content.encode("utf-8")) for item in normalized_files)
+    if total_upload_bytes > CUSTOM_SKILL_MAX_UPLOAD_BYTES:
+        raise ValueError(
+            f"{field_name}: custom skill upload size must be <= {CUSTOM_SKILL_MAX_UPLOAD_BYTES} bytes"
+        )
 
     skill_name, skill_description = _parse_skill_frontmatter(file_by_path[skill_md_path].content, field_name=field_name)
     fingerprint = sha256(
@@ -596,8 +605,16 @@ def _parse_skill_frontmatter(content: str, *, field_name: str) -> tuple[str, str
         raise ValueError(
             f"{field_name}: SKILL.md frontmatter name must be lowercase letters, numbers, or hyphens only"
         )
+    if "<" in name or ">" in name:
+        raise ValueError(f"{field_name}: SKILL.md frontmatter name must not contain XML tags")
     if not description:
         raise ValueError(f"{field_name}: SKILL.md frontmatter must include a non-empty description")
+    if len(description) > SKILL_DESCRIPTION_MAX_CHARS:
+        raise ValueError(
+            f"{field_name}: SKILL.md frontmatter description must be <= {SKILL_DESCRIPTION_MAX_CHARS} characters"
+        )
+    if "<" in description or ">" in description:
+        raise ValueError(f"{field_name}: SKILL.md frontmatter description must not contain XML tags")
     return name, description
 
 
