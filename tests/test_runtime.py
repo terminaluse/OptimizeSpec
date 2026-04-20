@@ -144,7 +144,7 @@ def test_wait_for_settled_session_polls_until_idle(monkeypatch) -> None:
 
 
 def test_archive_session_if_idle_skips_running_session() -> None:
-    sessions = _FakeSessions(["running"])
+    sessions = _FakeSessions(["running", "running", "running"])
     runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
     errors: list[str] = []
 
@@ -163,6 +163,18 @@ def test_archive_session_if_idle_records_archive_failures() -> None:
 
     assert sessions.archive_calls == ["sesn_test", "sesn_test", "sesn_test"]
     assert errors == ["session archive failed: boom"]
+
+
+def test_archive_session_if_idle_waits_for_idle_before_archiving(monkeypatch) -> None:
+    sessions = _FakeSessions(["running", "idle"])
+    runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
+    errors: list[str] = []
+    monkeypatch.setattr("claude_gepa.runtime.time.sleep", lambda _: None)
+
+    runtime._archive_session_if_idle("sesn_test", session_status="idle", errors=errors)
+
+    assert sessions.archive_calls == ["sesn_test"]
+    assert errors == []
 
 
 def test_resolve_custom_skill_reuses_registry_entry(tmp_path) -> None:

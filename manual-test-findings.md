@@ -94,9 +94,13 @@ Status: fixed locally. Long end-to-end optimize workflow still needs a full manu
 
 ## Remaining Local Fixes / Polish
 
-### 4. Session archive cleanup still logs noisy warnings on successful runs
+No known local correctness bug remains from the manual contract pass.
 
-Observed message on otherwise successful runs:
+The previous archive-warning issue is now fixed.
+
+### 4. Session archive cleanup warning noise
+
+Previous observed message:
 
 ```text
 skipped session archive because session status was running
@@ -104,20 +108,16 @@ skipped session archive because session status was running
 
 Context:
 
-- Some successful runs later show `session_status = idle` in the final runtime metadata.
-- Archive cleanup still sometimes emits the earlier `running` warning.
+- `_archive_session_if_idle(...)` was re-checking once and recording a warning too eagerly.
+- Some runs later settled to `idle`, so the warning was stale noise rather than a real failure.
 
-Impact:
+Fix:
 
-- Does not break evaluation.
-- Makes successful runs look noisier than they should.
+- Updated [src/claude_gepa/runtime.py](/Users/vraja/Desktop/cc/sb0/claude-gepa/src/claude_gepa/runtime.py) so archive cleanup now polls briefly for `idle` before giving up.
+- Added coverage for the “running then idle” case in [tests/test_runtime.py](/Users/vraja/Desktop/cc/sb0/claude-gepa/tests/test_runtime.py).
+- Re-verified with a real successful run; the warning no longer appears.
 
-Likely fix direction:
-
-- tighten the settle/archive ordering
-- avoid recording the warning if the session later settles to `idle`
-
-Status: not fixed yet.
+Status: fixed and manually verified.
 
 ## Non-Local / Access-Gated Findings
 
@@ -163,24 +163,35 @@ Status: treated as Anthropic feature availability, not a local implementation bu
 
 These are not known bugs. They are incomplete manual verification items.
 
-### 7. `optimize-demo` has not been manually waited through to a final completed payload after the latest fixes
+### 7. `optimize-demo` verification outcome
 
 Context:
 
-- Real runs show progress and artifact creation under `runs/manual-live/optimize-demo`.
-- A full completed end-to-end result was not yet captured during the manual pass.
+- A real run completed under `runs/manual-live/optimize-demo-final`.
+- GEPA completed normally and proposed at least one new `system_prompt`.
+- The base candidate remained the best candidate.
 
-What remains:
+Observed result:
 
-- run `claude-gepa optimize-demo` to completion
-- inspect `candidates.json`, `run_log*`, and final best-candidate output
+```text
+Iteration 0: Base program full valset score: 1.0 over 5 / 5 examples
+Iteration 1: Proposed new text for system_prompt ...
+Iteration 1: New subsample score 3.0 is not better than old score 3.0, skipping
+```
+
+Implication:
+
+- The optimizer path is functioning.
+- The current `DEMO_SEED_CANDIDATE` plus current benchmark is already strong enough that the run did not accept a non-seed candidate.
+- OpenSpec task `5.2` is therefore still open, but it is currently a benchmark/seed-pressure issue rather than a broken optimize workflow.
 
 ### 8. `compare-demo` has not yet been manually run to completion with the real API
 
 Context:
 
 - The reporting path exists.
-- It has not yet been manually exercised to completion against the real API after the latest fixes.
+- A real run is in progress under `runs/manual-live/compare-demo-final`.
+- It has finished the optimize phase and has already produced baseline-eval artifacts, but a final completed compare payload has not yet been captured in this pass.
 
 What remains:
 

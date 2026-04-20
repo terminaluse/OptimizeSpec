@@ -13,7 +13,7 @@
 - [x] 2.3 Implement candidate-defined environment compilation into fresh Anthropic environments per evaluation
 - [x] 2.4 Replace the current subagent guardrail with real callable-agent creation and attachment from `subagent_specs`
 - [x] 2.5 Add runtime tests and smoke checks that verify non-prompt field changes alter the compiled execution path
-- [ ] 2.6 Remove or reduce misleading successful-run archive warnings such as `skipped session archive because session status was running` when the session later settles to `idle`
+- [x] 2.6 Remove or reduce misleading successful-run archive warnings such as `skipped session archive because session status was running` when the session later settles to `idle`
 
 ## 3. Evaluator feedback and reflection guidance
 

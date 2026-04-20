@@ -513,6 +513,7 @@ class ManagedAgentRuntime:
             )
             return
         archive_error: Exception | None = None
+        latest_status: str | None = session_status
         for _ in range(3):
             try:
                 session = self.client.beta.sessions.retrieve(
@@ -523,12 +524,10 @@ class ManagedAgentRuntime:
                 archive_error = exc
                 break
 
-            latest_status = getattr(session, "status", None)
+            latest_status = getattr(session, "status", latest_status)
             if latest_status != "idle":
-                errors.append(
-                    f"skipped session archive because session status was {latest_status or 'unknown'}"
-                )
-                return
+                time.sleep(1.0)
+                continue
             try:
                 self.client.beta.sessions.archive(
                     session_id,
@@ -538,6 +537,11 @@ class ManagedAgentRuntime:
             except Exception as exc:
                 archive_error = exc
                 time.sleep(1.0)
+        if latest_status != "idle":
+            errors.append(
+                f"skipped session archive because session status was {latest_status or 'unknown'}"
+            )
+            return
         if archive_error is not None:
             errors.append(f"session archive failed: {archive_error}")
 
