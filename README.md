@@ -1,43 +1,30 @@
 # Agent GEPA
 
-Agent GEPA helps you create a self-improvement system for your agent.
+Create a self-improvement system for your agent.
 
-Most agents fail in ways that are hard to reproduce: a prompt works on one task, misses an edge case on another, and gets worse when you try to fix it manually. This project gives you a practical eval and optimization loop around your Claude Managed Agent:
+Agent GEPA gives you a repeatable loop for improving a Claude Managed Agent with evidence instead of guesswork. You define evals, run the agent, capture scores and useful feedback, let GEPA propose better instructions/configuration, and compare the improved candidate against the baseline.
 
-1. Define what good behavior looks like with evals.
-2. Run the agent against those evals.
-3. Capture scores and useful feedback from each rollout.
-4. Let GEPA propose better agent instructions, skills, environment settings, and related configuration.
-5. Compare the improved candidate against the baseline.
+Most agent work still looks like manual prompt tuning: try a change, run a few examples, hope it generalizes. Agent GEPA turns that into a workflow:
 
-The goal is not just to run a benchmark. The goal is to build a repeatable improvement workflow that produces evidence: what changed, why it changed, which evals improved, and which failures still need work.
+1. Describe what good behavior means.
+2. Run evals against the current agent.
+3. Capture numeric scores plus Actionable Side Information.
+4. Let GEPA mutate prompts, skills, environment settings, rubrics, and subagent specs.
+5. Compare the new candidate against the old one on the same evals.
 
-## Why care?
+The result is not just a benchmark. It is an improvement loop with artifacts: what changed, why it changed, which cases improved, and what still failed.
 
-Use this when you have an agent that is important enough to improve systematically.
-
-Agent GEPA can help you:
-
-- create evals for a Claude Managed Agent
-- optimize prompts and agent configuration with GEPA
-- compare baseline and improved candidates on the same tasks
-- capture Actionable Side Information so failures can guide the next candidate
-- validate that an eval and optimization loop actually runs end to end
-- avoid guessing whether an agent got better
-
-This repo also includes a skill workflow for helping a coding agent create evals and apply the GEPA optimization loop to an existing Claude Managed Agents project.
-
-## What is in this repo?
+## What You Get
 
 - A working Claude Managed Agents runtime wired to GEPA.
-- A candidate model where GEPA can mutate prompts, skills, environment configuration, rubrics, and subagent specs.
+- A candidate model GEPA can optimize across prompts, skills, environment config, rubrics, and subagents.
 - Direct eval, optimize, and compare commands.
-- A repo-local skill pack under `skills/` for designing eval-driven self-improvement workflows.
-- Fixture-based validation that checks whether the eval workflow can generate artifacts, run evals, run optimization, and fail usefully when inputs are incomplete.
+- A repo-local skill pack for creating eval-driven self-improvement workflows in other agent projects.
+- Validation fixtures that prove eval generation, scoring, comparison, optimization, and failure handling all run end to end.
 
-## Quick start
+## Quick Start
 
-Create an environment and install the package:
+Install the repo:
 
 ```bash
 uv venv
@@ -45,95 +32,101 @@ source .venv/bin/activate
 uv pip install -e '.[dev]'
 ```
 
-Run the local validation suite first. This does not call the live API:
+Run the local test suite:
 
 ```bash
 pytest -q
 ```
 
-Run the deterministic self-improvement smoke commands:
+Run a deterministic eval smoke test:
 
 ```bash
-agent-gepa self-show-candidate --candidate skills/gepa-evals-common/assets/templates/seed-candidate.yaml --pretty
 agent-gepa self-eval \
   --cases skills/gepa-evals-common/assets/templates/eval-cases.yaml \
   --candidate skills/gepa-evals-common/assets/templates/seed-candidate.yaml \
   --run-dir runs/self-eval-smoke
 ```
 
-## Live API setup
+That command does not call the live API. It proves the self-improvement eval runner can load eval cases, load a candidate, execute rollouts, score them, and persist ASI artifacts.
 
-Live Claude Managed Agents runs require Anthropic Research Preview access, the dedicated Research Preview SDK, and the Managed Agents beta header used by the package.
+## Live Managed Agents
 
-Install the preview SDK:
+Live runs require Anthropic Research Preview access for Claude Managed Agents.
+
+Install the Research Preview SDK:
 
 ```bash
 uv pip install -r requirements-managed-agents-preview.txt
 ```
 
-Set your Anthropic API key:
+Set your API key:
 
 ```bash
 export ANTHROPIC_API_KEY=...
 ```
 
-Run one direct live evaluation. This is the cheapest useful live check:
+Run one live evaluation:
 
 ```bash
 agent-gepa eval-demo --max-runtime-seconds 300
 ```
 
-Run the opt-in GEPA improvement sanity check. This starts with a deliberately weak candidate and asserts GEPA improves it from `0.0` to `1.0`:
-
-```bash
-AGENT_GEPA_RUN_LIVE_IMPROVEMENT=1 pytest tests/test_gepa_improvement_live.py -q
-```
-
-Run a small live GEPA optimization smoke:
+Run a small live optimization smoke:
 
 ```bash
 agent-gepa optimize-demo --max-metric-calls 1 --max-runtime-seconds 300
 ```
 
-`compare-demo` runs optimize plus before/after live evaluations across the demo suite. It is intentionally heavier and is documented in [TECHNICAL.md](TECHNICAL.md).
+Run the live improvement sanity check:
 
-## Eval self-improvement workflow
+```bash
+AGENT_GEPA_RUN_LIVE_IMPROVEMENT=1 pytest tests/test_gepa_improvement_live.py -q
+```
 
-The repo includes skills under `skills/` that guide a coding agent through creating and applying a GEPA eval workflow.
+The sanity check starts from a deliberately weak candidate, runs GEPA, and asserts the optimized candidate improves from `0.0` to `1.0`.
 
-The skill folders follow the standard root-level convention:
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `pytest -q` | Runs the default local test suite. Live GEPA tests are skipped unless explicitly enabled. |
+| `agent-gepa self-show-candidate --candidate <file>` | Prints a self-improvement candidate so you can inspect the mutable fields. |
+| `agent-gepa self-eval --cases <cases.yaml> --candidate <candidate.yaml>` | Runs deterministic eval cases and writes rollout artifacts, scores, and ASI. |
+| `agent-gepa self-compare --cases <cases.yaml> --baseline <a.yaml> --candidate <b.yaml>` | Compares two candidates on the same eval cases and reports deltas. |
+| `agent-gepa eval-demo` | Runs one live Claude Managed Agents evaluation. Best first live check. |
+| `agent-gepa optimize-demo --max-metric-calls 1` | Runs a small live GEPA optimization smoke. |
+| `agent-gepa compare-demo` | Runs optimize plus before/after live evaluations across the demo suite. Useful, but slower and more expensive. |
+
+`--max-metric-calls` is GEPA's eval budget. Higher values give GEPA more chances to test and improve candidates, but each call can mean another live rollout.
+
+## Skills For Other Agent Projects
+
+The `skills/` folder contains a workflow a coding agent can use to create evals and apply GEPA to another Claude Managed Agents project:
 
 ```text
 skills/
   gepa-evals-new/
-    SKILL.md
   gepa-evals-continue/
-    SKILL.md
   gepa-evals-apply/
-    SKILL.md
   gepa-evals-verify/
-    SKILL.md
   gepa-evals-common/
-    SKILL.md
 ```
 
 Use them in this order:
 
-1. `gepa-evals-new`: start a change and define the eval objective, input/output examples, scoring, qualitative rubric, and ASI needs.
+1. `gepa-evals-new`: define the target agent, eval objective, input/output examples, scoring, qualitative rubric, and ASI needs.
 2. `gepa-evals-continue`: create the design, specs, and task artifacts.
-3. `gepa-evals-apply`: implement the eval runner, scorers, compare path, and GEPA optimizer from the artifacts.
+3. `gepa-evals-apply`: implement the eval runner, scorers, compare path, and GEPA optimizer.
 4. `gepa-evals-verify`: check artifact completeness, ASI quality, direct eval, compare, and optimize readiness.
 
-If your coding agent automatically loads repo-local skills, point it at this repository and ask it to use the relevant `gepa-evals-*` skill. If it expects skills in a global directory, copy the needed `skills/gepa-evals-*` folders there.
+If your coding agent loads repo-local skills, point it at this repository and ask it to use the relevant `gepa-evals-*` skill. If it expects global skills, copy the needed `skills/gepa-evals-*` folders into that skills directory.
 
-The workflow is inspired by OpenSpec, but focused on agent self-improvement: the artifacts are not just documentation, they become the plan for a runnable eval and GEPA loop.
+## Current Scope
+
+Agent GEPA currently focuses on Claude Managed Agents. Other runtimes can be added later, but this first version keeps the runtime surface narrow so the eval and optimization loop can be validated end to end.
+
+For implementation details, candidate fields, preview SDK notes, validation internals, and heavier commands, see [TECHNICAL.md](TECHNICAL.md).
 
 ## License
 
 MIT
-
-## Current scope
-
-The current implementation focuses on Claude Managed Agents. Other agent runtimes can be added later, but the first version intentionally keeps the runtime surface narrow so the eval and optimization loop can be validated end to end.
-
-For implementation details, command references, candidate fields, preview SDK notes, and validation internals, see [TECHNICAL.md](TECHNICAL.md).
