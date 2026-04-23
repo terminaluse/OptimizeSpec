@@ -8,6 +8,7 @@ from typing import Sequence
 
 from .candidate import DEFAULT_SEED_CANDIDATE
 from .evaluator import ManagedAgentEvaluator
+from . import eval_validation
 from .optimizer import DEMO_SEED_CANDIDATE, diff_candidates, evaluate_candidate_suite, optimize_demo
 from .self_improvement import (
     TemplateEchoExecutor,
@@ -26,6 +27,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     eval_demo = subparsers.add_parser("eval-demo", help="Run one direct evaluation on the first validation task.")
     eval_demo.add_argument("--run-dir", default="runs/eval-demo")
+    eval_demo.add_argument("--max-runtime-seconds", type=float, default=300.0)
 
     optimize = subparsers.add_parser("optimize-demo", help="Run a GEPA optimization job from the weak demo seed.")
     optimize.add_argument("--max-metric-calls", type=int, default=48)
@@ -75,6 +77,12 @@ def build_parser() -> argparse.ArgumentParser:
     self_show.add_argument("--candidate", required=True, help="YAML or JSON candidate file.")
     self_show.add_argument("--pretty", action="store_true")
 
+    eval_validation_parser = subparsers.add_parser(
+        "eval-validation",
+        help="Run GEPA eval workflow validation commands. Use `claude-gepa eval-validation -- <command> ...`.",
+    )
+    eval_validation_parser.add_argument("eval_validation_args", nargs=argparse.REMAINDER)
+
     return parser
 
 
@@ -83,9 +91,9 @@ def require_api_key() -> None:
         raise SystemExit("ANTHROPIC_API_KEY is required")
 
 
-def cmd_eval_demo(run_dir: str) -> int:
+def cmd_eval_demo(run_dir: str, max_runtime_seconds: float) -> int:
     require_api_key()
-    evaluator = ManagedAgentEvaluator(run_dir=Path(run_dir))
+    evaluator = ManagedAgentEvaluator(run_dir=Path(run_dir), max_runtime_seconds=max_runtime_seconds)
     score, side_info = evaluator(dict(DEFAULT_SEED_CANDIDATE), example=VAL_TASKS[0])
     print(json.dumps({"score": score, "side_info": side_info}, indent=2, sort_keys=True))
     return 0
@@ -260,7 +268,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "eval-demo":
-        return cmd_eval_demo(args.run_dir)
+        return cmd_eval_demo(args.run_dir, args.max_runtime_seconds)
     if args.command == "optimize-demo":
         return cmd_optimize_demo(
             args.max_metric_calls,
@@ -294,6 +302,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cmd_self_compare(args.cases, args.baseline, args.candidate, args.run_dir, args.timeout_seconds)
     if args.command == "self-show-candidate":
         return cmd_self_show_candidate(args.candidate, args.pretty)
+    if args.command == "eval-validation":
+        validation_args = list(args.eval_validation_args)
+        if validation_args and validation_args[0] == "--":
+            validation_args = validation_args[1:]
+        return eval_validation.main(validation_args)
 
     parser.error(f"unknown command: {args.command}")
     return 2

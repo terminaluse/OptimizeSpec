@@ -1,0 +1,20 @@
+id: missing-invocation-details
+name: missing-invocation-details
+fixture_type: negative
+runtime: Claude Managed Agents
+description: Negative fixture where the agent invocation details are insufficient to design a runner.
+source_files: {}
+existing_commands: {}
+candidate_fields:
+  - system_prompt
+expected_failure: missing invocation details
+runtime_facts:
+  - The runtime claim is present but source and command evidence are absent.
+v1_constraints:
+  - The workflow must block apply when it cannot discover how to run the target agent.
+expected_behavior:
+  semantic_checks: {}
+  live:
+    requires_live: false
+    required_env:
+      - ANTHROPIC_API_KEY

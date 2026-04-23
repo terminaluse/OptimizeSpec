@@ -9,17 +9,18 @@ from claude_gepa.candidate import (
     SkillFile,
     SubagentSpec,
 )
-from claude_gepa.runtime import ManagedAgentRuntime
+from claude_gepa.runtime import ManagedAgentRuntime, _require_managed_agents_preview_sdk
 
 
 class _FakeSessions:
-    def __init__(self, statuses: list[str], *, archive_error: Exception | None = None) -> None:
+    def __init__(self, statuses: list[str], *, archive_error: Exception | None = None, default_status: str = "idle") -> None:
         self._statuses = list(statuses)
         self.archive_calls: list[str] = []
         self.archive_error = archive_error
+        self.default_status = default_status
 
     def retrieve(self, session_id: str, *, betas: list[str]) -> SimpleNamespace:
-        status = self._statuses.pop(0) if self._statuses else "idle"
+        status = self._statuses.pop(0) if self._statuses else self.default_status
         return SimpleNamespace(status=status)
 
     def archive(self, session_id: str, *, betas: list[str]) -> None:
@@ -143,38 +144,53 @@ def test_wait_for_settled_session_polls_until_idle(monkeypatch) -> None:
     assert status == "idle"
 
 
-def test_archive_session_if_idle_skips_running_session() -> None:
-    sessions = _FakeSessions(["running", "running", "running"])
-    runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
-    errors: list[str] = []
+def test_preview_sdk_preflight_reports_missing_surfaces() -> None:
+    client = SimpleNamespace(beta=SimpleNamespace(sessions=SimpleNamespace(create=lambda **_: None)))
 
-    runtime._archive_session_if_idle("sesn_test", session_status="running", errors=errors)
+    with pytest.raises(RuntimeError, match="Managed Agents Research Preview SDK"):
+        _require_managed_agents_preview_sdk(client)
+
+
+def test_archive_session_if_idle_skips_running_session(monkeypatch) -> None:
+    sessions = _FakeSessions(["running", "running", "running"], default_status="running")
+    runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
+    cleanup_warnings: list[str] = []
+    monkeypatch.setattr("claude_gepa.runtime.time.sleep", lambda _: None)
+
+    runtime._archive_session_if_idle(
+        "sesn_test",
+        session_status="running",
+        cleanup_warnings=cleanup_warnings,
+        max_wait_seconds=0.01,
+        poll_interval_seconds=0.001,
+    )
 
     assert sessions.archive_calls == []
-    assert errors == ["skipped session archive because session status was running"]
+    assert cleanup_warnings == ["skipped session archive because session status was running"]
 
 
-def test_archive_session_if_idle_records_archive_failures() -> None:
+def test_archive_session_if_idle_records_archive_failures(monkeypatch) -> None:
     sessions = _FakeSessions(["idle"], archive_error=RuntimeError("boom"))
     runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
-    errors: list[str] = []
+    cleanup_warnings: list[str] = []
+    monkeypatch.setattr("claude_gepa.runtime.time.sleep", lambda _: None)
 
-    runtime._archive_session_if_idle("sesn_test", session_status="idle", errors=errors)
+    runtime._archive_session_if_idle("sesn_test", session_status="idle", cleanup_warnings=cleanup_warnings)
 
     assert sessions.archive_calls == ["sesn_test", "sesn_test", "sesn_test"]
-    assert errors == ["session archive failed: boom"]
+    assert cleanup_warnings == ["session archive failed: boom"]
 
 
 def test_archive_session_if_idle_waits_for_idle_before_archiving(monkeypatch) -> None:
     sessions = _FakeSessions(["running", "idle"])
     runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
-    errors: list[str] = []
+    cleanup_warnings: list[str] = []
     monkeypatch.setattr("claude_gepa.runtime.time.sleep", lambda _: None)
 
-    runtime._archive_session_if_idle("sesn_test", session_status="idle", errors=errors)
+    runtime._archive_session_if_idle("sesn_test", session_status="idle", cleanup_warnings=cleanup_warnings)
 
     assert sessions.archive_calls == ["sesn_test"]
-    assert errors == []
+    assert cleanup_warnings == []
 
 
 def test_resolve_custom_skill_reuses_registry_entry(tmp_path) -> None:

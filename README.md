@@ -131,25 +131,39 @@ source .venv/bin/activate
 uv pip install -e '.[dev]'
 ```
 
-2. Export your Anthropic key:
+2. Install the Managed Agents Research Preview SDK for live Managed Agent runs:
+
+```bash
+uv pip install -r requirements-managed-agents-preview.txt
+```
+
+Deterministic tests and fixture validation do not require this preview wheel, but live Managed Agents API calls do. The runtime uses the `managed-agents-2026-04-01-research-preview` beta header and will print this install command if the installed SDK is missing the required preview surfaces.
+
+3. Export your Anthropic key:
 
 ```bash
 export ANTHROPIC_API_KEY=...
 ```
 
-3. Run one direct evaluation:
+4. Run one direct evaluation:
 
 ```bash
 claude-gepa eval-demo
 ```
 
-4. Run a GEPA optimization job:
+For live Managed Agent runs, allow enough time for the session to settle and cleanup:
+
+```bash
+claude-gepa eval-demo --max-runtime-seconds 300
+```
+
+5. Run a GEPA optimization job:
 
 ```bash
 claude-gepa optimize-demo --max-metric-calls 48
 ```
 
-5. Compare the seed candidate against the accepted best candidate:
+6. Compare the seed candidate against the accepted best candidate:
 
 ```bash
 claude-gepa compare-demo --max-metric-calls 48
@@ -217,6 +231,61 @@ Known v1 limits:
 - other agent runtimes such as Codex are intentionally out of scope
 - qualitative rubric scoring needs a target-repo scorer implementation
 - live optimize runs can be expensive; start with direct eval and small budgets
+
+## Eval workflow validation
+
+The eval workflow validation harness checks whether the GEPA eval skill workflow is ready to share beyond this repo. It deliberately separates hard contracts from semantic artifact scoring:
+
+- hard contracts: fixture metadata, eval cases, candidate fields, rollout results, score results, ASI, command evidence, summaries, and comparisons
+- semantic contracts: proposal, design, spec, task, and apply-plan prose
+
+Validation readiness means deterministic fixtures can generate artifacts, run direct eval, run compare, invoke GEPA with a small budget, verify required evidence files, and show useful failure behavior for negative fixtures.
+
+Deterministic smoke commands:
+
+```bash
+python -m claude_gepa.eval_validation generate \
+  --fixture claude-gepa-managed-agent \
+  --run-dir runs/eval-validation/managed-agent
+python -m claude_gepa.eval_validation eval \
+  --fixture claude-gepa-managed-agent \
+  --run-dir runs/eval-validation/managed-agent \
+  --skip-system-loop
+python -m claude_gepa.eval_validation compare \
+  --fixture claude-gepa-managed-agent \
+  --run-dir runs/eval-validation/managed-agent \
+  --skip-system-loop
+python -m claude_gepa.eval_validation optimize \
+  --fixture claude-gepa-managed-agent \
+  --run-dir runs/eval-validation/managed-agent \
+  --max-metric-calls 1 \
+  --skip-system-loop
+python -m claude_gepa.eval_validation verify \
+  --fixture claude-gepa-managed-agent \
+  --run-dir runs/eval-validation/managed-agent
+```
+
+The full system-loop eval is stricter: it runs generate, direct eval, compare, and optimize as actual commands and returns 1.0 only when required command evidence and artifacts exist:
+
+```bash
+python -m claude_gepa.eval_validation eval \
+  --fixture claude-gepa-managed-agent \
+  --run-dir runs/eval-validation/system-loop
+```
+
+Negative fixtures are available under `gepa-evals/fixtures/agents/` for missing eval contracts, missing scoring guidance, unsupported runtimes, and missing invocation details. A useful negative result is a blocked or clarification state with actionable diagnostics, not an invented apply plan.
+
+Optional live validation is opt-in:
+
+```bash
+export CLAUDE_GEPA_EVAL_VALIDATION_LIVE=1
+export ANTHROPIC_API_KEY=...
+python -m claude_gepa.eval_validation eval \
+  --fixture <live-fixture-id> \
+  --run-dir runs/eval-validation/live
+```
+
+Live validation can incur API cost and is not required for the deterministic test suite. Current validation limits remain Claude Managed Agent-only runtime support, deterministic fixture coverage by default, and semantic scoring that catches critical omissions without requiring exact golden-file prose.
 
 ## Notes
 

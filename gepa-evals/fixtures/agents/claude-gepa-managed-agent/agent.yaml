@@ -1,4 +1,6 @@
+id: claude-gepa-managed-agent
 name: claude-gepa-managed-agent
+fixture_type: positive
 runtime: Claude Managed Agents
 description: Existing package prototype that optimizes Claude Managed Agents with GEPA optimize_anything.
 source_files:
@@ -30,3 +32,59 @@ v1_constraints:
   - Live runs require ANTHROPIC_API_KEY.
   - Multi-agent subagents require CLAUDE_GEPA_ENABLE_MULTI_AGENT=1 and Anthropic preview access.
   - Other agent runtimes are out of scope for the first eval-generation workflow.
+expected_behavior:
+  required_artifacts:
+    - generated/proposal.md
+    - generated/design.md
+    - generated/specs/eval-validation-spec.md
+    - generated/tasks.md
+    - generated/eval-cases.yaml
+    - generated/seed-candidate.yaml
+    - generated/apply-plan.md
+    - eval/summary.json
+    - compare/comparison.json
+    - optimize/candidates.json
+    - optimize/run_log.txt
+  semantic_checks:
+    proposal:
+      - target agent
+      - Claude Managed Agents
+      - eval objective
+      - input
+      - expected output
+      - numeric scoring
+      - qualitative rubric
+      - ASI
+    design:
+      - direct eval
+      - rollout lifecycle
+      - scorer
+      - ASI
+      - GEPA
+      - compare
+      - credentials
+    specs_tasks:
+      - candidate surface
+      - eval dataset
+      - scorer
+      - ASI
+      - GEPA optimization
+      - validation
+    eval_cases:
+      - train
+      - val
+      - input
+      - expected
+      - scorer
+      - metadata
+    apply_plan:
+      - runnable commands
+      - direct eval
+      - optimize
+      - compare
+      - verify
+      - unsupported runtimes
+  live:
+    requires_live: false
+    required_env:
+      - ANTHROPIC_API_KEY

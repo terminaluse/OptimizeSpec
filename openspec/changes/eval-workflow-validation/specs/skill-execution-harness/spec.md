@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Harness invokes the GEPA eval workflow against fixtures
-The system SHALL provide a launch-alpha harness that runs the GEPA eval skill workflow against fixture agent inputs and records the generated artifacts and command evidence.
+The system SHALL provide a validation harness that runs the GEPA eval skill workflow against fixture agent inputs and records the generated artifacts and command evidence.
 
 #### Scenario: Harness generates workflow artifacts
 - **WHEN** the harness runs generation for a fixture

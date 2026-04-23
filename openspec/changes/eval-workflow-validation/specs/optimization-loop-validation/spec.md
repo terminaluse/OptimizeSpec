@@ -33,7 +33,7 @@ The system SHALL allow optimization-loop validation to run with a small metric-c
 - **THEN** GEPA is invoked and optimizer evidence is written even if quality improvement is not guaranteed
 
 #### Scenario: Release optimization runs
-- **WHEN** the user runs an optional larger launch-readiness validation
+- **WHEN** the user runs an optional larger validation
 - **THEN** the harness records whether optimized candidates improve validation or test scores over the seed candidate
 
 ### Requirement: Optimization-loop ASI includes system evidence

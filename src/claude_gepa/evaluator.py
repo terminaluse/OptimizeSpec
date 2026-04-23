@@ -87,6 +87,7 @@ class ManagedAgentEvaluator:
                 "expected_output": example.expected_output,
                 "actual_output": None,
                 "errors": [str(exc)],
+                "cleanup_warnings": [],
                 "exception_type": type(exc).__name__,
                 "traceback": traceback.format_exc(),
                 "field_feedback": {
@@ -200,6 +201,7 @@ def build_side_info(
         "outcome_result": artifacts.outcome_result,
         "outcome_explanation": artifacts.outcome_explanation,
         "errors": artifacts.errors,
+        "cleanup_warnings": artifacts.cleanup_warnings,
         "field_feedback": field_feedback,
         "scores": {
             "task_success": score,

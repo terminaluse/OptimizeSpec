@@ -16,16 +16,14 @@ from .tasks import DummyTask
 
 
 DEFAULT_MODEL = "claude-opus-4-7"
-MANAGED_AGENTS_BETA = "managed-agents-2026-04-01"
-RESEARCH_PREVIEW_BETA = "managed-agents-2026-04-01-research-preview"
+MANAGED_AGENTS_RESEARCH_PREVIEW_BETA = "managed-agents-2026-04-01-research-preview"
+MANAGED_AGENTS_BETAS = [MANAGED_AGENTS_RESEARCH_PREVIEW_BETA]
 SKILLS_BETA = "skills-2025-10-02"
-STREAM_BETAS = [
-    MANAGED_AGENTS_BETA,
-    RESEARCH_PREVIEW_BETA,
-]
+STREAM_BETAS = MANAGED_AGENTS_BETAS
 OUTCOME_SEND_BETA = "agent-api-2026-03-01"
 MULTI_AGENT_FLAG_ENV = "CLAUDE_GEPA_ENABLE_MULTI_AGENT"
 MAX_MANAGED_AGENT_SKILLS_PER_SESSION = 20
+PREVIEW_SDK_INSTALL_COMMAND = "uv pip install -r requirements-managed-agents-preview.txt"
 
 
 @dataclass
@@ -45,6 +43,7 @@ class RunArtifacts:
     event_types: list[str]
     usage: dict[str, int]
     errors: list[str]
+    cleanup_warnings: list[str]
     resolved_skills: list[dict[str, Any]]
     subagents: list[dict[str, Any]]
     environment_config: dict[str, Any]
@@ -59,6 +58,8 @@ class ManagedAgentRuntime:
         enable_multi_agent: bool | None = None,
     ) -> None:
         self.client = client or anthropic.Anthropic()
+        if client is None:
+            _require_managed_agents_preview_sdk(self.client)
         self.skill_registry = LocalSkillRegistry(skill_registry_path or Path(".claude_gepa") / "skill_registry.json")
         self.enable_multi_agent = _resolve_feature_flag(enable_multi_agent, MULTI_AGENT_FLAG_ENV)
 
@@ -111,13 +112,13 @@ class ManagedAgentRuntime:
                 "task_id": task.task_id,
             },
         }
-        if subagent_records:
-            session_kwargs["betas"] = [RESEARCH_PREVIEW_BETA]
+        session_kwargs["betas"] = MANAGED_AGENTS_BETAS
         session = self.client.beta.sessions.create(**session_kwargs)
 
         event_types: list[str] = []
         tool_events: list[dict[str, Any]] = []
         errors: list[str] = []
+        cleanup_warnings: list[str] = []
         usage = {"input_tokens": 0, "output_tokens": 0}
         outcome_result: str | None = None
         outcome_explanation: str | None = None
@@ -168,11 +169,11 @@ class ManagedAgentRuntime:
             timeout_seconds=15.0,
         )
         output_file_id, output_text = self._fetch_output_text(session.id, expected_output_path=Path(task.output_path).name)
-        self._archive_session_if_idle(session.id, session_status=session_status, errors=errors)
-        self._best_effort_archive_agent(agent.id, errors=errors)
-        self._best_effort_archive_environment(environment.id, errors=errors)
+        self._archive_session_if_idle(session.id, session_status=session_status, cleanup_warnings=cleanup_warnings)
+        self._best_effort_archive_agent(agent.id, cleanup_warnings=cleanup_warnings)
+        self._best_effort_archive_environment(environment.id, cleanup_warnings=cleanup_warnings)
         for subagent in subagent_records:
-            self._best_effort_archive_agent(subagent["id"], errors=errors)
+            self._best_effort_archive_agent(subagent["id"], cleanup_warnings=cleanup_warnings)
 
         return RunArtifacts(
             candidate_id=bundle.candidate_id,
@@ -190,6 +191,7 @@ class ManagedAgentRuntime:
             event_types=event_types,
             usage=usage,
             errors=errors,
+            cleanup_warnings=cleanup_warnings,
             resolved_skills=root_skill_events,
             subagents=subagent_records,
             environment_config=bundle.environment.config,
@@ -220,6 +222,7 @@ class ManagedAgentRuntime:
             headers={
                 "x-api-key": api_key,
                 "anthropic-version": "2023-06-01",
+                # The raw outcome-event fallback uses its own beta. Managed Agents SDK calls use MANAGED_AGENTS_BETAS.
                 "anthropic-beta": OUTCOME_SEND_BETA,
                 "content-type": "application/json",
             },
@@ -246,6 +249,7 @@ class ManagedAgentRuntime:
                     ],
                 }
             ],
+            betas=MANAGED_AGENTS_BETAS,
         )
 
     def _create_subagents(self, subagents: tuple[SubagentSpec, ...], *, suffix: str) -> list[dict[str, Any]]:
@@ -284,6 +288,7 @@ class ManagedAgentRuntime:
             "model": DEFAULT_MODEL,
             "system": system_prompt,
             "tools": self._build_agent_tools(),
+            "betas": MANAGED_AGENTS_BETAS,
         }
         if description is not None:
             kwargs["description"] = description
@@ -295,7 +300,6 @@ class ManagedAgentRuntime:
                     {"type": "agent", "id": record["id"], "version": record["version"]} for record in callable_agents
                 ]
             }
-            kwargs["betas"] = [RESEARCH_PREVIEW_BETA]
         return self.client.beta.agents.create(**kwargs)
 
     def _build_agent_tools(self) -> list[dict[str, Any]]:
@@ -460,7 +464,7 @@ class ManagedAgentRuntime:
         for _ in range(4):
             files = self.client.beta.files.list(
                 scope_id=session_id,
-                betas=[MANAGED_AGENTS_BETA],
+                betas=MANAGED_AGENTS_BETAS,
             )
             for file_meta in files.data:
                 if file_meta.filename == expected_output_path:
@@ -474,6 +478,7 @@ class ManagedAgentRuntime:
             self.client.beta.sessions.events.send(
                 session_id=session_id,
                 events=[{"type": "user.interrupt"}],
+                betas=MANAGED_AGENTS_BETAS,
             )
         except Exception:
             return
@@ -495,7 +500,7 @@ class ManagedAgentRuntime:
             try:
                 session = self.client.beta.sessions.retrieve(
                     session_id,
-                    betas=[MANAGED_AGENTS_BETA],
+                    betas=MANAGED_AGENTS_BETAS,
                 )
             except Exception:
                 return status
@@ -506,19 +511,30 @@ class ManagedAgentRuntime:
             time.sleep(poll_interval_seconds)
         return status
 
-    def _archive_session_if_idle(self, session_id: str, *, session_status: str | None, errors: list[str]) -> None:
-        if session_status != "idle":
-            errors.append(
+    def _archive_session_if_idle(
+        self,
+        session_id: str,
+        *,
+        session_status: str | None,
+        cleanup_warnings: list[str],
+        max_wait_seconds: float = 60.0,
+        poll_interval_seconds: float = 2.0,
+        max_archive_attempts: int = 3,
+    ) -> None:
+        if session_status not in {"idle", "running"}:
+            cleanup_warnings.append(
                 f"skipped session archive because session status was {session_status or 'unknown'}"
             )
             return
         archive_error: Exception | None = None
         latest_status: str | None = session_status
-        for _ in range(3):
+        archive_attempts = 0
+        deadline = time.monotonic() + max_wait_seconds
+        while time.monotonic() < deadline and archive_attempts < max_archive_attempts:
             try:
                 session = self.client.beta.sessions.retrieve(
                     session_id,
-                    betas=[MANAGED_AGENTS_BETA],
+                    betas=MANAGED_AGENTS_BETAS,
                 )
             except Exception as exc:
                 archive_error = exc
@@ -526,36 +542,37 @@ class ManagedAgentRuntime:
 
             latest_status = getattr(session, "status", latest_status)
             if latest_status != "idle":
-                time.sleep(1.0)
+                time.sleep(poll_interval_seconds)
                 continue
             try:
+                archive_attempts += 1
                 self.client.beta.sessions.archive(
                     session_id,
-                    betas=[MANAGED_AGENTS_BETA],
+                    betas=MANAGED_AGENTS_BETAS,
                 )
                 return
             except Exception as exc:
                 archive_error = exc
-                time.sleep(1.0)
+                time.sleep(poll_interval_seconds)
         if latest_status != "idle":
-            errors.append(
+            cleanup_warnings.append(
                 f"skipped session archive because session status was {latest_status or 'unknown'}"
             )
             return
         if archive_error is not None:
-            errors.append(f"session archive failed: {archive_error}")
+            cleanup_warnings.append(f"session archive failed: {archive_error}")
 
-    def _best_effort_archive_agent(self, agent_id: str, *, errors: list[str]) -> None:
+    def _best_effort_archive_agent(self, agent_id: str, *, cleanup_warnings: list[str]) -> None:
         try:
             self.client.beta.agents.archive(agent_id)
         except Exception as exc:
-            errors.append(f"agent archive failed: {exc}")
+            cleanup_warnings.append(f"agent archive failed: {exc}")
 
-    def _best_effort_archive_environment(self, environment_id: str, *, errors: list[str]) -> None:
+    def _best_effort_archive_environment(self, environment_id: str, *, cleanup_warnings: list[str]) -> None:
         try:
             self.client.beta.environments.archive(environment_id)
         except Exception as exc:
-            errors.append(f"environment archive failed: {exc}")
+            cleanup_warnings.append(f"environment archive failed: {exc}")
 
 
 def _resolve_feature_flag(explicit_value: bool | None, env_var: str) -> bool:
@@ -563,3 +580,44 @@ def _resolve_feature_flag(explicit_value: bool | None, env_var: str) -> bool:
         return explicit_value
     raw_value = os.environ.get(env_var, "")
     return raw_value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _require_managed_agents_preview_sdk(client: anthropic.Anthropic) -> None:
+    missing = [
+        path
+        for path in (
+            "beta.agents.create",
+            "beta.agents.archive",
+            "beta.environments.create",
+            "beta.environments.archive",
+            "beta.files.upload",
+            "beta.files.list",
+            "beta.files.download",
+            "beta.sessions.create",
+            "beta.sessions.retrieve",
+            "beta.sessions.archive",
+            "beta.sessions.events.stream",
+            "beta.sessions.events.send",
+            "beta.skills.create",
+            "beta.skills.list",
+            "beta.skills.versions.create",
+            "beta.skills.versions.retrieve",
+        )
+        if not _has_dotted_attr(client, path)
+    ]
+    if not missing:
+        return
+    missing_text = ", ".join(missing)
+    raise RuntimeError(
+        "Managed Agents Research Preview SDK is required for live Claude Managed Agents evals. "
+        f"Missing SDK surfaces: {missing_text}. Install with: {PREVIEW_SDK_INSTALL_COMMAND}"
+    )
+
+
+def _has_dotted_attr(root: object, path: str) -> bool:
+    current = root
+    for part in path.split("."):
+        if not hasattr(current, part):
+            return False
+        current = getattr(current, part)
+    return True

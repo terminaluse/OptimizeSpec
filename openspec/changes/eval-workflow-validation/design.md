@@ -2,7 +2,7 @@
 
 The current repo has a working GEPA self-improvement core in `src/claude_gepa/self_improvement.py`, CLI entry points for direct eval, compare, and optimize, and fixture changes under `gepa-evals/changes/`. The existing `claude-gepa-managed-agent-eval-generator` fixture already proves a narrow system loop: generate artifacts, run direct eval, run GEPA with a tiny budget, and score 1.0 when the loop emits the expected output files.
 
-The launch gap is confidence. Static skill validation and one happy-path fixture do not prove that the skill workflow can reliably handle realistic Claude Managed Agent repos, incomplete user inputs, artifact quality expectations, optimizer execution, and failure modes. This change adds a validation layer around the skill pack so launch readiness is measured by runnable evidence rather than subjective review.
+The validation gap is confidence. Static skill validation and one happy-path fixture do not prove that the skill workflow can reliably handle realistic Claude Managed Agent repos, incomplete user inputs, artifact quality expectations, optimizer execution, and failure modes. This change adds a validation layer around the skill pack so validation readiness is measured by runnable evidence rather than subjective review.
 
 Constraints:
 
@@ -17,17 +17,17 @@ Constraints:
 
 - Provide representative positive and negative Claude Managed Agent fixtures for validating the GEPA eval skills.
 - Add a harness that invokes the skill workflow against fixture inputs and records generated artifacts, command logs, summaries, and failures.
-- Score generated artifacts for required launch-alpha content, including eval contracts, design-level runner details, ASI, scorer semantics, GEPA invocation, compare paths, and limitations.
+- Score generated artifacts for required validation content, including eval contracts, design-level runner details, ASI, scorer semantics, GEPA invocation, compare paths, and limitations.
 - Enforce hard contracts only for machine-consumed boundaries: fixture metadata, eval cases, candidate fields, rollout results, score results, ASI, command evidence, and run summaries.
-- Score agent-written proposal, design, spec, task, and apply-plan prose semantically so useful variation is allowed while launch-blocking omissions are still caught.
+- Score agent-written proposal, design, spec, task, and apply-plan prose semantically so useful variation is allowed while critical omissions are still caught.
 - Verify applied systems by running direct eval, compare, and optimize commands against generated artifacts.
 - Preserve inspectable rollout evidence: `summary.json`, `comparison.json`, GEPA candidate outputs, command logs, `side_info.json`, and generated files.
-- Document launch-readiness criteria and the commands needed to reproduce the evidence.
+- Document validation criteria and the commands needed to reproduce the evidence.
 
 **Non-Goals:**
 
 - Add support for Codex, generic shell agents, browser agents, or other non-Claude runtimes.
-- Guarantee that every optimized candidate improves live production behavior; this alpha validates the workflow and optimizer mechanics.
+- Guarantee that every optimized candidate improves live production behavior; this validation checks the workflow and optimizer mechanics.
 - Replace OpenSpec or change the OpenSpec artifact graph.
 - Build a hosted eval service or persistent dashboard.
 - Require live API credentials for the full default test suite.
@@ -38,7 +38,7 @@ Constraints:
 
 The harness will use `EvalCase`, `RolloutResult`, `ScoreResult`, `evaluate_candidate`, `compare_candidates`, and `optimize_candidate` from `src/claude_gepa/self_improvement.py`. Fixture-specific behavior will live in small rollout executors and custom scorers.
 
-Rationale: this avoids two competing eval models and keeps ASI, persistence, and GEPA invocation identical between package features and launch validation.
+Rationale: this avoids two competing eval models and keeps ASI, persistence, and GEPA invocation identical between package features and eval workflow validation.
 
 Alternative considered: create a separate validation runner under `gepa-evals/`. That would make fixtures easier to isolate, but it risks validating a different system than the one users will actually apply.
 
@@ -52,7 +52,7 @@ Add a fixture directory structure that can represent multiple Claude Managed Age
 
 Each fixture should declare runtime type, relevant source files, existing commands, candidate fields, expected skill workflow behavior, and whether live credentials are required.
 
-Rationale: fixture agents become the stable benchmark for launch confidence and can grow without changing the core eval API.
+Rationale: fixture agents become the stable benchmark for validation confidence and can grow without changing the core eval API.
 
 Alternative considered: encode all fixtures directly in Python tests. That is simpler initially but makes it harder for agents and humans to inspect what the workflow is supposed to learn from each target.
 
@@ -66,11 +66,11 @@ The harness should run the GEPA eval workflow in an isolated output directory fo
 - `optimize`: invoke GEPA with `max_metric_calls` controls and persist optimizer artifacts.
 - `verify`: assert expected files, scores, and failure behavior.
 
-The harness can start as a Python module under `gepa-evals/launch_alpha/` or as fixture-specific scripts, but common command behavior should converge on reusable helpers once more than one fixture exists.
+The harness can start as a Python module under `gepa-evals/eval_validation/` or as fixture-specific scripts, but common command behavior should converge on reusable helpers once more than one fixture exists.
 
-Rationale: launch evidence needs repeatable commands and durable artifacts, not just unit assertions.
+Rationale: validation evidence needs repeatable commands and durable artifacts, not just unit assertions.
 
-Alternative considered: manually run the skills in the interactive agent session and inspect output. That is useful for development but not sufficient for regression testing or launch claims.
+Alternative considered: manually run the skills in the interactive agent session and inspect output. That is useful for development but not sufficient for regression testing or readiness claims.
 
 ### Score generated artifacts semantically and structurally
 
@@ -82,7 +82,7 @@ Artifact quality scorers should combine required-term checks, section checks, YA
 - Eval cases: parse as YAML, include train/val or train/test splits, expected outputs, scorer definitions, and metadata needed by custom scorers.
 - Apply output: exposes runnable commands and writes expected evidence artifacts.
 
-Rationale: launch readiness depends on generated artifacts containing the operational details a coding agent needs, especially the eval runner and optimizer mechanics.
+Rationale: validation readiness depends on generated artifacts containing the operational details a coding agent needs, especially the eval runner and optimizer mechanics.
 
 Alternative considered: use only exact golden-file matching. That is brittle for agent-generated artifacts and discourages useful variation.
 
@@ -99,7 +99,7 @@ The validation layer should use strict typed contracts for data and execution su
 - Command evidence
 - Run summaries and comparison summaries
 
-Generated proposal, design, spec, task, and apply-plan text should not be locked to golden files or exact phrasing. Those artifacts should be scored by required concepts, structural sections, semantic fit to the fixture, and launch-blocking omissions.
+Generated proposal, design, spec, task, and apply-plan text should not be locked to golden files or exact phrasing. Those artifacts should be scored by required concepts, structural sections, semantic fit to the fixture, and critical omissions.
 
 Rationale: the optimizer and harness need reliable structured data, but agent-written prose should stay flexible enough to adapt to different repos and still be useful.
 
@@ -119,15 +119,15 @@ Any missing required artifact, nonzero command, unhandled exception, or unsuppor
 
 Rationale: this matches the user's desired eval: if the actual system runs and performs an optimization loop, it scores 1.0.
 
-Alternative considered: partially credit command progress. Partial scores are useful for artifact quality, but the launch gate should remain binary so it cannot hide a broken optimizer path.
+Alternative considered: partially credit command progress. Partial scores are useful for artifact quality, but the validation gate should remain binary so it cannot hide a broken optimizer path.
 
 ### Keep live Managed Agent runs separate from default deterministic validation
 
 Default CI and local smoke tests should use deterministic fixture executors. Live Managed Agent validation should be opt-in through an environment flag and require `ANTHROPIC_API_KEY`.
 
-Rationale: launch validation should be reproducible and affordable by default, while still allowing a manual live gate before release.
+Rationale: eval workflow validation should be reproducible and affordable by default, while still allowing a manual live gate before release.
 
-Alternative considered: require live API calls for all launch validation. That would better simulate production but makes the test suite expensive, slower, and unavailable to contributors without credentials.
+Alternative considered: require live API calls for all eval workflow validation. That would better simulate production but makes the test suite expensive, slower, and unavailable to contributors without credentials.
 
 ### Negative fixtures must be first-class eval cases
 
@@ -140,13 +140,13 @@ Negative fixtures should check that the workflow asks for clarification or fails
 - Required credentials or resources are impossible to infer.
 - Generated eval cases cannot be parsed or scored.
 
-Rationale: a launchable skill should not confidently invent an eval system when the information needed for GEPA is missing.
+Rationale: a reliable skill should not confidently invent an eval system when the information needed for GEPA is missing.
 
 Alternative considered: rely on code review to catch unclear behavior. That does not scale and misses regressions in agent-facing instructions.
 
 ## Eval Runner and Optimizer Flow
 
-The launch validation runner should use the same lifecycle for every positive fixture:
+The eval workflow validation runner should use the same lifecycle for every positive fixture:
 
 1. Load fixture metadata, seed candidate, and eval cases.
 2. Select mutable candidate fields, usually guidance fields for fixture analysis, proposal, design, specs/tasks, apply, scoring, and ASI.
@@ -162,11 +162,11 @@ The launch validation runner should use the same lifecycle for every positive fi
 The user-facing validation commands should be small and explicit. The exact command names can be finalized in tasks, but the shape should be:
 
 ```bash
-python -m claude_gepa.launch_alpha generate --fixture <fixture-id> --output-dir <run-dir>/generated
-python -m claude_gepa.launch_alpha eval --fixture <fixture-id> --candidate <candidate.yaml> --run-dir <run-dir>/eval
-python -m claude_gepa.launch_alpha compare --fixture <fixture-id> --baseline <seed.yaml> --candidate <candidate.yaml> --run-dir <run-dir>/compare
-python -m claude_gepa.launch_alpha optimize --fixture <fixture-id> --candidate <seed.yaml> --max-metric-calls 1 --run-dir <run-dir>/optimize
-python -m claude_gepa.launch_alpha verify --run-dir <run-dir>
+python -m claude_gepa.eval_validation generate --fixture <fixture-id> --output-dir <run-dir>/generated
+python -m claude_gepa.eval_validation eval --fixture <fixture-id> --candidate <candidate.yaml> --run-dir <run-dir>/eval
+python -m claude_gepa.eval_validation compare --fixture <fixture-id> --baseline <seed.yaml> --candidate <candidate.yaml> --run-dir <run-dir>/compare
+python -m claude_gepa.eval_validation optimize --fixture <fixture-id> --candidate <seed.yaml> --max-metric-calls 1 --run-dir <run-dir>/optimize
+python -m claude_gepa.eval_validation verify --run-dir <run-dir>
 ```
 
 For generated applied systems, the harness should also support invoking fixture-specific commands, such as the existing `agent_eval_generator.py generate`, `eval`, and `optimize` operations, so the validation can prove that apply output is actually runnable.
@@ -174,7 +174,7 @@ For generated applied systems, the harness should also support invoking fixture-
 ## Risks / Trade-offs
 
 - [Risk] Required-term scoring can reward keyword stuffing. -> Mitigation: combine required terms with YAML parsing, section checks, command evidence, and binary system-loop scoring.
-- [Risk] Deterministic fixtures may not capture live Managed Agent failure modes. -> Mitigation: add an opt-in live fixture gate and document that public launch should include one successful live run.
+- [Risk] Deterministic fixtures may not capture live Managed Agent failure modes. -> Mitigation: add an opt-in live fixture gate and document that broader release should include one successful live run.
 - [Risk] GEPA with `max_metric_calls=1` proves wiring but not meaningful optimization. -> Mitigation: use the small budget for fast system-loop validation and add a larger optional quality run for release evidence.
 - [Risk] Harness code can duplicate fixture-specific scripts. -> Mitigation: start with explicit fixture scripts where useful, then extract shared helpers once a second positive fixture and one negative fixture exist.
 - [Risk] Negative fixture expected behavior can be subjective. -> Mitigation: encode expected outcomes as concrete assertions: clarification marker, unsupported runtime marker, nonzero score behavior, or missing-info error.
@@ -182,17 +182,17 @@ For generated applied systems, the harness should also support invoking fixture-
 
 ## Migration Plan
 
-1. Add the launch-alpha validation fixtures and harness without changing existing CLI behavior.
+1. Add the eval workflow validation fixtures and harness without changing existing CLI behavior.
 2. Wire tests around deterministic fixture commands and artifact scorers.
 3. Add optional live Managed Agent validation behind an explicit environment flag.
-4. Document launch-readiness commands and evidence paths.
+4. Document validation commands and evidence paths.
 5. Keep the existing `gepa-evals/changes/*` examples working throughout; if harness entry points replace fixture-specific scripts, leave compatibility wrappers or update docs and tests together.
 
-Rollback is straightforward because this change adds validation surfaces rather than modifying the Managed Agent runtime contract. If a new harness path is unstable, disable its launch gate while retaining the existing self-improvement CLI and fixture scripts.
+Rollback is straightforward because this change adds validation surfaces rather than modifying the Managed Agent runtime contract. If a new harness path is unstable, disable its validation gate while retaining the existing self-improvement CLI and fixture scripts.
 
 ## Open Questions
 
-- Should launch validation live under `src/claude_gepa/launch_alpha.py` for package CLI reuse, or under `gepa-evals/launch_alpha/` as repo-local validation tooling?
-- What is the minimum number of positive fixtures required for alpha launch: one realistic fixture plus the existing package optimizer, or two distinct Claude Managed Agent fixtures?
-- Should the optional live gate be required before public launch, or only before claiming production readiness?
+- Should eval workflow validation live under `src/claude_gepa/eval_validation.py` for package CLI reuse, or under `gepa-evals/eval_validation/` as repo-local validation tooling?
+- What is the minimum number of positive fixtures required for eval validation: one realistic fixture plus the existing package optimizer, or two distinct Claude Managed Agent fixtures?
+- Should the optional live gate be required before broader release, or only before claiming production readiness?
 - How strict should artifact semantic scoring be before it starts blocking useful variation in generated specs and designs?

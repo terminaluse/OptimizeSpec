@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Fixture agents declare validation metadata
-The system SHALL represent each launch-alpha fixture agent with metadata that identifies the target runtime, source references, invocation surface, candidate fields, expected workflow behavior, and credential requirements.
+The system SHALL represent each validation fixture agent with metadata that identifies the target runtime, source references, invocation surface, candidate fields, expected workflow behavior, and credential requirements.
 
 #### Scenario: Fixture metadata is loaded
 - **WHEN** the validation harness loads a fixture agent
@@ -11,7 +11,7 @@ The system SHALL represent each launch-alpha fixture agent with metadata that id
 - **WHEN** required fixture metadata is missing
 - **THEN** the validation harness marks the fixture invalid before running eval or optimization commands
 
-### Requirement: Positive fixtures exercise the full alpha workflow
+### Requirement: Positive fixtures exercise the full validation workflow
 The system SHALL include positive Claude Managed Agent fixtures that can exercise artifact generation, direct eval, compare, and GEPA optimization using deterministic local execution by default.
 
 #### Scenario: Positive fixture is validated

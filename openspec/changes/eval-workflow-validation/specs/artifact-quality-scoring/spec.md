@@ -12,13 +12,13 @@ The system SHALL enforce strict structural contracts for fixture metadata, eval 
 - **THEN** the harness fails validation with parser or schema diagnostics instead of passing malformed data downstream
 
 ### Requirement: Agent-written artifacts use semantic scoring
-The system SHALL score proposal, design, spec, task, and apply-plan prose by required concepts, structural sections, semantic fit, and launch-blocking omissions rather than exact wording or golden-file equality.
+The system SHALL score proposal, design, spec, task, and apply-plan prose by required concepts, structural sections, semantic fit, and critical omissions rather than exact wording or golden-file equality.
 
 #### Scenario: Agent-written artifact uses different wording
 - **WHEN** a generated prose artifact contains the required concepts with different phrasing from the reference examples
 - **THEN** the scorer can award credit without requiring exact text matches
 
-#### Scenario: Agent-written artifact omits a launch-critical concept
+#### Scenario: Agent-written artifact omits a critical concept
 - **WHEN** a generated prose artifact omits required runner, scorer, ASI, optimizer, or validation detail
 - **THEN** the scorer records the omission and lowers the score
 
@@ -42,10 +42,10 @@ The system SHALL score generated designs for concrete direct-eval invocation, ro
 
 #### Scenario: Design omits optimization mechanics
 - **WHEN** the design does not explain how rollouts are passed into GEPA or how optimizer artifacts are persisted
-- **THEN** the design scorer records a launch-blocking omission
+- **THEN** the design scorer records a critical omission
 
 ### Requirement: Spec and task artifacts are scored for implementation coverage
-The system SHALL score generated specs and tasks for requirements and implementation steps covering direct eval, rollouts, scorers, ASI, GEPA optimize, compare, validation, negative cases, and launch documentation.
+The system SHALL score generated specs and tasks for requirements and implementation steps covering direct eval, rollouts, scorers, ASI, GEPA optimize, compare, validation, negative cases, and validation documentation.
 
 #### Scenario: Specs and tasks cover all required subsystems
 - **WHEN** generated specs and tasks include every required subsystem
