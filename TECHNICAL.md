@@ -155,6 +155,8 @@ Comparison:
 agent-gepa compare-demo --max-metric-calls 48
 ```
 
+`compare-demo` is intentionally heavier than `eval-demo` or `optimize-demo`: it runs GEPA and then evaluates the baseline and optimized candidates across the demo suite. For a quick live smoke, prefer `optimize-demo --max-metric-calls 1`.
+
 Deterministic self-improvement smoke commands:
 
 ```bash
