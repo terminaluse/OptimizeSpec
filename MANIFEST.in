@@ -4,5 +4,5 @@ include TECHNICAL.md
 include requirements-managed-agents-preview.txt
 recursive-include skills *
 recursive-include gepa-evals *
-recursive-include openspec *
+prune openspec
 global-exclude *.py[cod]
