@@ -4,9 +4,9 @@ fixture_type: negative
 runtime: Claude Managed Agents
 description: Negative fixture where the request does not provide eval input/output examples.
 source_files:
-  runtime: src/claude_gepa/runtime.py
+  runtime: src/agent_gepa/runtime.py
 existing_commands:
-  direct_eval: claude-gepa eval-demo
+  direct_eval: agent-gepa eval-demo
 candidate_fields:
   - system_prompt
 expected_failure: missing eval input/output

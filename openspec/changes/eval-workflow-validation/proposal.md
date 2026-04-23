@@ -29,4 +29,4 @@ None.
 
 ## Impact
 
-This affects the repo-local GEPA eval skill pack under `.codex/skills/gepa-evals-*`, validation fixtures under `gepa-evals/`, the self-improvement runner and optimizer code under `src/claude_gepa/`, CLI smoke paths, tests, and validation documentation. The change does not introduce a new agent runtime abstraction; it strengthens the existing Claude Managed Agent path and makes validation readiness measurable.
+This affects the repo-local GEPA eval skill pack under `skills/gepa-evals-*`, validation fixtures under `gepa-evals/`, the self-improvement runner and optimizer code under `src/agent_gepa/`, CLI smoke paths, tests, and validation documentation. The change does not introduce a new agent runtime abstraction; it strengthens the existing Claude Managed Agent path and makes validation readiness measurable.

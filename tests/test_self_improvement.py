@@ -6,7 +6,7 @@ import importlib.util
 
 import pytest
 
-from claude_gepa.self_improvement import (
+from agent_gepa.self_improvement import (
     EvalCase,
     GEPAEvaluator,
     RolloutResult,
@@ -146,7 +146,7 @@ def test_gepa_evaluator_supports_custom_scorers(tmp_path: Path) -> None:
 
 
 def test_package_optimizer_fixture_scores_required_terms(tmp_path: Path) -> None:
-    module_path = Path("gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py")
+    module_path = Path("gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py")
     spec = importlib.util.spec_from_file_location("package_optimizer", module_path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -168,7 +168,7 @@ def test_package_optimizer_fixture_scores_required_terms(tmp_path: Path) -> None
 
 
 def test_existing_agent_eval_generator_scores_generated_artifacts(tmp_path: Path) -> None:
-    module_path = Path("gepa-evals/changes/claude-gepa-managed-agent-eval-generator/agent_eval_generator.py")
+    module_path = Path("gepa-evals/changes/agent-gepa-managed-agent-eval-generator/agent_eval_generator.py")
     spec = importlib.util.spec_from_file_location("agent_eval_generator", module_path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -196,7 +196,7 @@ def test_existing_agent_eval_generator_scores_generated_artifacts(tmp_path: Path
 
 
 def test_existing_agent_eval_generator_writes_generated_artifacts(tmp_path: Path) -> None:
-    module_path = Path("gepa-evals/changes/claude-gepa-managed-agent-eval-generator/agent_eval_generator.py")
+    module_path = Path("gepa-evals/changes/agent-gepa-managed-agent-eval-generator/agent_eval_generator.py")
     spec = importlib.util.spec_from_file_location("agent_eval_generator_generate", module_path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -222,7 +222,7 @@ def test_existing_agent_eval_generator_writes_generated_artifacts(tmp_path: Path
     ],
 )
 def test_gepa_eval_skill_frontmatter(skill_name: str) -> None:
-    skill_path = Path(".codex") / "skills" / skill_name / "SKILL.md"
+    skill_path = Path("skills") / skill_name / "SKILL.md"
     text = skill_path.read_text(encoding="utf-8")
     assert text.startswith("---\n")
     assert f"name: {skill_name}" in text
@@ -231,7 +231,7 @@ def test_gepa_eval_skill_frontmatter(skill_name: str) -> None:
 
 
 def test_common_skill_reference_paths_exist() -> None:
-    base = Path(".codex") / "skills" / "gepa-evals-common"
+    base = Path("skills") / "gepa-evals-common"
     required = [
         "references/workflow.md",
         "references/gepa-reflection.md",

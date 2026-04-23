@@ -1,5 +1,5 @@
 fixture_analysis_guidance: |
-  Inspect the existing claude-gepa fixture before generating artifacts. Ground the plan in src/claude_gepa/candidate.py, src/claude_gepa/runtime.py, src/claude_gepa/evaluator.py, src/claude_gepa/optimizer.py, src/claude_gepa/tasks.py, and src/claude_gepa/cli.py. Name Claude Managed Agents, ManagedAgentRuntime, ManagedAgentEvaluator, optimize_demo, optimize_anything, and the dict[str, str] candidate boundary.
+  Inspect the existing agent-gepa fixture before generating artifacts. Ground the plan in src/agent_gepa/candidate.py, src/agent_gepa/runtime.py, src/agent_gepa/evaluator.py, src/agent_gepa/optimizer.py, src/agent_gepa/tasks.py, and src/agent_gepa/cli.py. Name Claude Managed Agents, ManagedAgentRuntime, ManagedAgentEvaluator, optimize_demo, optimize_anything, and the dict[str, str] candidate boundary.
 proposal_generation_guidance: |
   The proposal should identify Claude Managed Agents as the runtime, list candidate fields system_prompt, task_prompt, outcome_rubric, skills, environment_spec, and subagent_specs, include numeric scoring and qualitative rubric guidance, and define ASI as a first-class output.
 design_generation_guidance: |

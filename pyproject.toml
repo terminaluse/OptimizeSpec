@@ -3,9 +3,9 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "claude-gepa"
+name = "agent-gepa"
 version = "0.1.0"
-description = "Minimal GEPA + Claude Managed Agents prototype."
+description = "Create a self-improvement system for agents with GEPA."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -23,7 +23,7 @@ dev = [
 ]
 
 [project.scripts]
-claude-gepa = "claude_gepa.cli:main"
+agent-gepa = "agent_gepa.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

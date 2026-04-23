@@ -28,7 +28,7 @@ from .self_improvement import (
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_ROOT = ROOT / "gepa-evals" / "fixtures" / "agents"
 DEFAULT_RUN_DIR = ROOT / "runs" / "eval-validation"
-LIVE_ENV_FLAG = "CLAUDE_GEPA_EVAL_VALIDATION_LIVE"
+LIVE_ENV_FLAG = "AGENT_GEPA_EVAL_VALIDATION_LIVE"
 REQUIRED_LIVE_ENV = "ANTHROPIC_API_KEY"
 MUTABLE_FIELDS = [
     "fixture_analysis_guidance",
@@ -639,11 +639,11 @@ Unsupported runtimes are blocked. Live Managed Agents require {REQUIRED_LIVE_ENV
 
 ## Command Shape
 
-python -m claude_gepa.eval_validation generate --fixture {fixture.fixture_id} --run-dir runs/eval-validation/{fixture.fixture_id}
-python -m claude_gepa.eval_validation eval --fixture {fixture.fixture_id} --run-dir runs/eval-validation/{fixture.fixture_id}
-python -m claude_gepa.eval_validation compare --fixture {fixture.fixture_id} --run-dir runs/eval-validation/{fixture.fixture_id}
-python -m claude_gepa.eval_validation optimize --fixture {fixture.fixture_id} --max-metric-calls 1 --run-dir runs/eval-validation/{fixture.fixture_id}
-python -m claude_gepa.eval_validation verify --fixture {fixture.fixture_id} --run-dir runs/eval-validation/{fixture.fixture_id}
+python -m agent_gepa.eval_validation generate --fixture {fixture.fixture_id} --run-dir runs/eval-validation/{fixture.fixture_id}
+python -m agent_gepa.eval_validation eval --fixture {fixture.fixture_id} --run-dir runs/eval-validation/{fixture.fixture_id}
+python -m agent_gepa.eval_validation compare --fixture {fixture.fixture_id} --run-dir runs/eval-validation/{fixture.fixture_id}
+python -m agent_gepa.eval_validation optimize --fixture {fixture.fixture_id} --max-metric-calls 1 --run-dir runs/eval-validation/{fixture.fixture_id}
+python -m agent_gepa.eval_validation verify --fixture {fixture.fixture_id} --run-dir runs/eval-validation/{fixture.fixture_id}
 
 ## Guidance
 
@@ -747,12 +747,12 @@ def run_system_loop(fixture: FixtureMetadata, parent_run_dir: Path, *, timeout_s
     stamp = f"{fixture.fixture_id}-{int(time.time() * 1000)}"
     work_dir = parent_run_dir / "system-loop" / stamp
     work_dir.mkdir(parents=True, exist_ok=True)
-    command_timeout = max(timeout_seconds / 4.0, 10.0)
+    command_timeout = max(timeout_seconds, 30.0)
     commands = {
         "generate": [
             sys.executable,
             "-m",
-            "claude_gepa.eval_validation",
+            "agent_gepa.eval_validation",
             "generate",
             "--fixture",
             fixture.fixture_id,
@@ -762,7 +762,7 @@ def run_system_loop(fixture: FixtureMetadata, parent_run_dir: Path, *, timeout_s
         "eval": [
             sys.executable,
             "-m",
-            "claude_gepa.eval_validation",
+            "agent_gepa.eval_validation",
             "eval",
             "--fixture",
             fixture.fixture_id,
@@ -773,7 +773,7 @@ def run_system_loop(fixture: FixtureMetadata, parent_run_dir: Path, *, timeout_s
         "compare": [
             sys.executable,
             "-m",
-            "claude_gepa.eval_validation",
+            "agent_gepa.eval_validation",
             "compare",
             "--fixture",
             fixture.fixture_id,
@@ -784,7 +784,7 @@ def run_system_loop(fixture: FixtureMetadata, parent_run_dir: Path, *, timeout_s
         "optimize": [
             sys.executable,
             "-m",
-            "claude_gepa.eval_validation",
+            "agent_gepa.eval_validation",
             "optimize",
             "--fixture",
             fixture.fixture_id,
@@ -1081,7 +1081,7 @@ def cmd_show_fixture(fixture_id: str | None, pretty: bool) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="python -m claude_gepa.eval_validation")
+    parser = argparse.ArgumentParser(prog="python -m agent_gepa.eval_validation")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     show = subparsers.add_parser("show-fixture")

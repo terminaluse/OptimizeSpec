@@ -21,7 +21,7 @@ MANAGED_AGENTS_BETAS = [MANAGED_AGENTS_RESEARCH_PREVIEW_BETA]
 SKILLS_BETA = "skills-2025-10-02"
 STREAM_BETAS = MANAGED_AGENTS_BETAS
 OUTCOME_SEND_BETA = "agent-api-2026-03-01"
-MULTI_AGENT_FLAG_ENV = "CLAUDE_GEPA_ENABLE_MULTI_AGENT"
+MULTI_AGENT_FLAG_ENV = "AGENT_GEPA_ENABLE_MULTI_AGENT"
 MAX_MANAGED_AGENT_SKILLS_PER_SESSION = 20
 PREVIEW_SDK_INSTALL_COMMAND = "uv pip install -r requirements-managed-agents-preview.txt"
 
@@ -60,7 +60,7 @@ class ManagedAgentRuntime:
         self.client = client or anthropic.Anthropic()
         if client is None:
             _require_managed_agents_preview_sdk(self.client)
-        self.skill_registry = LocalSkillRegistry(skill_registry_path or Path(".claude_gepa") / "skill_registry.json")
+        self.skill_registry = LocalSkillRegistry(skill_registry_path or Path(".agent_gepa") / "skill_registry.json")
         self.enable_multi_agent = _resolve_feature_flag(enable_multi_agent, MULTI_AGENT_FLAG_ENV)
 
     def run_task(
@@ -90,14 +90,14 @@ class ManagedAgentRuntime:
         subagent_records = self._create_subagents(bundle.subagents, suffix=suffix)
 
         agent = self._create_agent(
-            name=f"claude-gepa-agent-{suffix}",
+            name=f"agent-gepa-agent-{suffix}",
             system_prompt=bundle.system_prompt,
             resolved_skills=resolved_root_skills,
             description=None,
             callable_agents=subagent_records,
         )
         environment = self.client.beta.environments.create(
-            name=f"claude-gepa-env-{suffix}",
+            name=f"agent-gepa-env-{suffix}",
             config=bundle.environment.config,
         )
         session_kwargs: dict[str, Any] = {
@@ -106,7 +106,7 @@ class ManagedAgentRuntime:
             "resources": [
                 {"type": "file", "file_id": uploaded_file.id, "mount_path": task.input_path},
             ],
-            "title": f"claude-gepa-{task.task_id}",
+            "title": f"agent-gepa-{task.task_id}",
             "metadata": {
                 "candidate_id": bundle.candidate_id,
                 "task_id": task.task_id,
@@ -257,7 +257,7 @@ class ManagedAgentRuntime:
         for index, subagent in enumerate(subagents, start=1):
             resolved_skills, skill_events = self._resolve_skills(subagent.skills)
             created = self._create_agent(
-                name=f"claude-gepa-subagent-{index}-{suffix}",
+                name=f"agent-gepa-subagent-{index}-{suffix}",
                 system_prompt=subagent.system_prompt,
                 resolved_skills=resolved_skills,
                 description=subagent.description,

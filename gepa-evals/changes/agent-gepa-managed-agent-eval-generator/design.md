@@ -1,17 +1,17 @@
 ## Context
 
-This change uses this repo's existing Claude Managed Agent prototype as the example agent. The fixture points at `src/claude_gepa/candidate.py`, `runtime.py`, `evaluator.py`, `optimizer.py`, `tasks.py`, and `cli.py`.
+This change uses this repo's existing Claude Managed Agent prototype as the example agent. The fixture points at `src/agent_gepa/candidate.py`, `runtime.py`, `evaluator.py`, `optimizer.py`, `tasks.py`, and `cli.py`.
 
 The generated artifact evaluator is deterministic and credential-free. It composes proposal/design/spec/task/eval/apply artifact text from a mutable candidate and fixture facts, then scores required concept coverage. This lets the package evaluate whether its skill guidance is specific enough before running live agent sessions.
 
 ## Runner Invocation
 
 ```bash
-python gepa-evals/changes/claude-gepa-managed-agent-eval-generator/agent_eval_generator.py show-candidate
-python gepa-evals/changes/claude-gepa-managed-agent-eval-generator/agent_eval_generator.py generate --output-dir runs/agent-eval-generator/generated
-python gepa-evals/changes/claude-gepa-managed-agent-eval-generator/agent_eval_generator.py eval --run-dir runs/agent-eval-generator/eval
-python gepa-evals/changes/claude-gepa-managed-agent-eval-generator/agent_eval_generator.py compare --run-dir runs/agent-eval-generator/compare
-python gepa-evals/changes/claude-gepa-managed-agent-eval-generator/agent_eval_generator.py optimize --max-metric-calls 12 --run-dir runs/agent-eval-generator/optimize
+python gepa-evals/changes/agent-gepa-managed-agent-eval-generator/agent_eval_generator.py show-candidate
+python gepa-evals/changes/agent-gepa-managed-agent-eval-generator/agent_eval_generator.py generate --output-dir runs/agent-eval-generator/generated
+python gepa-evals/changes/agent-gepa-managed-agent-eval-generator/agent_eval_generator.py eval --run-dir runs/agent-eval-generator/eval
+python gepa-evals/changes/agent-gepa-managed-agent-eval-generator/agent_eval_generator.py compare --run-dir runs/agent-eval-generator/compare
+python gepa-evals/changes/agent-gepa-managed-agent-eval-generator/agent_eval_generator.py optimize --max-metric-calls 12 --run-dir runs/agent-eval-generator/optimize
 ```
 
 The `end-to-end-optimization-loop` eval case invokes the generated system itself: `generate`, `eval`, and `optimize --max-metric-calls 1` against a reduced non-recursive case set. It scores `1.0` only when the commands exit successfully and GEPA writes optimization artifacts.
@@ -29,7 +29,7 @@ The `end-to-end-optimization-loop` eval case invokes the generated system itself
 
 1. Load the fixture agent descriptor and eval case.
 2. Select candidate guidance fields relevant to the requested artifact.
-3. Compose generated artifact text for the existing `claude-gepa` agent.
+3. Compose generated artifact text for the existing `agent-gepa` agent.
 4. Score required-term coverage.
 5. Build ASI with missing terms and field-specific feedback.
 6. Persist rollout artifacts.
@@ -44,7 +44,7 @@ The scorer computes required-term coverage for artifact-generation cases. The sy
 
 ## GEPA Configuration
 
-The optimizer uses train/val cases from `eval-cases.yaml`, a required-term scorer, objective/background text specific to the existing `claude-gepa` agent, round-robin field selection, and run directory capture.
+The optimizer uses train/val cases from `eval-cases.yaml`, a required-term scorer, objective/background text specific to the existing `agent-gepa` agent, round-robin field selection, and run directory capture.
 
 ## Risks and Blockers
 

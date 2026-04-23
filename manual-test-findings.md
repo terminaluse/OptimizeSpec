@@ -43,7 +43,7 @@ Context:
 
 Fix:
 
-- Added fallback logic in [src/claude_gepa/runtime.py](/Users/vraja/Desktop/cc/sb0/claude-gepa/src/claude_gepa/runtime.py) to:
+- Added fallback logic in [src/agent_gepa/runtime.py](/Users/vraja/Desktop/cc/sb0/agent-gepa/src/agent_gepa/runtime.py) to:
   - list existing custom skills by `display_title`
   - reuse the existing skill lineage
   - create a new version on that lineage instead of trying to create a duplicate skill
@@ -65,7 +65,7 @@ Context:
 
 Fix:
 
-- Added `_validate_existing_skill_lineage(...)` in [src/claude_gepa/runtime.py](/Users/vraja/Desktop/cc/sb0/claude-gepa/src/claude_gepa/runtime.py).
+- Added `_validate_existing_skill_lineage(...)` in [src/agent_gepa/runtime.py](/Users/vraja/Desktop/cc/sb0/agent-gepa/src/agent_gepa/runtime.py).
 - Before versioning onto an existing lineage, we now retrieve the latest version and compare its `name` with the candidate's `SKILL.md` `name`.
 - If the names differ, we fail locally with a clear error instead of relying on Anthropic to reject the request.
 
@@ -88,7 +88,7 @@ Context:
 
 Fix:
 
-- Removed `objective` and `background` from the `optimize_anything(...)` call path in [src/claude_gepa/optimizer.py](/Users/vraja/Desktop/cc/sb0/claude-gepa/src/claude_gepa/optimizer.py).
+- Removed `objective` and `background` from the `optimize_anything(...)` call path in [src/agent_gepa/optimizer.py](/Users/vraja/Desktop/cc/sb0/agent-gepa/src/agent_gepa/optimizer.py).
 
 Status: fixed locally. Long end-to-end optimize workflow still needs a full manual completion run.
 
@@ -113,8 +113,8 @@ Context:
 
 Fix:
 
-- Updated [src/claude_gepa/runtime.py](/Users/vraja/Desktop/cc/sb0/claude-gepa/src/claude_gepa/runtime.py) so archive cleanup now polls briefly for `idle` before giving up.
-- Added coverage for the “running then idle” case in [tests/test_runtime.py](/Users/vraja/Desktop/cc/sb0/claude-gepa/tests/test_runtime.py).
+- Updated [src/agent_gepa/runtime.py](/Users/vraja/Desktop/cc/sb0/agent-gepa/src/agent_gepa/runtime.py) so archive cleanup now polls briefly for `idle` before giving up.
+- Added coverage for the “running then idle” case in [tests/test_runtime.py](/Users/vraja/Desktop/cc/sb0/agent-gepa/tests/test_runtime.py).
 - Re-verified with a real successful run; the warning no longer appears.
 
 Status: fixed and manually verified.
@@ -134,12 +134,12 @@ v1_create_agent_params.callable_agents: Extra inputs are not permitted
 Context:
 
 - The local implementation path exists.
-- Multi-agent is now behind `CLAUDE_GEPA_ENABLE_MULTI_AGENT`.
+- Multi-agent is now behind `AGENT_GEPA_ENABLE_MULTI_AGENT`.
 - The current account/request path still rejects the preview field.
 
 What we changed:
 
-- Added `CLAUDE_GEPA_ENABLE_MULTI_AGENT` in [src/claude_gepa/runtime.py](/Users/vraja/Desktop/cc/sb0/claude-gepa/src/claude_gepa/runtime.py).
+- Added `AGENT_GEPA_ENABLE_MULTI_AGENT` in [src/agent_gepa/runtime.py](/Users/vraja/Desktop/cc/sb0/agent-gepa/src/agent_gepa/runtime.py).
 - When the flag is off, we fail early locally instead of calling the preview API path.
 
 Status: intentionally gated behind a feature flag; not a local blocker for non-multi-agent work.
@@ -195,7 +195,7 @@ Context:
 
 What remains:
 
-- run `claude-gepa compare-demo`
+- run `agent-gepa compare-demo`
 - inspect:
   - `input_candidate`
   - `final_candidate`

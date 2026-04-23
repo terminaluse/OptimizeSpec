@@ -2,14 +2,14 @@ from types import SimpleNamespace
 
 import pytest
 
-from claude_gepa.candidate import (
+from agent_gepa.candidate import (
     CandidateBundle,
     CustomSkillSpec,
     EnvironmentSpec,
     SkillFile,
     SubagentSpec,
 )
-from claude_gepa.runtime import ManagedAgentRuntime, _require_managed_agents_preview_sdk
+from agent_gepa.runtime import ManagedAgentRuntime, _require_managed_agents_preview_sdk
 
 
 class _FakeSessions:
@@ -132,7 +132,7 @@ def _make_bundle_with_subagent() -> CandidateBundle:
 def test_wait_for_settled_session_polls_until_idle(monkeypatch) -> None:
     sessions = _FakeSessions(["running", "running", "idle"])
     runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
-    monkeypatch.setattr("claude_gepa.runtime.time.sleep", lambda _: None)
+    monkeypatch.setattr("agent_gepa.runtime.time.sleep", lambda _: None)
 
     status = runtime._wait_for_settled_session(
         "sesn_test",
@@ -155,7 +155,7 @@ def test_archive_session_if_idle_skips_running_session(monkeypatch) -> None:
     sessions = _FakeSessions(["running", "running", "running"], default_status="running")
     runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
     cleanup_warnings: list[str] = []
-    monkeypatch.setattr("claude_gepa.runtime.time.sleep", lambda _: None)
+    monkeypatch.setattr("agent_gepa.runtime.time.sleep", lambda _: None)
 
     runtime._archive_session_if_idle(
         "sesn_test",
@@ -173,7 +173,7 @@ def test_archive_session_if_idle_records_archive_failures(monkeypatch) -> None:
     sessions = _FakeSessions(["idle"], archive_error=RuntimeError("boom"))
     runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
     cleanup_warnings: list[str] = []
-    monkeypatch.setattr("claude_gepa.runtime.time.sleep", lambda _: None)
+    monkeypatch.setattr("agent_gepa.runtime.time.sleep", lambda _: None)
 
     runtime._archive_session_if_idle("sesn_test", session_status="idle", cleanup_warnings=cleanup_warnings)
 
@@ -185,7 +185,7 @@ def test_archive_session_if_idle_waits_for_idle_before_archiving(monkeypatch) ->
     sessions = _FakeSessions(["running", "idle"])
     runtime = ManagedAgentRuntime(client=_FakeClient(sessions))
     cleanup_warnings: list[str] = []
-    monkeypatch.setattr("claude_gepa.runtime.time.sleep", lambda _: None)
+    monkeypatch.setattr("agent_gepa.runtime.time.sleep", lambda _: None)
 
     runtime._archive_session_if_idle("sesn_test", session_status="idle", cleanup_warnings=cleanup_warnings)
 
@@ -269,11 +269,11 @@ def test_run_task_rejects_subagents_when_multi_agent_flag_is_disabled(tmp_path) 
             ),
         )
 
-    assert "CLAUDE_GEPA_ENABLE_MULTI_AGENT=1" in str(excinfo.value)
+    assert "AGENT_GEPA_ENABLE_MULTI_AGENT=1" in str(excinfo.value)
 
 
 def test_runtime_reads_multi_agent_flag_from_env(monkeypatch, tmp_path) -> None:
-    monkeypatch.setenv("CLAUDE_GEPA_ENABLE_MULTI_AGENT", "1")
+    monkeypatch.setenv("AGENT_GEPA_ENABLE_MULTI_AGENT", "1")
     runtime = ManagedAgentRuntime(client=_FakeClient(), skill_registry_path=tmp_path / "skills.json")
 
     assert runtime.enable_multi_agent is True

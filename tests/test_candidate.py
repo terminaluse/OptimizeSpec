@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from claude_gepa.candidate import (
+from agent_gepa.candidate import (
     CandidateBundle,
     CandidateCompilationError,
     CustomSkillSpec,

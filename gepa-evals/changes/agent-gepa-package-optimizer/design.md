@@ -1,6 +1,6 @@
 ## Context
 
-This change applies the GEPA eval skills to this package itself. The repo already provides `claude_gepa.self_improvement`, which includes eval case loading, deterministic scorers, ASI construction, rollout persistence, direct eval, compare, and GEPA optimize wiring.
+This change applies the GEPA eval skills to this package itself. The repo already provides `agent_gepa.self_improvement`, which includes eval case loading, deterministic scorers, ASI construction, rollout persistence, direct eval, compare, and GEPA optimize wiring.
 
 The target is a package-guidance candidate: a `dict[str, str]` containing text fields a coding or Managed Agent can use to explain and operate this package. The local executor is deterministic and credential-free so direct eval and compare can run in CI. GEPA optimization still requires a reflection model and provider credentials.
 
@@ -9,10 +9,10 @@ The target is a package-guidance candidate: a `dict[str, str]` containing text f
 The new folder exposes:
 
 ```bash
-python gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py show-candidate
-python gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py eval --run-dir runs/package-optimizer/eval
-python gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py compare --candidate gepa-evals/changes/claude-gepa-package-optimizer/seed-candidate.yaml --run-dir runs/package-optimizer/compare
-python gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py optimize --max-metric-calls 12 --run-dir runs/package-optimizer/optimize
+python gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py show-candidate
+python gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py eval --run-dir runs/package-optimizer/eval
+python gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py compare --candidate gepa-evals/changes/agent-gepa-package-optimizer/seed-candidate.yaml --run-dir runs/package-optimizer/compare
+python gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py optimize --max-metric-calls 12 --run-dir runs/package-optimizer/optimize
 ```
 
 ## Candidate Surface

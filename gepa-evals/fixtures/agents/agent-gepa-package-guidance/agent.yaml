@@ -1,18 +1,18 @@
-id: claude-gepa-package-guidance
-name: claude-gepa-package-guidance
+id: agent-gepa-package-guidance
+name: agent-gepa-package-guidance
 fixture_type: positive
 runtime: Claude Managed Agents
 description: Package-guidance fixture that validates whether eval validation skills can explain and optimize the repo-local GEPA eval workflow.
 source_files:
-  self_improvement: src/claude_gepa/self_improvement.py
-  cli: src/claude_gepa/cli.py
-  package_optimizer: gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py
-  package_cases: gepa-evals/changes/claude-gepa-package-optimizer/eval-cases.yaml
+  self_improvement: src/agent_gepa/self_improvement.py
+  cli: src/agent_gepa/cli.py
+  package_optimizer: gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py
+  package_cases: gepa-evals/changes/agent-gepa-package-optimizer/eval-cases.yaml
 existing_commands:
-  direct_eval: python gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py eval
-  optimize: python gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py optimize --max-metric-calls 1
-  compare: python gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py compare
-  show_candidate: python gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py show-candidate
+  direct_eval: python gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py eval
+  optimize: python gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py optimize --max-metric-calls 1
+  compare: python gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py compare
+  show_candidate: python gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py show-candidate
 candidate_fields:
   - package_summary
   - eval_workflow

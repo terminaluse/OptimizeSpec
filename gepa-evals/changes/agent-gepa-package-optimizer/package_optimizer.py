@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from claude_gepa.self_improvement import (  # noqa: E402
+from agent_gepa.self_improvement import (  # noqa: E402
     EvalCase,
     RolloutResult,
     ScoreResult,
@@ -177,7 +177,7 @@ def cmd_optimize(
         executor=PackageGuidanceExecutor(),
         run_dir=Path(run_dir),
         objective=(
-            "Improve package guidance for claude-gepa so answers include required operational concepts, "
+            "Improve package guidance for agent-gepa so answers include required operational concepts, "
             "accurately describe GEPA rollouts, and preserve concise ASI-first workflow guidance."
         ),
         background=(

@@ -1,6 +1,6 @@
 ## Context
 
-The current repo has a working GEPA self-improvement core in `src/claude_gepa/self_improvement.py`, CLI entry points for direct eval, compare, and optimize, and fixture changes under `gepa-evals/changes/`. The existing `claude-gepa-managed-agent-eval-generator` fixture already proves a narrow system loop: generate artifacts, run direct eval, run GEPA with a tiny budget, and score 1.0 when the loop emits the expected output files.
+The current repo has a working GEPA self-improvement core in `src/agent_gepa/self_improvement.py`, CLI entry points for direct eval, compare, and optimize, and fixture changes under `gepa-evals/changes/`. The existing `agent-gepa-managed-agent-eval-generator` fixture already proves a narrow system loop: generate artifacts, run direct eval, run GEPA with a tiny budget, and score 1.0 when the loop emits the expected output files.
 
 The validation gap is confidence. Static skill validation and one happy-path fixture do not prove that the skill workflow can reliably handle realistic Claude Managed Agent repos, incomplete user inputs, artifact quality expectations, optimizer execution, and failure modes. This change adds a validation layer around the skill pack so validation readiness is measured by runnable evidence rather than subjective review.
 
@@ -36,7 +36,7 @@ Constraints:
 
 ### Use the existing self-improvement core as the validation runtime
 
-The harness will use `EvalCase`, `RolloutResult`, `ScoreResult`, `evaluate_candidate`, `compare_candidates`, and `optimize_candidate` from `src/claude_gepa/self_improvement.py`. Fixture-specific behavior will live in small rollout executors and custom scorers.
+The harness will use `EvalCase`, `RolloutResult`, `ScoreResult`, `evaluate_candidate`, `compare_candidates`, and `optimize_candidate` from `src/agent_gepa/self_improvement.py`. Fixture-specific behavior will live in small rollout executors and custom scorers.
 
 Rationale: this avoids two competing eval models and keeps ASI, persistence, and GEPA invocation identical between package features and eval workflow validation.
 
@@ -162,11 +162,11 @@ The eval workflow validation runner should use the same lifecycle for every posi
 The user-facing validation commands should be small and explicit. The exact command names can be finalized in tasks, but the shape should be:
 
 ```bash
-python -m claude_gepa.eval_validation generate --fixture <fixture-id> --output-dir <run-dir>/generated
-python -m claude_gepa.eval_validation eval --fixture <fixture-id> --candidate <candidate.yaml> --run-dir <run-dir>/eval
-python -m claude_gepa.eval_validation compare --fixture <fixture-id> --baseline <seed.yaml> --candidate <candidate.yaml> --run-dir <run-dir>/compare
-python -m claude_gepa.eval_validation optimize --fixture <fixture-id> --candidate <seed.yaml> --max-metric-calls 1 --run-dir <run-dir>/optimize
-python -m claude_gepa.eval_validation verify --run-dir <run-dir>
+python -m agent_gepa.eval_validation generate --fixture <fixture-id> --output-dir <run-dir>/generated
+python -m agent_gepa.eval_validation eval --fixture <fixture-id> --candidate <candidate.yaml> --run-dir <run-dir>/eval
+python -m agent_gepa.eval_validation compare --fixture <fixture-id> --baseline <seed.yaml> --candidate <candidate.yaml> --run-dir <run-dir>/compare
+python -m agent_gepa.eval_validation optimize --fixture <fixture-id> --candidate <seed.yaml> --max-metric-calls 1 --run-dir <run-dir>/optimize
+python -m agent_gepa.eval_validation verify --run-dir <run-dir>
 ```
 
 For generated applied systems, the harness should also support invoking fixture-specific commands, such as the existing `agent_eval_generator.py generate`, `eval`, and `optimize` operations, so the validation can prove that apply output is actually runnable.
@@ -192,7 +192,7 @@ Rollback is straightforward because this change adds validation surfaces rather 
 
 ## Open Questions
 
-- Should eval workflow validation live under `src/claude_gepa/eval_validation.py` for package CLI reuse, or under `gepa-evals/eval_validation/` as repo-local validation tooling?
+- Should eval workflow validation live under `src/agent_gepa/eval_validation.py` for package CLI reuse, or under `gepa-evals/eval_validation/` as repo-local validation tooling?
 - What is the minimum number of positive fixtures required for eval validation: one realistic fixture plus the existing package optimizer, or two distinct Claude Managed Agent fixtures?
 - Should the optional live gate be required before broader release, or only before claiming production readiness?
 - How strict should artifact semantic scoring be before it starts blocking useful variation in generated specs and designs?

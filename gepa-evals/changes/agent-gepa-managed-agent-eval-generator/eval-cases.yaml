@@ -1,8 +1,8 @@
 cases:
   - id: proposal-for-existing-agent
     split: train
-    input: "Create the proposal artifact for the existing claude-gepa Managed Agent fixture."
-    expected: "Claude Managed Agents, src/claude_gepa/runtime.py, src/claude_gepa/evaluator.py, dict[str, str], system_prompt, task_prompt, outcome_rubric, skills, environment_spec, subagent_specs, numeric scoring, qualitative rubric, ASI"
+    input: "Create the proposal artifact for the existing agent-gepa Managed Agent fixture."
+    expected: "Claude Managed Agents, src/agent_gepa/runtime.py, src/agent_gepa/evaluator.py, dict[str, str], system_prompt, task_prompt, outcome_rubric, skills, environment_spec, subagent_specs, numeric scoring, qualitative rubric, ASI"
     scorer:
       type: custom
       expected: required_terms
@@ -10,8 +10,8 @@ cases:
       artifact_type: proposal
       required_terms:
         - Claude Managed Agents
-        - src/claude_gepa/runtime.py
-        - src/claude_gepa/evaluator.py
+        - src/agent_gepa/runtime.py
+        - src/agent_gepa/evaluator.py
         - dict[str, str]
         - system_prompt
         - task_prompt

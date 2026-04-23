@@ -18,7 +18,7 @@ Do not use this as the primary user-facing workflow. Use it as a shared referenc
 - `references/gepa-reflection.md`: GEPA reflective evolution, ASI, candidate fields, and optimizer configuration.
 - `references/managed-agents-runner.md`: Claude Managed Agents rollout lifecycle.
 - `references/scorers-and-asi.md`: scorer templates and ASI shape.
-- `references/repo-patterns.md`: local `claude_gepa` prototype patterns to adapt.
+- `references/repo-patterns.md`: local `agent_gepa` prototype patterns to adapt.
 
 ## Assets
 

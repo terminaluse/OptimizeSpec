@@ -251,7 +251,7 @@ Alternatives considered:
 
 The skill pack should include concise reference files derived from this repo and official skill guidance:
 
-- GEPA candidate/evaluator/optimizer patterns from `src/claude_gepa/`
+- GEPA candidate/evaluator/optimizer patterns from `src/agent_gepa/`
 - Claude Managed Agents concepts needed for eval execution
 - skill authoring conventions: concise frontmatter, progressive disclosure, references, validation
 - OpenSpec workflow motivation and artifact examples

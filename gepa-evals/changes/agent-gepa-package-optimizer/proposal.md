@@ -1,13 +1,13 @@
 ## Target Agent
 
-- Name: `claude-gepa-package-guidance`
+- Name: `agent-gepa-package-guidance`
 - Runtime: Claude Managed Agents in live use; local fixture executor for credential-free package optimizer smoke tests
-- Invocation: `python gepa-evals/changes/claude-gepa-package-optimizer/package_optimizer.py <command>`
+- Invocation: `python gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py <command>`
 - Constraints: v1 remains focused on Claude Managed Agents and GEPA `optimize_anything(...)`; local smoke runs do not call Anthropic APIs
 
 ## Improvement Target
 
-Optimize the text guidance a package-maintenance agent uses when explaining and operating this `claude-gepa` package. The optimized candidate should help an agent explain the package purpose, GEPA boundary, eval workflow, rollout lifecycle, ASI requirements, commands, verification, and v1 runtime limits accurately.
+Optimize the text guidance a package-maintenance agent uses when explaining and operating this `agent-gepa` package. The optimized candidate should help an agent explain the package purpose, GEPA boundary, eval workflow, rollout lifecycle, ASI requirements, commands, verification, and v1 runtime limits accurately.
 
 ## Candidate Surface
 

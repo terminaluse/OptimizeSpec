@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from claude_gepa.self_improvement import (  # noqa: E402
+from agent_gepa.self_improvement import (  # noqa: E402
     EvalCase,
     RolloutResult,
     ScoreResult,
@@ -30,7 +30,7 @@ from claude_gepa.self_improvement import (  # noqa: E402
 CHANGE_DIR = Path(__file__).resolve().parent
 DEFAULT_CASES = CHANGE_DIR / "eval-cases.yaml"
 DEFAULT_CANDIDATE = CHANGE_DIR / "seed-candidate.yaml"
-DEFAULT_FIXTURE = ROOT / "gepa-evals" / "fixtures" / "agents" / "claude-gepa-managed-agent" / "agent.yaml"
+DEFAULT_FIXTURE = ROOT / "gepa-evals" / "fixtures" / "agents" / "agent-gepa-managed-agent" / "agent.yaml"
 MUTABLE_FIELDS = [
     "fixture_analysis_guidance",
     "proposal_generation_guidance",
@@ -155,7 +155,7 @@ Use numeric scoring from 0.0 to 1.0 plus qualitative rubric review. Every rollou
     if artifact_type == "design":
         return f"""## Runtime Discovery
 
-Use ManagedAgentRuntime from src/claude_gepa/runtime.py, ManagedAgentEvaluator from src/claude_gepa/evaluator.py, and optimize_demo from src/claude_gepa/optimizer.py.
+Use ManagedAgentRuntime from src/agent_gepa/runtime.py, ManagedAgentEvaluator from src/agent_gepa/evaluator.py, and optimize_demo from src/agent_gepa/optimizer.py.
 
 ## Invocation
 
@@ -472,7 +472,7 @@ def cmd_optimize(
         executor=ExistingAgentEvalGeneratorExecutor(),
         run_dir=Path(run_dir),
         objective=(
-            "Improve guidance for generating eval and optimizer artifacts for the existing claude-gepa "
+            "Improve guidance for generating eval and optimizer artifacts for the existing agent-gepa "
             "Claude Managed Agent prototype."
         ),
         background=(

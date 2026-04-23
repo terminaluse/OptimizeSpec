@@ -1,4 +1,4 @@
-Create evals and a GEPA optimizer for the existing `claude-gepa` Managed Agent prototype.
+Create evals and a GEPA optimizer for the existing `agent-gepa` Managed Agent prototype.
 
 The generated workflow should:
 

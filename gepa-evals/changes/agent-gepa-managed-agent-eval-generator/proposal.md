@@ -1,8 +1,8 @@
 ## Target Agent
 
-- Name: `claude-gepa-managed-agent`
+- Name: `agent-gepa-managed-agent`
 - Runtime: Claude Managed Agents
-- Fixture: `gepa-evals/fixtures/agents/claude-gepa-managed-agent`
+- Fixture: `gepa-evals/fixtures/agents/agent-gepa-managed-agent`
 - Invocation under test: generate eval artifacts for the existing package prototype and score whether they contain the required eval/GEPA design concepts.
 
 ## Improvement Target
@@ -22,7 +22,7 @@ Evaluate whether the GEPA eval skills can produce a useful eval plan and optimiz
 
 ### Example: proposal-for-existing-agent
 
-- Input: Existing `claude-gepa-managed-agent` fixture plus request to create a proposal.
+- Input: Existing `agent-gepa-managed-agent` fixture plus request to create a proposal.
 - Expected: Proposal identifies target runtime, existing source files, candidate fields, eval examples, scoring, ASI, and unknowns.
 - Split: train
 
@@ -63,7 +63,7 @@ Evaluate whether the GEPA eval skills can produce a useful eval plan and optimiz
 - Partial score means: some required terms are missing and ASI lists them.
 - Failing score means: generated output is empty, irrelevant, or errors.
 - Deterministic scorer: required-term coverage, plus end-to-end system loop success for the system-run case.
-- Qualitative rubric: Generated artifacts should be specific to the existing `claude-gepa` Managed Agent implementation rather than generic eval advice.
+- Qualitative rubric: Generated artifacts should be specific to the existing `agent-gepa` Managed Agent implementation rather than generic eval advice.
 
 ## ASI Contract
 

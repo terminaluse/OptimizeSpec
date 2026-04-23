@@ -8,12 +8,12 @@ import sys
 
 import pytest
 
-from claude_gepa import eval_validation
-from claude_gepa.self_improvement import EvalCase, RolloutResult, ScorerSpec
+from agent_gepa import eval_validation
+from agent_gepa.self_improvement import EvalCase, RolloutResult, ScorerSpec
 
 
 def test_fixture_metadata_contract_loads_positive_fixture() -> None:
-    fixture = eval_validation.load_fixture("claude-gepa-managed-agent")
+    fixture = eval_validation.load_fixture("agent-gepa-managed-agent")
 
     assert fixture.runtime == "Claude Managed Agents"
     assert fixture.is_positive
@@ -107,7 +107,7 @@ def test_negative_fixture_scores_useful_failure() -> None:
 
 def test_generate_eval_compare_optimize_verify_smoke(tmp_path: Path) -> None:
     run_dir = tmp_path / "eval-validation"
-    fixture = "claude-gepa-managed-agent"
+    fixture = "agent-gepa-managed-agent"
 
     assert eval_validation.cmd_generate(fixture, str(run_dir), None, live=False) == 0
     assert eval_validation.cmd_eval(fixture, str(run_dir), None, None, 60.0, True, live=False) == 0
@@ -127,27 +127,27 @@ def test_generate_eval_compare_optimize_verify_smoke(tmp_path: Path) -> None:
 def test_documented_module_commands_execute(tmp_path: Path) -> None:
     run_dir = tmp_path / "documented"
     commands = [
-        ["generate", "--fixture", "claude-gepa-package-guidance", "--run-dir", str(run_dir)],
-        ["eval", "--fixture", "claude-gepa-package-guidance", "--run-dir", str(run_dir), "--skip-system-loop"],
-        ["compare", "--fixture", "claude-gepa-package-guidance", "--run-dir", str(run_dir), "--skip-system-loop"],
+        ["generate", "--fixture", "agent-gepa-package-guidance", "--run-dir", str(run_dir)],
+        ["eval", "--fixture", "agent-gepa-package-guidance", "--run-dir", str(run_dir), "--skip-system-loop"],
+        ["compare", "--fixture", "agent-gepa-package-guidance", "--run-dir", str(run_dir), "--skip-system-loop"],
         [
             "optimize",
             "--fixture",
-            "claude-gepa-package-guidance",
+            "agent-gepa-package-guidance",
             "--run-dir",
             str(run_dir),
             "--max-metric-calls",
             "1",
             "--skip-system-loop",
         ],
-        ["verify", "--fixture", "claude-gepa-package-guidance", "--run-dir", str(run_dir)],
+        ["verify", "--fixture", "agent-gepa-package-guidance", "--run-dir", str(run_dir)],
     ]
 
     for args in commands:
         env = os.environ.copy()
         env["PYTHONPATH"] = str(Path.cwd() / "src")
         completed = subprocess.run(
-            [sys.executable, "-m", "claude_gepa.eval_validation", *args],
+            [sys.executable, "-m", "agent_gepa.eval_validation", *args],
             cwd=Path.cwd(),
             text=True,
             capture_output=True,
@@ -160,7 +160,7 @@ def test_documented_module_commands_execute(tmp_path: Path) -> None:
 
 
 def test_system_loop_eval_scores_one(tmp_path: Path) -> None:
-    fixture = eval_validation.load_fixture("claude-gepa-managed-agent")
+    fixture = eval_validation.load_fixture("agent-gepa-managed-agent")
     cases = [case for case in eval_validation.default_eval_cases(fixture) if case.metadata.get("artifact_type") == "system_loop"]
     summary = eval_validation.evaluate_candidate(
         candidate=eval_validation.default_seed_candidate(fixture),

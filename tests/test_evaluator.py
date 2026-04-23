@@ -1,6 +1,6 @@
-from claude_gepa.candidate import CandidateCompilationError
-from claude_gepa.evaluator import ManagedAgentEvaluator, compute_text_match_score
-from claude_gepa.tasks import VAL_TASKS
+from agent_gepa.candidate import CandidateCompilationError
+from agent_gepa.evaluator import ManagedAgentEvaluator, compute_text_match_score
+from agent_gepa.tasks import VAL_TASKS
 
 
 def test_exact_match_score() -> None:

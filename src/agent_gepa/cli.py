@@ -22,7 +22,7 @@ from .tasks import VAL_TASKS
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="claude-gepa")
+    parser = argparse.ArgumentParser(prog="agent-gepa")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     eval_demo = subparsers.add_parser("eval-demo", help="Run one direct evaluation on the first validation task.")
@@ -79,7 +79,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     eval_validation_parser = subparsers.add_parser(
         "eval-validation",
-        help="Run GEPA eval workflow validation commands. Use `claude-gepa eval-validation -- <command> ...`.",
+        help="Run GEPA eval workflow validation commands. Use `agent-gepa eval-validation -- <command> ...`.",
     )
     eval_validation_parser.add_argument("eval_validation_args", nargs=argparse.REMAINDER)
 
