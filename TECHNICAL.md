@@ -249,6 +249,16 @@ python -m agent_gepa.eval_validation eval \
   --run-dir runs/eval-validation/live
 ```
 
+Live GEPA improvement sanity check:
+
+```bash
+export AGENT_GEPA_RUN_LIVE_IMPROVEMENT=1
+export ANTHROPIC_API_KEY=...
+pytest tests/test_gepa_improvement_live.py -q
+```
+
+This opt-in test starts with a deliberately weak `answer_template: wrong` candidate, runs GEPA with a small budget, and asserts that the optimized candidate changes and improves the direct eval score from 0.0 to 1.0.
+
 Negative fixtures live under `gepa-evals/fixtures/agents/` and cover missing eval contracts, missing scoring guidance, unsupported runtimes, and missing invocation details.
 
 ## Runtime notes
