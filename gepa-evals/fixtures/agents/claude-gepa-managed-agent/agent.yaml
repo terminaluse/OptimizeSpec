@@ -1,0 +1,32 @@
+name: claude-gepa-managed-agent
+runtime: Claude Managed Agents
+description: Existing package prototype that optimizes Claude Managed Agents with GEPA optimize_anything.
+source_files:
+  candidate: src/claude_gepa/candidate.py
+  runtime: src/claude_gepa/runtime.py
+  evaluator: src/claude_gepa/evaluator.py
+  optimizer: src/claude_gepa/optimizer.py
+  tasks: src/claude_gepa/tasks.py
+  cli: src/claude_gepa/cli.py
+existing_commands:
+  direct_eval: claude-gepa eval-demo
+  optimize: claude-gepa optimize-demo
+  compare: claude-gepa compare-demo
+  show_candidate: claude-gepa show-seed
+candidate_fields:
+  - system_prompt
+  - task_prompt
+  - outcome_rubric
+  - skills
+  - environment_spec
+  - subagent_specs
+runtime_facts:
+  - ManagedAgentRuntime creates Claude Managed Agents, Environments, Sessions, resources, and event streams.
+  - ManagedAgentEvaluator returns score and side_info for GEPA.
+  - CandidateBundle compiles dict[str, str] candidates into runtime behavior.
+  - optimize_demo invokes GEPA optimize_anything with train and validation tasks.
+  - Run artifacts include candidate snapshots, side_info, outputs, runtime IDs, usage, and errors.
+v1_constraints:
+  - Live runs require ANTHROPIC_API_KEY.
+  - Multi-agent subagents require CLAUDE_GEPA_ENABLE_MULTI_AGENT=1 and Anthropic preview access.
+  - Other agent runtimes are out of scope for the first eval-generation workflow.

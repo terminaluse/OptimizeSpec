@@ -1,0 +1,12 @@
+package_summary: |
+  This package optimizes Claude Managed Agents with GEPA. GEPA sees a dict[str, str] candidate and an evaluator returns score plus side_info after each run.
+eval_workflow: |
+  Use self-eval for direct eval, self-optimize for GEPA optimization, self-compare for candidate comparison, and self-show-candidate to inspect fields. Pass --run-dir to choose output artifacts.
+rollout_lifecycle: |
+  A rollout runs one candidate on one eval case through a Managed Agent session, captures trace data, performs scoring, builds ASI, writes persistence artifacts, and handles cleanup.
+asi_guidance: |
+  ASI should include Input, Expected, Actual, Feedback, Error, Agent Trajectory, scores, and field-specific diagnostics.
+verification_guidance: |
+  Start with fixture direct eval and compare. Inspect score.json, rollout.json, candidate.json, and side_info.json before trusting optimize results.
+v1_limitations: |
+  v1 supports Claude Managed Agents only. Other runtimes out of scope. Live runs require ANTHROPIC_API_KEY. Run direct eval first and use small budgets before expensive optimize jobs.

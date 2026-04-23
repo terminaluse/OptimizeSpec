@@ -1,0 +1,32 @@
+## Why
+
+The GEPA eval skill workflow is promising, but it is not launch-ready until it can prove that real agents can use the skills to create runnable evals, execute an optimization loop, and produce inspectable evidence of improvement or failure. This change adds the validation layer needed to turn the current prototype into a launchable alpha with clear pass/fail confidence.
+
+## What Changes
+
+- Add launch-alpha fixture coverage with example Claude Managed Agents that exercise the full new, continue, apply, eval, compare, and optimize flow.
+- Add a true skill execution harness that validates whether the GEPA eval skills can create the expected artifacts from realistic agent inputs, not just whether static files exist.
+- Add artifact quality scorers for proposals, designs, specs, tasks, eval cases, ASI, and runner outputs so generated work is assessed semantically and structurally.
+- Add applied system scorers that run the generated eval runner and optimizer and assign 1.0 only when the system completes an optimization loop with expected outputs.
+- Add negative fixtures that should fail or ask for clarification, covering missing eval contracts, ambiguous scoring, impossible runtime assumptions, and broken agent setup.
+- Add launch-readiness documentation that explains the alpha workflow, fixture expectations, known limitations, and the evidence required before broader release.
+- Keep the scope focused on Claude Managed Agents and repo-local skill workflows; other runtimes remain out of scope for this launch-alpha validation pass.
+
+## Capabilities
+
+### New Capabilities
+
+- `fixture-agent-validation`: Define representative Claude Managed Agent fixtures and expected end-to-end behavior for validating the GEPA eval skill workflow.
+- `skill-execution-harness`: Run the GEPA eval skills against fixture agents and capture whether the skills create complete, coherent artifacts and runnable implementations.
+- `artifact-quality-scoring`: Score generated proposals, designs, specs, tasks, eval cases, ASI, and runner artifacts for required content, semantic fit, and launch-blocking omissions.
+- `optimization-loop-validation`: Verify that applied eval systems can run direct evals, perform GEPA optimization rollouts, emit optimizer evidence, and score successful loops as 1.0.
+- `negative-fixture-validation`: Validate that the workflow fails usefully or asks for clarification when inputs are incomplete, ambiguous, or incompatible with Claude Managed Agent assumptions.
+- `launch-readiness-documentation`: Document the alpha launch workflow, validation commands, evidence artifacts, current limitations, and release criteria.
+
+### Modified Capabilities
+
+None.
+
+## Impact
+
+This affects the repo-local GEPA eval skill pack under `.codex/skills/gepa-evals-*`, validation fixtures under `gepa-evals/`, the self-improvement runner and optimizer code under `src/claude_gepa/`, CLI smoke paths, tests, and launch documentation. The change does not introduce a new agent runtime abstraction; it strengthens the existing Claude Managed Agent path and makes launch readiness measurable.

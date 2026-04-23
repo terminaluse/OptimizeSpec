@@ -1,0 +1,4 @@
+interface:
+  display_name: "GEPA Evals Continue"
+  short_description: "Continue GEPA eval workflow artifacts."
+  default_prompt: "Continue a GEPA eval change."

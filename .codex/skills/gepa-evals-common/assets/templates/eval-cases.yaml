@@ -1,0 +1,9 @@
+cases:
+  - id: exact-output-example
+    split: train
+    input: "hello"
+    expected: "hello"
+    scorer:
+      type: exact_match
+      expected: "hello"
+    rubric: "Output must exactly match the expected string."

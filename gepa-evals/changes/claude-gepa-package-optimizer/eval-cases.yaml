@@ -1,0 +1,87 @@
+cases:
+  - id: package-purpose
+    split: train
+    input: "Explain what this package is for and how GEPA interacts with it."
+    expected: "GEPA, Claude Managed Agents, dict[str, str], evaluator, side_info"
+    scorer:
+      type: custom
+      expected: required_terms
+    metadata:
+      required_terms:
+        - GEPA
+        - Claude Managed Agents
+        - dict[str, str]
+        - evaluator
+        - side_info
+      focus_fields:
+        - package_summary
+  - id: workflow-commands
+    split: train
+    input: "How do I run direct eval, optimization, comparison, and inspect the candidate?"
+    expected: "self-eval, self-optimize, self-compare, self-show-candidate, run-dir"
+    scorer:
+      type: custom
+      expected: required_terms
+    metadata:
+      required_terms:
+        - self-eval
+        - self-optimize
+        - self-compare
+        - self-show-candidate
+        - run-dir
+      focus_fields:
+        - eval_workflow
+  - id: asi-contract
+    split: train
+    input: "What should Actionable Side Information contain for reflection?"
+    expected: "Input, Expected, Actual, Feedback, Error, Agent Trajectory, scores, field-specific"
+    scorer:
+      type: custom
+      expected: required_terms
+    metadata:
+      required_terms:
+        - Input
+        - Expected
+        - Actual
+        - Feedback
+        - Error
+        - Agent Trajectory
+        - scores
+        - field-specific
+      focus_fields:
+        - asi_guidance
+  - id: rollout-lifecycle
+    split: val
+    input: "What is one rollout in this package optimizer?"
+    expected: "candidate, eval case, Managed Agent session, trace, scoring, ASI, persistence, cleanup"
+    scorer:
+      type: custom
+      expected: required_terms
+    metadata:
+      required_terms:
+        - candidate
+        - eval case
+        - Managed Agent session
+        - trace
+        - scoring
+        - ASI
+        - persistence
+        - cleanup
+      focus_fields:
+        - rollout_lifecycle
+  - id: v1-limits
+    split: val
+    input: "What are the v1 limitations and live-run requirements?"
+    expected: "Claude Managed Agents only, other runtimes out of scope, ANTHROPIC_API_KEY, direct eval first, small budgets"
+    scorer:
+      type: custom
+      expected: required_terms
+    metadata:
+      required_terms:
+        - Claude Managed Agents only
+        - other runtimes out of scope
+        - ANTHROPIC_API_KEY
+        - direct eval first
+        - small budgets
+      focus_fields:
+        - v1_limitations

@@ -155,6 +155,69 @@ claude-gepa optimize-demo --max-metric-calls 48
 claude-gepa compare-demo --max-metric-calls 48
 ```
 
+## GEPA eval self-improvement workflow
+
+This repo includes a repo-local skill pack for designing eval-driven self-improvement loops inspired by OpenSpec:
+
+- `.codex/skills/gepa-evals-new`
+- `.codex/skills/gepa-evals-continue`
+- `.codex/skills/gepa-evals-apply`
+- `.codex/skills/gepa-evals-verify`
+- `.codex/skills/gepa-evals-common`
+
+The default artifact layout for target projects is:
+
+```text
+gepa-evals/changes/<change-name>/
+  proposal.md
+  design.md
+  specs/
+  tasks.md
+  eval-cases.yaml
+  seed-candidate.yaml
+```
+
+The workflow works backward from GEPA reflection:
+
+1. Define the behavior to improve and mutable candidate fields.
+2. Define the Actionable Side Information GEPA needs after each rollout.
+3. Define eval cases and scorers.
+4. Design Claude Managed Agents rollouts and trace capture.
+5. Apply the design by adding direct eval, optimize, compare, and candidate-inspection operations.
+
+The reusable core lives in `src/claude_gepa/self_improvement.py`. It provides:
+
+- portable eval case and scorer schemas
+- direct candidate evaluation
+- rollout artifact persistence
+- ASI construction with field-specific feedback
+- candidate comparison
+- GEPA `optimize_anything(...)` wiring through a pluggable rollout executor
+
+Fixture commands use a local template executor so the mechanics can be tested without live Anthropic credentials:
+
+```bash
+claude-gepa self-show-candidate --candidate .codex/skills/gepa-evals-common/assets/templates/seed-candidate.yaml --pretty
+claude-gepa self-eval \
+  --cases .codex/skills/gepa-evals-common/assets/templates/eval-cases.yaml \
+  --candidate .codex/skills/gepa-evals-common/assets/templates/seed-candidate.yaml \
+  --run-dir runs/self-eval-smoke
+claude-gepa self-compare \
+  --cases .codex/skills/gepa-evals-common/assets/templates/eval-cases.yaml \
+  --baseline .codex/skills/gepa-evals-common/assets/templates/seed-candidate.yaml \
+  --candidate .codex/skills/gepa-evals-common/assets/templates/seed-candidate.yaml \
+  --run-dir runs/self-compare-smoke
+```
+
+For real Claude Managed Agent targets, replace the fixture executor with a rollout executor that reuses the target repo's existing Agent, Environment, Session, resource, event-stream, and cleanup code. Required live environment variables depend on that target repo, but `ANTHROPIC_API_KEY` is required for Managed Agents API calls.
+
+Known v1 limits:
+
+- only Claude Managed Agents are supported
+- other agent runtimes such as Codex are intentionally out of scope
+- qualitative rubric scoring needs a target-repo scorer implementation
+- live optimize runs can be expensive; start with direct eval and small budgets
+
 ## Notes
 
 - Fresh agents and environments are created for every evaluation.

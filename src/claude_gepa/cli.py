@@ -9,6 +9,14 @@ from typing import Sequence
 from .candidate import DEFAULT_SEED_CANDIDATE
 from .evaluator import ManagedAgentEvaluator
 from .optimizer import DEMO_SEED_CANDIDATE, diff_candidates, evaluate_candidate_suite, optimize_demo
+from .self_improvement import (
+    TemplateEchoExecutor,
+    compare_candidates,
+    evaluate_candidate,
+    load_candidate,
+    load_eval_cases,
+    optimize_candidate,
+)
 from .tasks import VAL_TASKS
 
 
@@ -36,6 +44,36 @@ def build_parser() -> argparse.ArgumentParser:
 
     show = subparsers.add_parser("show-seed", help="Print the default strong seed candidate.")
     show.add_argument("--pretty", action="store_true")
+
+    self_eval = subparsers.add_parser("self-eval", help="Run direct self-improvement eval cases without GEPA search.")
+    self_eval.add_argument("--cases", required=True, help="YAML file containing eval cases.")
+    self_eval.add_argument("--candidate", required=True, help="YAML or JSON candidate file.")
+    self_eval.add_argument("--run-dir", default="runs/self-eval")
+    self_eval.add_argument("--timeout-seconds", type=float, default=120.0)
+
+    self_optimize = subparsers.add_parser("self-optimize", help="Run GEPA over self-improvement eval cases.")
+    self_optimize.add_argument("--cases", required=True, help="YAML file containing eval cases.")
+    self_optimize.add_argument("--candidate", required=True, help="YAML or JSON seed candidate file.")
+    self_optimize.add_argument("--run-dir", default="runs/self-optimize")
+    self_optimize.add_argument("--max-metric-calls", type=int, default=12)
+    self_optimize.add_argument("--reflection-model", default="anthropic/claude-opus-4-7")
+    self_optimize.add_argument("--timeout-seconds", type=float, default=120.0)
+    self_optimize.add_argument("--objective", default="Improve the candidate so it scores higher on the eval suite.")
+    self_optimize.add_argument(
+        "--background",
+        default="The candidate is a dict[str, str]. The evaluator returns numeric score plus Actionable Side Information.",
+    )
+
+    self_compare = subparsers.add_parser("self-compare", help="Compare two candidates on the same eval cases.")
+    self_compare.add_argument("--cases", required=True, help="YAML file containing eval cases.")
+    self_compare.add_argument("--baseline", required=True, help="YAML or JSON baseline candidate file.")
+    self_compare.add_argument("--candidate", required=True, help="YAML or JSON comparison candidate file.")
+    self_compare.add_argument("--run-dir", default="runs/self-compare")
+    self_compare.add_argument("--timeout-seconds", type=float, default=120.0)
+
+    self_show = subparsers.add_parser("self-show-candidate", help="Print a self-improvement candidate.")
+    self_show.add_argument("--candidate", required=True, help="YAML or JSON candidate file.")
+    self_show.add_argument("--pretty", action="store_true")
 
     return parser
 
@@ -147,6 +185,76 @@ def cmd_show_seed(pretty: bool) -> int:
     return 0
 
 
+def cmd_self_eval(cases_path: str, candidate_path: str, run_dir: str, timeout_seconds: float) -> int:
+    cases = load_eval_cases(Path(cases_path))
+    candidate = load_candidate(Path(candidate_path))
+    payload = evaluate_candidate(
+        candidate=candidate,
+        cases=cases,
+        executor=TemplateEchoExecutor(),
+        run_dir=Path(run_dir),
+        candidate_id="candidate",
+        timeout_seconds=timeout_seconds,
+    )
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return 0
+
+
+def cmd_self_optimize(
+    cases_path: str,
+    candidate_path: str,
+    run_dir: str,
+    max_metric_calls: int,
+    reflection_model: str,
+    timeout_seconds: float,
+    objective: str,
+    background: str,
+) -> int:
+    cases = load_eval_cases(Path(cases_path))
+    candidate = load_candidate(Path(candidate_path))
+    result = optimize_candidate(
+        seed_candidate=candidate,
+        cases=cases,
+        executor=TemplateEchoExecutor(),
+        run_dir=Path(run_dir),
+        objective=objective,
+        background=background,
+        reflection_model=reflection_model,
+        max_metric_calls=max_metric_calls,
+        timeout_seconds=timeout_seconds,
+    )
+    print(json.dumps(result.best_candidate, indent=2, sort_keys=True))
+    return 0
+
+
+def cmd_self_compare(
+    cases_path: str,
+    baseline_path: str,
+    candidate_path: str,
+    run_dir: str,
+    timeout_seconds: float,
+) -> int:
+    cases = load_eval_cases(Path(cases_path))
+    baseline = load_candidate(Path(baseline_path))
+    candidate = load_candidate(Path(candidate_path))
+    payload = compare_candidates(
+        baseline=baseline,
+        candidate=candidate,
+        cases=cases,
+        executor=TemplateEchoExecutor(),
+        run_dir=Path(run_dir),
+        timeout_seconds=timeout_seconds,
+    )
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return 0
+
+
+def cmd_self_show_candidate(candidate_path: str, pretty: bool) -> int:
+    candidate = load_candidate(Path(candidate_path))
+    print(json.dumps(candidate, indent=2 if pretty else None, sort_keys=pretty))
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -169,6 +277,23 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     if args.command == "show-seed":
         return cmd_show_seed(args.pretty)
+    if args.command == "self-eval":
+        return cmd_self_eval(args.cases, args.candidate, args.run_dir, args.timeout_seconds)
+    if args.command == "self-optimize":
+        return cmd_self_optimize(
+            args.cases,
+            args.candidate,
+            args.run_dir,
+            args.max_metric_calls,
+            args.reflection_model,
+            args.timeout_seconds,
+            args.objective,
+            args.background,
+        )
+    if args.command == "self-compare":
+        return cmd_self_compare(args.cases, args.baseline, args.candidate, args.run_dir, args.timeout_seconds)
+    if args.command == "self-show-candidate":
+        return cmd_self_show_candidate(args.candidate, args.pretty)
 
     parser.error(f"unknown command: {args.command}")
     return 2

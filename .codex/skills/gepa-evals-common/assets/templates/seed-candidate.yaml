@@ -1,0 +1,3 @@
+answer_template: "{input}"
+system_prompt: "You are an agent being optimized by GEPA."
+task_prompt: "Complete the task exactly."
