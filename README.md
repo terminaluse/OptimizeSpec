@@ -9,7 +9,8 @@ It does not ship a Python optimization runtime as the product. Instead, it helps
 - A TypeScript/Node CLI for creating and validating OptimizeSpec artifacts.
 - Repo-local skills for proposal, design, apply, and verification workflows.
 - Target-repo scaffolding for eval runners and optimizer entrypoints.
-- A Python Claude Managed Agents + GEPA example kept as reference material under `examples/python-managed-agent/`.
+- A Python Claude Managed Agents + GEPA harness kept as reference/test material under `examples/python-managed-agent/`.
+- Reference agent fixtures under `tests/fixtures/reference-agents/`; optimization systems are generated during tests instead of committed as examples.
 
 ## Install For Development
 
@@ -20,6 +21,21 @@ node bin/optimizespec.js --help
 ```
 
 Node.js 20.19.0 or newer is required.
+
+## Install For Users
+
+After release, install the CLI globally:
+
+```bash
+npm install -g optimizespec
+optimizespec --help
+```
+
+Or run it without a global install:
+
+```bash
+npx optimizespec@latest --help
+```
 
 ## CLI Quickstart
 
@@ -87,7 +103,15 @@ The original Python Managed Agents + GEPA prototype moved to:
 examples/python-managed-agent/
 ```
 
-It remains useful as a runnable reference for candidate compilation, Claude Managed Agents sessions, GEPA evaluator wiring, and evidence-ledger structure. It is not the public OptimizeSpec package and is not required for normal CLI usage.
+It remains useful as a reference harness for candidate compilation, Claude Managed Agents sessions, GEPA evaluator wiring, and evidence-ledger structure. It is not the public OptimizeSpec package and is not required for normal CLI usage.
+
+Reference agents live in:
+
+```text
+tests/fixtures/reference-agents/
+```
+
+Those fixtures are committed inputs. Generated optimization systems, run ledgers, optimizer traces, and `optimizespec.generated/` output should be created in temporary test workspaces or ignored local `runs/` directories, not committed as product examples.
 
 Run its deterministic tests from the repo root:
 

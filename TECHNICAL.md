@@ -3,7 +3,8 @@
 This repository now has two clear layers:
 
 - The public product is the TypeScript CLI and OptimizeSpec skill/template system.
-- The Python Claude Managed Agents + GEPA implementation is a reference example under `examples/python-managed-agent/`.
+- The Python Claude Managed Agents + GEPA implementation is a reference harness under `examples/python-managed-agent/`.
+- Reference agents are committed as test inputs under `tests/fixtures/reference-agents/`; optimization systems are generated outputs.
 
 ## TypeScript CLI
 
@@ -33,7 +34,7 @@ Package inspection:
 npm run pack:check
 ```
 
-The npm package allowlist intentionally includes `bin`, `dist`, `skills`, and documentation. It does not include `examples/python-managed-agent/`, root run artifacts, Python package metadata, caches, or OpenSpec planning history.
+The npm package allowlist intentionally includes `bin`, `dist`, `skills`, and documentation. It does not include `examples/python-managed-agent/`, `tests/fixtures/reference-agents/`, root run artifacts, Python package metadata, caches, generated optimization systems, or OpenSpec planning history.
 
 ## CLI Commands
 
@@ -54,6 +55,22 @@ optimizespec.generated/<change-name>/
 ```
 
 Generated code is deliberately local to the target repository. A TypeScript target gets TypeScript runner files; a Python target can get Python runner files. OptimizeSpec itself does not require target repos to import a bundled Python runtime.
+
+## Reference Fixtures
+
+Committed reference agents live under:
+
+```text
+tests/fixtures/reference-agents/<fixture-id>/
+  agent.yaml
+  request.md
+```
+
+These files are source inputs for tests and skills. They should stay narrow and hand-authored. Do not commit full generated `optimizespec/changes/<change-name>/` systems, `optimizespec.generated/<change-name>/` output, run ledgers, optimizer traces, or generated runner directories as examples.
+
+Tests that need an optimization system should generate one in a temporary workspace or an ignored `runs/` directory. If deterministic comparison data is needed, keep it as a focused expected-output fixture rather than a complete runnable system.
+
+To add a reference agent, create `tests/fixtures/reference-agents/<fixture-id>/agent.yaml` and `request.md`, then add or update a test that generates the optimization-system artifacts from that fixture in a temporary directory. Keep the fixture limited to source inputs and metadata. If a regression needs expected output, store only the stable contract being asserted, such as a CLI JSON shape or a short generated-file excerpt, and regenerate it through an explicit test update rather than committing a full runnable system.
 
 ## Artifact Layout
 
@@ -92,7 +109,7 @@ Shared contracts live under `skills/optimizespec-common/references/`. The most i
 
 ## Python Reference Example
 
-The Python example lives at:
+The Python reference harness lives at:
 
 ```text
 examples/python-managed-agent/
@@ -104,7 +121,7 @@ It contains the original modules for:
 - Managed Agents runtime sessions and event collection
 - GEPA evaluator and optimizer wiring
 - deterministic validation harness
-- evidence-ledger examples
+- evidence-ledger generation in temporary or ignored run directories
 
 Run Python regression tests from the repo root:
 
@@ -129,7 +146,7 @@ Live tests remain opt-in through environment flags such as `OPTIMIZESPEC_RUN_LIV
 Before release, verify:
 
 - `npm test` passes.
-- `npm run pack:check` does not include `examples/python-managed-agent/`.
+- `npm run pack:check` does not include `examples/python-managed-agent/`, `tests/fixtures/reference-agents/`, or generated optimization systems.
 - `pytest -q` passes for the Python reference example.
 - Documentation presents the TypeScript CLI as the public command surface.
-- Python commands are documented only as reference/example workflows.
+- Python commands are documented only as reference harness workflows.

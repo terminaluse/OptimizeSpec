@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-import importlib.util
 
 import pytest
 import yaml
 
+from optimizespec import eval_validation
 from optimizespec.self_improvement import (
     EvalCase,
     GEPAEvaluator,
@@ -146,73 +146,68 @@ def test_gepa_evaluator_supports_custom_scorers(tmp_path: Path) -> None:
     assert side_info["Feedback"] == "custom scorer ran"
 
 
-def test_package_optimizer_fixture_scores_required_terms(tmp_path: Path) -> None:
-    module_path = Path("examples/python-managed-agent/optimizespec/changes/optimizespec-package-optimizer/package_optimizer.py")
-    spec = importlib.util.spec_from_file_location("package_optimizer", module_path)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+def test_package_guidance_reference_fixture_scores_required_terms(tmp_path: Path) -> None:
+    fixture = eval_validation.load_fixture("optimizespec-package-guidance")
+    cases = [
+        case
+        for case in eval_validation.default_eval_cases(fixture, include_system_loop=False)
+        if case.metadata.get("artifact_type") == "proposal"
+    ]
 
     payload = evaluate_candidate(
-        candidate=module.load_seed(),
-        cases=module.load_cases(),
-        executor=module.PackageGuidanceExecutor(),
+        candidate=eval_validation.default_seed_candidate(fixture),
+        cases=cases,
+        executor=eval_validation.EvalValidationExecutor(fixture=fixture, run_dir=tmp_path),
         run_dir=tmp_path,
-        mutable_fields=module.MUTABLE_FIELDS,
-        custom_scorers=module.custom_scorers(),
+        mutable_fields=eval_validation.MUTABLE_FIELDS,
+        custom_scorers=eval_validation.custom_scorers(),
     )
 
     assert payload["mean_score"] == 1.0
-    side_info = json.loads((tmp_path / "rollouts" / "candidate" / "asi-contract" / "side_info.json").read_text())
-    assert "asi_guidance_specific_info" in side_info
-    assert side_info["scores"]["required_term_coverage"] == 1.0
-
-
-def test_existing_agent_eval_generator_scores_generated_artifacts(tmp_path: Path) -> None:
-    module_path = Path(
-        "examples/python-managed-agent/optimizespec/changes/optimizespec-managed-agent-eval-generator/agent_eval_generator.py"
+    side_info = json.loads(
+        (tmp_path / "rollouts" / "candidate" / "optimizespec-package-guidance-proposal" / "side_info.json").read_text()
     )
-    spec = importlib.util.spec_from_file_location("agent_eval_generator", module_path)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    assert "proposal_generation_guidance_specific_info" in side_info
+    assert side_info["scores"]["semantic_concept_coverage"] == 1.0
+
+
+def test_reference_agent_generated_artifacts_score_cleanly(tmp_path: Path) -> None:
+    fixture = eval_validation.load_fixture("optimizespec-managed-agent")
+    cases = [
+        case
+        for case in eval_validation.default_eval_cases(fixture, include_system_loop=False)
+        if case.metadata.get("artifact_type") in {"design", "apply_plan"}
+    ]
 
     payload = evaluate_candidate(
-        candidate=module.load_seed(),
-        cases=module.load_cases(),
-        executor=module.ExistingAgentEvalGeneratorExecutor(),
+        candidate=eval_validation.default_seed_candidate(fixture),
+        cases=cases,
+        executor=eval_validation.EvalValidationExecutor(fixture=fixture, run_dir=tmp_path),
         run_dir=tmp_path,
-        mutable_fields=module.MUTABLE_FIELDS,
-        custom_scorers=module.custom_scorers(),
+        mutable_fields=eval_validation.MUTABLE_FIELDS,
+        custom_scorers=eval_validation.custom_scorers(),
     )
 
     assert payload["mean_score"] == 1.0
-    assert payload["mean_test_score"] == 1.0
-    side_info = json.loads((tmp_path / "rollouts" / "candidate" / "design-for-existing-agent" / "side_info.json").read_text())
+    assert payload["mean_val_score"] == 1.0
+    side_info = json.loads((tmp_path / "rollouts" / "candidate" / "optimizespec-managed-agent-design" / "side_info.json").read_text())
     assert "design_generation_guidance_specific_info" in side_info
-    assert side_info["scores"]["required_term_coverage"] == 1.0
-    loop_side_info = json.loads(
-        (tmp_path / "rollouts" / "candidate" / "end-to-end-optimization-loop" / "side_info.json").read_text()
+    assert side_info["scores"]["semantic_concept_coverage"] == 1.0
+
+
+def test_reference_agent_generation_writes_temp_artifacts(tmp_path: Path) -> None:
+    fixture = eval_validation.load_fixture("optimizespec-managed-agent")
+
+    rendered = eval_validation.generate_artifacts(
+        fixture,
+        tmp_path,
+        eval_validation.default_seed_candidate(fixture),
     )
-    assert loop_side_info["Actual"].startswith("SYSTEM_LOOP_SUCCESS")
-    assert loop_side_info["scores"]["system_loop_success"] == 1.0
-
-
-def test_existing_agent_eval_generator_writes_generated_artifacts(tmp_path: Path) -> None:
-    module_path = Path(
-        "examples/python-managed-agent/optimizespec/changes/optimizespec-managed-agent-eval-generator/agent_eval_generator.py"
-    )
-    spec = importlib.util.spec_from_file_location("agent_eval_generator_generate", module_path)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-
-    rendered = module.generate_artifacts(tmp_path, module.load_seed())
 
     assert "proposal.md" in rendered
-    assert (tmp_path / "proposal.md").exists()
-    assert (tmp_path / "design.md").exists()
-    assert (tmp_path / "specs" / "meta-eval-spec.md").exists()
+    assert (tmp_path / "generated" / "proposal.md").exists()
+    assert (tmp_path / "generated" / "design.md").exists()
+    assert (tmp_path / "generated" / "specs" / "eval-validation-spec.md").exists()
 
 
 @pytest.mark.parametrize(

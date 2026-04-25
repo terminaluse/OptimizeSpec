@@ -1,3 +1,0 @@
-answer_template: wrong
-reflection_guidance: |
-  The candidate should inspect ASI, compare Actual with Expected, and update answer_template when the output is systematically wrong.

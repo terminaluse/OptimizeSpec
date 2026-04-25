@@ -26,9 +26,10 @@ from .self_improvement import (
 )
 
 
-ROOT = Path(__file__).resolve().parents[2]
-FIXTURE_ROOT = ROOT / "optimizespec" / "fixtures" / "agents"
-DEFAULT_RUN_DIR = ROOT / "runs" / "eval-validation"
+EXAMPLE_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[4]
+FIXTURE_ROOT = REPO_ROOT / "tests" / "fixtures" / "reference-agents"
+DEFAULT_RUN_DIR = REPO_ROOT / "runs" / "eval-validation"
 LIVE_ENV_FLAG = "OPTIMIZESPEC_EVAL_VALIDATION_LIVE"
 REQUIRED_LIVE_ENV = "ANTHROPIC_API_KEY"
 MUTABLE_FIELDS = [
@@ -1079,7 +1080,7 @@ def run_command(args: list[str], *, cwd: Path, timeout_seconds: float, generated
     started = time.monotonic()
     errors: list[str] = []
     env = os.environ.copy()
-    src_path = str(ROOT / "src")
+    src_path = str(EXAMPLE_ROOT / "src")
     env["PYTHONPATH"] = src_path if not env.get("PYTHONPATH") else f"{src_path}{os.pathsep}{env['PYTHONPATH']}"
     try:
         completed = subprocess.run(args, cwd=cwd, text=True, capture_output=True, timeout=timeout_seconds, env=env)
@@ -1370,7 +1371,7 @@ def run_system_loop(fixture: FixtureMetadata, parent_run_dir: Path, *, timeout_s
     }
     evidence: dict[str, CommandEvidence] = {}
     for name, args in commands.items():
-        result = run_command(args, cwd=ROOT, timeout_seconds=command_timeout, generated_root=work_dir)
+        result = run_command(args, cwd=REPO_ROOT, timeout_seconds=command_timeout, generated_root=work_dir)
         persist_command_evidence(work_dir, name, result)
         evidence[name] = result
 
@@ -1409,7 +1410,7 @@ def required_artifacts(fixture: FixtureMetadata) -> list[str]:
     return unique_terms([*DEFAULT_REQUIRED_ARTIFACTS, *EVIDENCE_REQUIRED_ARTIFACTS])
 
 
-def display_path(path: Path, base: Path = ROOT) -> str:
+def display_path(path: Path, base: Path = REPO_ROOT) -> str:
     try:
         return str(path.relative_to(base))
     except ValueError:

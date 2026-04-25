@@ -97,6 +97,43 @@ describe('optimizespec cli', () => {
     expect(runner).toContain('export async function runEvalCase');
   });
 
+  it('can start from a committed reference-agent fixture and generate output in temp workspaces', () => {
+    const fixture = join(process.cwd(), 'tests', 'fixtures', 'reference-agents', 'optimizespec-managed-agent');
+    const project = tempProject();
+    const target = tempProject();
+    const request = readFileSync(join(fixture, 'request.md'), 'utf8').trim();
+    run([
+      'new',
+      'change',
+      'reference-agent-system',
+      '--path',
+      project,
+      '--description',
+      request || 'Generate an optimization system from the reference agent fixture.',
+      '--json',
+    ]);
+
+    const result = JSON.parse(
+      run([
+        'apply',
+        '--change',
+        'reference-agent-system',
+        '--path',
+        project,
+        '--target',
+        target,
+        '--stack',
+        'typescript',
+        '--json',
+      ]),
+    );
+
+    expect(result.created).toHaveLength(3);
+    expect(readFileSync(join(target, 'optimizespec.generated', 'reference-agent-system', 'optimizer.ts'), 'utf8')).toContain(
+      'meanScore',
+    );
+  });
+
   it('emits structured JSON errors for invalid changes', () => {
     const project = tempProject();
     const result = spawnSync(

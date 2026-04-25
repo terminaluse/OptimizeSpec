@@ -1,0 +1,22 @@
+id: missing-judge-records
+name: missing-judge-records
+fixture_type: negative
+runtime: Claude Managed Agents
+description: Negative fixture where score records exist but judge output persistence is missing.
+source_files:
+  runtime: examples/python-managed-agent/src/optimizespec/runtime.py
+existing_commands:
+  direct_eval: optimizespec eval-demo
+candidate_fields:
+  - system_prompt
+expected_failure: missing judge records
+runtime_facts:
+  - Numeric scores without grader or judge records are hard to trust.
+v1_constraints:
+  - The workflow must persist grader type, rubric or criterion, structured output, calibration status, and reliability warnings.
+expected_behavior:
+  semantic_checks: {}
+  live:
+    requires_live: false
+    required_env:
+      - ANTHROPIC_API_KEY

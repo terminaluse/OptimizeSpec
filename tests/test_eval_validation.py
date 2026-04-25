@@ -21,6 +21,14 @@ def test_fixture_metadata_contract_loads_positive_fixture() -> None:
     assert "proposal" in eval_validation.semantic_checks(fixture)
 
 
+def test_reference_agent_fixture_root_is_repo_test_data() -> None:
+    fixture_root = Path.cwd() / "tests" / "fixtures" / "reference-agents"
+
+    assert eval_validation.FIXTURE_ROOT == fixture_root
+    assert (fixture_root / "optimizespec-managed-agent" / "agent.yaml").exists()
+    assert not Path("examples/python-managed-agent/optimizespec/changes").exists()
+
+
 def test_fixture_metadata_contract_rejects_missing_required_fields() -> None:
     with pytest.raises(eval_validation.ContractValidationError, match="description"):
         eval_validation.validate_fixture_metadata(

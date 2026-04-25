@@ -9,11 +9,18 @@
     "optimization",
     "cli"
   ],
-  "homepage": "https://github.com/Fission-AI/OpenSpec",
+  "homepage": "https://github.com/terminal-use/agent-gepa#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/terminal-use/agent-gepa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/terminal-use/agent-gepa/issues"
+  },
   "license": "MIT",
   "type": "module",
   "bin": {
-    "optimizespec": "./bin/optimizespec.js"
+    "optimizespec": "bin/optimizespec.js"
   },
   "files": [
     "bin",
@@ -28,7 +35,9 @@
     "dev": "tsc --watch",
     "dev:cli": "npm run build --silent && node bin/optimizespec.js",
     "test": "npm run build --silent && vitest run",
-    "pack:check": "npm pack --dry-run --json"
+    "pack:check": "npm pack --dry-run --json",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm test && npm run pack:check"
   },
   "engines": {
     "node": ">=20.19.0"

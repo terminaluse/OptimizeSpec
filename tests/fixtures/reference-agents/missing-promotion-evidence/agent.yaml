@@ -1,0 +1,23 @@
+id: missing-promotion-evidence
+name: missing-promotion-evidence
+fixture_type: negative
+runtime: Claude Managed Agents
+description: Negative fixture where a candidate is selected without a promotion or no-promotion decision record.
+source_files:
+  runtime: examples/python-managed-agent/src/optimizespec/runtime.py
+existing_commands:
+  direct_eval: optimizespec eval-demo
+  compare: optimizespec compare-demo
+candidate_fields:
+  - system_prompt
+expected_failure: missing promotion evidence
+runtime_facts:
+  - Candidate selection must explain promotion, rejection, manual review, and rollback path.
+v1_constraints:
+  - The workflow must persist promotion decision evidence before claiming readiness.
+expected_behavior:
+  semantic_checks: {}
+  live:
+    requires_live: false
+    required_env:
+      - ANTHROPIC_API_KEY

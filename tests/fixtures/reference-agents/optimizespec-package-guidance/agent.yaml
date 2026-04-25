@@ -1,0 +1,113 @@
+id: optimizespec-package-guidance
+name: optimizespec-package-guidance
+fixture_type: positive
+runtime: Claude Managed Agents
+description: Package-guidance fixture that validates whether eval validation skills can explain and optimize the repo-local OptimizeSpec workflow.
+source_files:
+  self_improvement: examples/python-managed-agent/src/optimizespec/self_improvement.py
+  eval_validation: examples/python-managed-agent/src/optimizespec/eval_validation.py
+  cli: examples/python-managed-agent/src/optimizespec/cli.py
+existing_commands:
+  direct_eval: python -m optimizespec.eval_validation eval --fixture optimizespec-package-guidance
+  optimize: python -m optimizespec.eval_validation optimize --fixture optimizespec-package-guidance --max-metric-calls 1
+  compare: python -m optimizespec.eval_validation compare --fixture optimizespec-package-guidance
+  show_candidate: python -m optimizespec.eval_validation show-fixture --fixture optimizespec-package-guidance
+candidate_fields:
+  - package_summary
+  - eval_workflow
+  - rollout_lifecycle
+  - asi_guidance
+  - verification_guidance
+  - v1_limitations
+runtime_facts:
+  - The package exposes reusable self-improvement primitives for eval cases, rollouts, scores, ASI, compare, and GEPA optimization.
+  - The eval validation harness uses deterministic execution so validation can run without live Anthropic credentials.
+  - The same hard contracts and semantic artifact scoring should apply to user-facing skill outputs.
+v1_constraints:
+  - Runtime support remains Claude Managed Agents only.
+  - Deterministic package guidance is a smoke fixture, not a live Managed Agent proof.
+  - Larger optimization budgets are optional release evidence.
+expected_behavior:
+  required_artifacts:
+    - generated/proposal.md
+    - generated/design.md
+    - generated/specs/eval-validation-spec.md
+    - generated/tasks.md
+    - generated/eval-cases.yaml
+    - generated/seed-candidate.yaml
+    - generated/apply-plan.md
+    - eval/summary.json
+    - compare/comparison.json
+    - optimize/candidates.json
+    - optimize/run_log.txt
+  semantic_checks:
+    proposal:
+      - target agent
+      - eval objective
+      - numeric scoring
+      - qualitative rubric
+      - primary criterion
+      - secondary criteria
+      - guardrails
+      - thresholds
+      - non-goals
+      - blind spots
+      - draft eval contract
+      - confirm or correct
+      - focused open questions
+      - ASI
+      - dict[str, str]
+    design:
+      - direct eval
+      - rollout lifecycle
+      - optimize_anything
+      - side_info
+      - compare
+      - credentials
+      - eval category
+      - real task distribution
+      - edge cases
+      - failure modes
+      - split strategy
+      - what this eval does not measure
+      - grading strategy
+      - grader type
+      - calibration examples
+      - reliability risks
+      - optimizer acceptance
+      - optimized metric
+      - diagnostic metrics
+      - guardrail metrics
+      - promotion rule
+      - regression tolerance
+    specs_tasks:
+      - candidate surface
+      - eval dataset
+      - scorer
+      - ASI
+      - GEPA optimization
+      - validation docs
+    eval_cases:
+      - train
+      - val
+      - input
+      - expected
+      - scorer
+      - metadata
+      - criteria
+      - grader
+      - acceptance
+    apply_plan:
+      - runnable commands
+      - direct eval
+      - optimize
+      - compare
+      - verify
+      - unsupported runtimes
+      - optimized metric
+      - guardrail metrics
+      - promotion rule
+  live:
+    requires_live: false
+    required_env:
+      - ANTHROPIC_API_KEY

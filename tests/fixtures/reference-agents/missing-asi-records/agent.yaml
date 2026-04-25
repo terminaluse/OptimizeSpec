@@ -1,0 +1,22 @@
+id: missing-asi-records
+name: missing-asi-records
+fixture_type: negative
+runtime: Claude Managed Agents
+description: Negative fixture where rollout scoring exists but ASI is not persisted for GEPA reflection.
+source_files:
+  runtime: examples/python-managed-agent/src/optimizespec/runtime.py
+existing_commands:
+  direct_eval: optimizespec eval-demo
+candidate_fields:
+  - system_prompt
+expected_failure: missing ASI records
+runtime_facts:
+  - GEPA needs persisted actionable side information for each candidate and case.
+v1_constraints:
+  - The workflow must store ASI and record whether it was passed into reflection.
+expected_behavior:
+  semantic_checks: {}
+  live:
+    requires_live: false
+    required_env:
+      - ANTHROPIC_API_KEY
