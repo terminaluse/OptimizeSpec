@@ -1,12 +1,12 @@
 ## Why
 
-`agent-gepa` can run evals and optimization loops, but the workflow needs stronger critical thinking before GEPA optimizes against a metric. A runnable eval is not automatically a useful eval. If the success criteria are vague, the task distribution is unrealistic, or the grader is unreliable, GEPA can improve the wrong thing while still producing convincing artifacts.
+`optimizespec` can run evals and optimization loops, but the workflow needs stronger critical thinking before GEPA optimizes against a metric. A runnable eval is not automatically a useful eval. If the success criteria are vague, the task distribution is unrealistic, or the grader is unreliable, GEPA can improve the wrong thing while still producing convincing artifacts.
 
-Anthropic's evaluation guidance starts with defining specific, measurable, achievable, and relevant success criteria, then building task-specific evals that mirror real-world distributions, include edge cases, and use the fastest reliable grading method. This change brings that discipline into the GEPA eval workflow so users do not jump from "I want evals" directly to "run the optimizer" without first defining what "better" means and why the measurement is trustworthy.
+Anthropic's evaluation guidance starts with defining specific, measurable, achievable, and relevant success criteria, then building task-specific evals that mirror real-world distributions, include edge cases, and use the fastest reliable grading method. This change brings that discipline into the OptimizeSpec workflow so users do not jump from "I want evals" directly to "run the optimizer" without first defining what "better" means and why the measurement is trustworthy.
 
 ## What Changes
 
-- Add criteria-first guidance to the GEPA eval proposal flow so every new eval workflow separates user outcome, primary metric, secondary diagnostics, guardrails, thresholds, and known non-goals.
+- Add criteria-first guidance to the OptimizeSpec proposal flow so every new eval workflow separates user outcome, primary metric, secondary diagnostics, guardrails, thresholds, and known non-goals.
 - Expand the proposal and design templates to require real task distribution, edge cases, train/validation/test intent, failure modes, and grader reliability before implementation begins.
 - Add grading strategy guidance that distinguishes deterministic, code-based, LLM-based, and human grading, including when each method is appropriate and how LLM graders must be calibrated.
 - Separate system-loop success from agent-quality success so `system_loop_success == 1.0` proves the machinery ran, not that the target agent improved on a meaningful product eval.
@@ -34,13 +34,13 @@ Anthropic's evaluation guidance starts with defining specific, measurable, achie
 
 This change primarily affects repo-local skills and validation artifacts:
 
-- `skills/gepa-evals-new/SKILL.md`
-- `skills/gepa-evals-common/assets/templates/proposal.md`
-- `skills/gepa-evals-common/assets/templates/design.md`
-- `skills/gepa-evals-common/assets/templates/eval-cases.yaml`
-- `skills/gepa-evals-common/references/*.md`
-- `src/agent_gepa/eval_validation.py`
-- `gepa-evals/fixtures/agents/*`
+- `skills/optimizespec-new/SKILL.md`
+- `skills/optimizespec-common/assets/templates/proposal.md`
+- `skills/optimizespec-common/assets/templates/design.md`
+- `skills/optimizespec-common/assets/templates/eval-cases.yaml`
+- `skills/optimizespec-common/references/*.md`
+- `src/optimizespec/eval_validation.py`
+- `optimizespec/fixtures/agents/*`
 - `TECHNICAL.md`
 - `README.md` if the public explanation needs to mention criteria-first eval design
 

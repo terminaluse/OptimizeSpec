@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: GEPA workflows define an optimizer objective
-Each GEPA eval workflow SHALL define the metric GEPA optimizes and distinguish it from diagnostic metrics and guardrail metrics.
+Each OptimizeSpec workflow SHALL define the metric GEPA optimizes and distinguish it from diagnostic metrics and guardrail metrics.
 
 #### Scenario: Optimizer objective is explicit
 - **WHEN** a design configures GEPA optimization
@@ -12,7 +12,7 @@ Each GEPA eval workflow SHALL define the metric GEPA optimizes and distinguish i
 - **THEN** the workflow identifies which metrics are diagnostics and which metrics can block candidate promotion
 
 ### Requirement: Promotion requires acceptance rules
-The GEPA eval workflow SHALL require optimizer acceptance rules before an optimized candidate is treated as better than the baseline.
+The OptimizeSpec workflow SHALL require optimizer acceptance rules before an optimized candidate is treated as better than the baseline.
 
 #### Scenario: Candidate improves primary score
 - **WHEN** a GEPA candidate improves the optimized metric

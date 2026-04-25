@@ -1,0 +1,4 @@
+interface:
+  display_name: "OptimizeSpec Continue"
+  short_description: "Continue OptimizeSpec workflow artifacts."
+  default_prompt: "Continue an OptimizeSpec change."

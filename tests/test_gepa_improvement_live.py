@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from agent_gepa.self_improvement import (
+from optimizespec.self_improvement import (
     EvalCase,
     ScorerSpec,
     TemplateEchoExecutor,
@@ -34,8 +34,8 @@ def _load_env_key() -> None:
 
 
 @pytest.mark.skipif(
-    os.environ.get("AGENT_GEPA_RUN_LIVE_IMPROVEMENT") != "1",
-    reason="set AGENT_GEPA_RUN_LIVE_IMPROVEMENT=1 to run the live GEPA improvement sanity check",
+    os.environ.get("OPTIMIZESPEC_RUN_LIVE_IMPROVEMENT") != "1",
+    reason="set OPTIMIZESPEC_RUN_LIVE_IMPROVEMENT=1 to run the live GEPA improvement sanity check",
 )
 def test_live_gepa_improves_weak_candidate(tmp_path: Path) -> None:
     _load_env_key()

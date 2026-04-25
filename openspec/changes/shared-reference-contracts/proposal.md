@@ -1,6 +1,6 @@
 ## Why
 
-`agent-gepa` is starting to encode serious eval-design judgment in its skills, but several important system expectations still live in scattered prose across skill instructions, templates, technical docs, and validation code. That makes the workflow harder to maintain and easier for skills to drift: a new skill may ask for criteria, but forget evidence persistence; an apply skill may implement a runner, but fail to record judge output, candidate lineage, or optimizer decisions in a durable way.
+`optimizespec` is starting to encode serious eval-design judgment in its skills, but several important system expectations still live in scattered prose across skill instructions, templates, technical docs, and validation code. That makes the workflow harder to maintain and easier for skills to drift: a new skill may ask for criteria, but forget evidence persistence; an apply skill may implement a runner, but fail to record judge output, candidate lineage, or optimizer decisions in a durable way.
 
 The most urgent gap is evidence. Users should be able to inspect every optimization run and answer: which candidate was tested, which eval cases ran, what each score was, what the judge said, what actionable side information was produced, why the optimizer chose the next candidate, and why a candidate was or was not promoted. Today that expectation is not captured as a first-class contract that every skill can reuse.
 
@@ -8,7 +8,7 @@ We should move these cross-cutting expectations into markdown reference contract
 
 ## What Changes
 
-- Add a shared reference-contract library under `skills/gepa-evals-common/references/`.
+- Add a shared reference-contract library under `skills/optimizespec-common/references/`.
 - Add `eval-system-evidence.md` as the primary contract for recording run manifests, candidate versions, per-case scores, judge outputs, ASI, rollout artifacts, optimizer lineage, comparison results, and promotion decisions.
 - Add runner, grader, ASI, candidate surface, optimizer, runtime, and verification reference contracts so skills share the same implementation expectations.
 - Update phase skills to load only the reference contracts needed for that phase instead of duplicating long requirements in each `SKILL.md`.
@@ -19,7 +19,7 @@ We should move these cross-cutting expectations into markdown reference contract
 
 ### New Capabilities
 
-- `reference-contract-library`: A shared library of markdown contracts for cross-skill GEPA eval system expectations.
+- `reference-contract-library`: A shared library of markdown contracts for cross-skill OptimizeSpec system expectations.
 - `eval-system-evidence-contract`: A required evidence model for optimization runs, candidate lineage, scores, judge outputs, ASI, rollouts, comparisons, and promotion decisions.
 - `skill-contract-integration`: Skill instructions and templates that progressively load the relevant contracts for proposal, design, apply, and verify work.
 
@@ -33,13 +33,13 @@ We should move these cross-cutting expectations into markdown reference contract
 
 This change affects repo-local skills, reference docs, templates, validation, and documentation:
 
-- `skills/gepa-evals-common/references/*.md`
-- `skills/gepa-evals-common/SKILL.md`
-- `skills/gepa-evals-new/SKILL.md`
+- `skills/optimizespec-common/references/*.md`
+- `skills/optimizespec-common/SKILL.md`
+- `skills/optimizespec-new/SKILL.md`
 - Future apply, continue, and verify skill files if present in this repo
-- `skills/gepa-evals-common/assets/templates/proposal.md`
-- `skills/gepa-evals-common/assets/templates/design.md`
-- `src/agent_gepa/eval_validation.py`
+- `skills/optimizespec-common/assets/templates/proposal.md`
+- `skills/optimizespec-common/assets/templates/design.md`
+- `src/optimizespec/eval_validation.py`
 - `tests/*`
 - `TECHNICAL.md`
 

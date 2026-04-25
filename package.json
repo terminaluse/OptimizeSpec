@@ -1,0 +1,44 @@
+{
+  "name": "optimizespec",
+  "version": "0.1.0",
+  "description": "Spec-driven optimization system generator for agents.",
+  "keywords": [
+    "optimizespec",
+    "agents",
+    "evals",
+    "optimization",
+    "cli"
+  ],
+  "homepage": "https://github.com/Fission-AI/OpenSpec",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "optimizespec": "./bin/optimizespec.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "skills",
+    "README.md",
+    "TECHNICAL.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "dev": "tsc --watch",
+    "dev:cli": "npm run build --silent && node bin/optimizespec.js",
+    "test": "npm run build --silent && vitest run",
+    "pack:check": "npm pack --dry-run --json"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "dependencies": {
+    "commander": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

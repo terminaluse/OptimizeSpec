@@ -55,7 +55,7 @@ Alternatives considered:
 
 ### 2. Keep artifacts repo-local and human-readable
 
-The workflow should write artifacts into a predictable repo-local directory such as `gepa-evals/changes/<name>/` or another directory chosen by the installed skill. Each change should contain:
+The workflow should write artifacts into a predictable repo-local directory such as `optimizespec/changes/<name>/` or another directory chosen by the installed skill. Each change should contain:
 
 - `proposal.md`
 - `design.md`
@@ -143,10 +143,10 @@ Every design artifact should define how the generated eval and optimization syst
 A Python target repo might expose these as CLI commands, for example:
 
 ```bash
-agent-self-improve eval --change gepa-evals/changes/<name> --candidate seed --split val --run-dir runs/<name>/eval
-agent-self-improve optimize --change gepa-evals/changes/<name> --max-metric-calls 48 --run-dir runs/<name>/optimize
-agent-self-improve compare --change gepa-evals/changes/<name> --baseline seed --candidate runs/<name>/optimize/best_candidate.json
-agent-self-improve show-candidate --change gepa-evals/changes/<name>
+agent-self-improve eval --change optimizespec/changes/<name> --candidate seed --split val --run-dir runs/<name>/eval
+agent-self-improve optimize --change optimizespec/changes/<name> --max-metric-calls 48 --run-dir runs/<name>/optimize
+agent-self-improve compare --change optimizespec/changes/<name> --baseline seed --candidate runs/<name>/optimize/best_candidate.json
+agent-self-improve show-candidate --change optimizespec/changes/<name>
 ```
 
 For another project layout, the same operations might be package scripts, Make targets, Python module invocations, or existing app commands. The design artifact should name the chosen invocation surface, required environment variables such as `ANTHROPIC_API_KEY`, expected inputs, and output directories.
@@ -251,7 +251,7 @@ Alternatives considered:
 
 The skill pack should include concise reference files derived from this repo and official skill guidance:
 
-- GEPA candidate/evaluator/optimizer patterns from `src/agent_gepa/`
+- GEPA candidate/evaluator/optimizer patterns from `src/optimizespec/`
 - Claude Managed Agents concepts needed for eval execution
 - skill authoring conventions: concise frontmatter, progressive disclosure, references, validation
 - OpenSpec workflow motivation and artifact examples
@@ -309,7 +309,7 @@ Rollback is straightforward while this is a skill pack: remove or disable the ge
 
 ## Open Questions
 
-- What should the workflow directory be named in target repos: `gepa-evals/`, `agent-evals/`, or another project-specific path?
+- What should the workflow directory be named in target repos: `optimizespec/`, `agent-evals/`, or another project-specific path?
 - Should the first implementation create a small CLI for status/instructions, or should skills manage artifact status directly from the filesystem?
 - Which scorer templates should be included in v1: exact match, structured JSON match, LLM rubric grading, file-system checks, or all of these?
 - Should generated GEPA candidates optimize only prompts initially, or include skills/environment/subagents when the target repo exposes those surfaces?

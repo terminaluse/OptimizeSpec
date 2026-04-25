@@ -1,0 +1,3 @@
+answer_template: "{input}"
+reflection_guidance: |
+  Echo the eval input exactly. Preserve the case input with no added explanation or formatting.

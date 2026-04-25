@@ -1,0 +1,4 @@
+interface:
+  display_name: "OptimizeSpec Verify"
+  short_description: "Verify OptimizeSpec workflow implementations."
+  default_prompt: "Verify an OptimizeSpec change."

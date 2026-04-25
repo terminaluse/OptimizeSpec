@@ -1,4 +1,0 @@
-interface:
-  display_name: "GEPA Evals Apply"
-  short_description: "Apply GEPA eval plans to Claude Managed Agent repos."
-  default_prompt: "Apply a GEPA eval change."

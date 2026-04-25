@@ -1,4 +1,0 @@
-interface:
-  display_name: "GEPA Evals Verify"
-  short_description: "Verify GEPA eval workflow implementations."
-  default_prompt: "Verify a GEPA eval change."

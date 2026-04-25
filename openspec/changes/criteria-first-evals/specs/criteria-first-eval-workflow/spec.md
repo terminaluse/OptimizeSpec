@@ -1,10 +1,10 @@
 ## ADDED Requirements
 
-### Requirement: GEPA eval proposals define success criteria before scoring mechanics
-The GEPA eval workflow SHALL require proposal artifacts to define success criteria before eval examples, scorers, ASI, design, or apply work is considered ready.
+### Requirement: OptimizeSpec proposals define success criteria before scoring mechanics
+The OptimizeSpec workflow SHALL require proposal artifacts to define success criteria before eval examples, scorers, ASI, design, or apply work is considered ready.
 
 #### Scenario: Proposal includes criteria-first content
-- **WHEN** a new GEPA eval proposal is created
+- **WHEN** a new OptimizeSpec proposal is created
 - **THEN** it includes user outcome, primary criterion, secondary criteria, guardrails, thresholds, non-goals, and known blind spots
 
 #### Scenario: Criteria are missing or vague
@@ -12,7 +12,7 @@ The GEPA eval workflow SHALL require proposal artifacts to define success criter
 - **THEN** the proposal records explicit unknowns and discovery questions instead of inventing a complete eval contract
 
 ### Requirement: Success criteria are specific, measurable, achievable, and relevant
-The GEPA eval workflow SHALL guide agents to assess whether success criteria are specific, measurable, achievable for the target runtime, and relevant to the target agent's user outcome.
+The OptimizeSpec workflow SHALL guide agents to assess whether success criteria are specific, measurable, achievable for the target runtime, and relevant to the target agent's user outcome.
 
 #### Scenario: Criterion is actionable
 - **WHEN** a criterion names observable behavior, measurement method, target threshold, and user relevance
@@ -23,7 +23,7 @@ The GEPA eval workflow SHALL guide agents to assess whether success criteria are
 - **THEN** the workflow records the weakness and asks for clarification or refinement
 
 ### Requirement: Eval categories are separated
-The GEPA eval workflow SHALL distinguish system evals, agent quality evals, and optimizer acceptance criteria.
+The OptimizeSpec workflow SHALL distinguish system evals, agent quality evals, and optimizer acceptance criteria.
 
 #### Scenario: System-loop eval succeeds
 - **WHEN** a system-loop eval scores 1.0 because direct eval, compare, optimize, and evidence persistence all ran
@@ -34,7 +34,7 @@ The GEPA eval workflow SHALL distinguish system evals, agent quality evals, and 
 - **THEN** the claim is backed by an agent-quality eval tied to explicit success criteria
 
 ### Requirement: Proposal artifacts include critical unknowns
-The GEPA eval workflow SHALL preserve missing criteria, missing task distribution, missing grader trust, and missing optimizer acceptance details as explicit unknowns.
+The OptimizeSpec workflow SHALL preserve missing criteria, missing task distribution, missing grader trust, and missing optimizer acceptance details as explicit unknowns.
 
 #### Scenario: User knows the eval contract
 - **WHEN** the user provides criteria, examples, scoring, and grader details
@@ -45,7 +45,7 @@ The GEPA eval workflow SHALL preserve missing criteria, missing task distributio
 - **THEN** the proposal captures the current hypothesis and lists discovery questions needed before implementation
 
 ### Requirement: Criteria-first workflow stays lightweight for users
-The GEPA eval workflow SHALL keep criteria-first rigor inside the proposal and design stages instead of adding extra user-facing phases or a long intake questionnaire.
+The OptimizeSpec workflow SHALL keep criteria-first rigor inside the proposal and design stages instead of adding extra user-facing phases or a long intake questionnaire.
 
 #### Scenario: User gives partial intent
 - **WHEN** the user provides the target agent, desired improvement, representative examples, or obvious failure modes

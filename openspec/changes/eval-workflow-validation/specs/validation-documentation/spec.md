@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Validation documentation defines readiness criteria
-The system SHALL document the eval workflow readiness criteria for the GEPA eval skill workflow, including required fixtures, required commands, required evidence artifacts, and passing score thresholds.
+The system SHALL document the eval workflow readiness criteria for the OptimizeSpec skill workflow, including required fixtures, required commands, required evidence artifacts, and passing score thresholds.
 
 #### Scenario: User reads validation criteria
 - **WHEN** a maintainer opens the validation documentation

@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Eval systems persist an auditable run ledger
-Applied GEPA eval systems SHALL persist enough evidence for each run to audit candidates, scores, judge output, ASI, rollouts, optimizer decisions, and promotion outcomes.
+Applied OptimizeSpec systems SHALL persist enough evidence for each run to audit candidates, scores, judge output, ASI, rollouts, optimizer decisions, and promotion outcomes.
 
 #### Scenario: A direct eval run completes
 - **WHEN** a candidate is evaluated against eval cases

@@ -1,12 +1,12 @@
 ## 1. Skill Guidance
 
-- [x] 1.1 Update `skills/gepa-evals-new/SKILL.md` so new changes must start with criteria-first eval thinking before examples and scoring.
-- [x] 1.2 Update `skills/gepa-evals-common/assets/templates/proposal.md` with success criteria, thresholds, guardrails, non-goals, blind spots, and criteria unknowns.
-- [x] 1.3 Update `skills/gepa-evals-common/assets/templates/design.md` with eval design, grading strategy, and optimizer acceptance sections.
-- [x] 1.4 Update `skills/gepa-evals-common/assets/templates/eval-cases.yaml` to show optional criteria, grader trust, and acceptance metadata.
+- [x] 1.1 Update `skills/optimizespec-new/SKILL.md` so new changes must start with criteria-first eval thinking before examples and scoring.
+- [x] 1.2 Update `skills/optimizespec-common/assets/templates/proposal.md` with success criteria, thresholds, guardrails, non-goals, blind spots, and criteria unknowns.
+- [x] 1.3 Update `skills/optimizespec-common/assets/templates/design.md` with eval design, grading strategy, and optimizer acceptance sections.
+- [x] 1.4 Update `skills/optimizespec-common/assets/templates/eval-cases.yaml` to show optional criteria, grader trust, and acceptance metadata.
 - [x] 1.5 Add or update reference docs explaining system evals, agent quality evals, optimizer acceptance criteria, and grader trust.
-- [x] 1.6 Update `gepa-evals-new` guidance so the skill asks at most 3-5 plain-language questions before drafting, then asks the user to confirm or correct the inferred eval contract.
-- [x] 1.7 Update `gepa-evals-new` guidance so first proposals stay concise and defer implementation depth to design.
+- [x] 1.6 Update `optimizespec-new` guidance so the skill asks at most 3-5 plain-language questions before drafting, then asks the user to confirm or correct the inferred eval contract.
+- [x] 1.7 Update `optimizespec-new` guidance so first proposals stay concise and defer implementation depth to design.
 
 ## 2. Validation Scoring
 

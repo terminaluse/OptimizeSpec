@@ -1,4 +1,0 @@
-interface:
-  display_name: "GEPA Evals New"
-  short_description: "Start GEPA eval self-improvement changes."
-  default_prompt: "Start a GEPA eval change."

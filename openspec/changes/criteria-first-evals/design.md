@@ -1,13 +1,13 @@
 ## Context
 
-The current GEPA eval workflow asks for target agent context, input/output examples, numeric scoring, qualitative rubric, and ASI. That is necessary, but it does not force enough evaluation design discipline. A user or coding agent can still create an eval with unclear criteria, unrepresentative examples, no edge cases, and a grader that is easy for GEPA to overfit.
+The current OptimizeSpec workflow asks for target agent context, input/output examples, numeric scoring, qualitative rubric, and ASI. That is necessary, but it does not force enough evaluation design discipline. A user or coding agent can still create an eval with unclear criteria, unrepresentative examples, no edge cases, and a grader that is easy for GEPA to overfit.
 
-Anthropic's test-and-evaluate guidance emphasizes that evals should start from success criteria, then use task-specific cases, automation where possible, enough volume, and the fastest reliable grader. It also calls out that most real use cases need multidimensional criteria rather than one vague score. `agent-gepa` should encode that into the skills because GEPA optimizes whatever feedback it receives.
+Anthropic's test-and-evaluate guidance emphasizes that evals should start from success criteria, then use task-specific cases, automation where possible, enough volume, and the fastest reliable grader. It also calls out that most real use cases need multidimensional criteria rather than one vague score. `optimizespec` should encode that into the skills because GEPA optimizes whatever feedback it receives.
 
 Constraints:
 
 - Keep runtime scope focused on Claude Managed Agents.
-- Keep OpenSpec and GEPA eval artifacts readable Markdown/YAML.
+- Keep OpenSpec and OptimizeSpec artifacts readable Markdown/YAML.
 - Do not require users to know all answers up front; unknowns should become explicit discovery questions.
 - Do not add more user-facing stages for criteria work; fold criteria thinking into proposal and design.
 - Ask at most 3-5 plain-language questions before drafting when the user has not provided a complete eval contract.
@@ -19,7 +19,7 @@ Constraints:
 
 **Goals:**
 
-- Require every new GEPA eval workflow to define criteria before eval cases and scoring mechanics.
+- Require every new OptimizeSpec workflow to define criteria before eval cases and scoring mechanics.
 - Separate product-quality evals from system-loop evals.
 - Make primary metrics, secondary diagnostics, guardrails, thresholds, and non-goals visible in proposal and design artifacts.
 - Require eval cases to reflect real task distribution, edge cases, failure modes, and split intent.
@@ -135,7 +135,7 @@ Alternative considered: let users inspect compare output manually. That is usefu
 
 ### Update validation to score eval-design quality
 
-`src/agent_gepa/eval_validation.py` and fixtures should add scoring checks for:
+`src/optimizespec/eval_validation.py` and fixtures should add scoring checks for:
 
 - Criteria specificity and measurability
 - Relevance to the target agent and user outcome
@@ -237,9 +237,9 @@ The exact field names can be finalized during implementation. The important cont
 The change should add deterministic tests around:
 
 - Proposal template contains success criteria and trust sections.
-- `gepa-evals-new` requires criteria-first content and records unknowns when criteria are missing.
-- `gepa-evals-new` does not require a long questionnaire before drafting a proposal.
-- `gepa-evals-new` keeps first proposals concise and defers implementation depth to design.
+- `optimizespec-new` requires criteria-first content and records unknowns when criteria are missing.
+- `optimizespec-new` does not require a long questionnaire before drafting a proposal.
+- `optimizespec-new` keeps first proposals concise and defers implementation depth to design.
 - Artifact quality scoring fails or lowers score when proposals omit primary metric, thresholds, guardrails, task distribution, or grader trust.
 - Negative fixtures with vague "make it better" requests are treated as clarification-needed, not as ready eval specs.
 - System-loop validation remains separate from agent-quality validation.

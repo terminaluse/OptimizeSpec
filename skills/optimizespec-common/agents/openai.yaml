@@ -1,0 +1,4 @@
+interface:
+  display_name: "OptimizeSpec Common"
+  short_description: "Shared references for OptimizeSpec workflows."
+  default_prompt: "Use the shared OptimizeSpec references."

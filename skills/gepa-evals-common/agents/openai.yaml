@@ -1,4 +1,0 @@
-interface:
-  display_name: "GEPA Evals Common"
-  short_description: "Shared references for GEPA eval workflows."
-  default_prompt: "Use the shared GEPA eval references."

@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Eval designs describe task distribution and edge cases
-The GEPA eval workflow SHALL require design artifacts to explain the real-world task distribution, edge cases, failure modes, and split strategy for each agent-quality eval.
+The OptimizeSpec workflow SHALL require design artifacts to explain the real-world task distribution, edge cases, failure modes, and split strategy for each agent-quality eval.
 
 #### Scenario: Eval design mirrors real usage
 - **WHEN** a design describes representative tasks, common cases, rare-but-important cases, and ambiguous or adversarial inputs
@@ -12,7 +12,7 @@ The GEPA eval workflow SHALL require design artifacts to explain the real-world 
 - **THEN** validation records a task-distribution omission
 
 ### Requirement: Eval cases preserve criteria metadata
-The GEPA eval workflow SHALL support criteria metadata in eval-case artifacts so cases can be traced back to primary criteria, secondary diagnostics, guardrails, and eval category.
+The OptimizeSpec workflow SHALL support criteria metadata in eval-case artifacts so cases can be traced back to primary criteria, secondary diagnostics, guardrails, and eval category.
 
 #### Scenario: Eval case is tied to a criterion
 - **WHEN** an eval case is loaded
@@ -23,7 +23,7 @@ The GEPA eval workflow SHALL support criteria metadata in eval-case artifacts so
 - **THEN** the runtime remains backward compatible while planning validation can still flag missing criteria in generated artifacts
 
 ### Requirement: Grading strategies explain grader trust
-The GEPA eval workflow SHALL require each scorer or grader plan to state the grader type, why it is appropriate, calibration evidence, reliability risks, and human review triggers.
+The OptimizeSpec workflow SHALL require each scorer or grader plan to state the grader type, why it is appropriate, calibration evidence, reliability risks, and human review triggers.
 
 #### Scenario: Deterministic grader is appropriate
 - **WHEN** the success condition can be checked with exact match, string match, schema validation, file existence, or code execution

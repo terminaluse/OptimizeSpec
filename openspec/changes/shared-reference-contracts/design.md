@@ -1,6 +1,6 @@
 ## Context
 
-The GEPA eval skills now need to do more than draft eval examples. They need to guide a coding agent through building a self-improvement system for an existing Claude Managed Agent, including runner invocation, rollouts, scoring, qualitative judgment, actionable side information, optimizer loops, candidate promotion, and verification.
+The OptimizeSpec skills now need to do more than draft eval examples. They need to guide a coding agent through building a self-improvement system for an existing Claude Managed Agent, including runner invocation, rollouts, scoring, qualitative judgment, actionable side information, optimizer loops, candidate promotion, and verification.
 
 Those expectations cut across multiple phases. If each phase embeds its own prose, the system will drift and the instructions will become too heavy. A reference-contract layer gives us a stable source of truth while preserving a light UX: the user sees a simple flow, and the agent loads the deeper contracts only when relevant.
 
@@ -35,7 +35,7 @@ Constraints:
 
 ### Add markdown contracts under the shared skill references directory
 
-Reference contracts should live in `skills/gepa-evals-common/references/` because every phase skill can load that directory and because these expectations belong to the skill system rather than only the runtime package.
+Reference contracts should live in `skills/optimizespec-common/references/` because every phase skill can load that directory and because these expectations belong to the skill system rather than only the runtime package.
 
 Initial contracts:
 

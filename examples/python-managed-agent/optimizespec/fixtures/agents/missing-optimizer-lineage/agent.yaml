@@ -1,0 +1,23 @@
+id: missing-optimizer-lineage
+name: missing-optimizer-lineage
+fixture_type: negative
+runtime: Claude Managed Agents
+description: Negative fixture where optimization output exists but candidate lineage and leaderboard evidence are missing.
+source_files:
+  runtime: src/optimizespec/runtime.py
+existing_commands:
+  direct_eval: optimizespec eval-demo
+  optimize: optimizespec optimize-demo
+candidate_fields:
+  - system_prompt
+expected_failure: missing optimizer lineage
+runtime_facts:
+  - Optimizer output without parentage, mutation, leaderboard, and rejection records is not auditable.
+v1_constraints:
+  - The workflow must persist optimizer lineage and candidate selection evidence.
+expected_behavior:
+  semantic_checks: {}
+  live:
+    requires_live: false
+    required_env:
+      - ANTHROPIC_API_KEY

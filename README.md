@@ -1,148 +1,113 @@
-# agent-gepa
+# OptimizeSpec
 
-Create a self-improvement system for your agent.
+OptimizeSpec is a TypeScript CLI and skill pack for creating spec-driven optimization systems for agents.
 
-`agent-gepa` helps you take an existing agent, define evals for it, and run GEPA to improve it with evidence instead of guesswork. You decide what good behavior looks like. The system runs the agent, scores the results, proposes improvements, and tests whether those changes actually help.
-
-## Why This Exists
-
-Most agent improvement is still manual:
-
-- make a prompt change
-- run a few examples
-- hope the change generalizes
-
-That breaks down quickly. It is hard to tell whether the agent really improved, what got worse, or which changes are worth keeping.
-
-`agent-gepa` gives you a repeatable loop:
-
-1. Define what "better" means for your agent.
-2. Run the current agent on representative cases.
-3. Score the outputs with numbers and useful feedback.
-4. Let GEPA propose changes.
-5. Keep the changes that perform better without violating guardrails.
-
-The hard part is usually not running the optimizer. It is deciding what the eval should reward, what it should reject, and which evidence is strong enough to trust. The included skills help a coding agent draft that eval contract from your intent and examples, then ask you to confirm or correct it.
+It does not ship a Python optimization runtime as the product. Instead, it helps you define an eval contract, design the runner and optimizer, and generate target-repo files that match the target agent's stack.
 
 ## What You Get
 
-- A way to define evals for an existing agent
-- A criteria-first workflow for success criteria, guardrails, grader trust, and promotion rules
-- A runner for executing those evals and storing rollout artifacts
-- A GEPA optimization loop that proposes and tests improvements
-- A working example for Claude Managed Agents
-- Skills that help a coding agent create evals and apply the system to another project
+- A TypeScript/Node CLI for creating and validating OptimizeSpec artifacts.
+- Repo-local skills for proposal, design, apply, and verification workflows.
+- Target-repo scaffolding for eval runners and optimizer entrypoints.
+- A Python Claude Managed Agents + GEPA example kept as reference material under `examples/python-managed-agent/`.
 
-## Who This Is For
-
-This repo is for you if:
-
-- you already have an agent
-- you want to improve it systematically
-- you can describe what "better" roughly means, even if you need help turning that into an eval
-- you want to start with Claude Managed Agents
-
-## Quickstart
-
-Create a virtual environment and install the project:
+## Install For Development
 
 ```bash
-uv venv
-source .venv/bin/activate
-uv pip install -e '.[dev]'
+npm install
+npm run build
+node bin/optimizespec.js --help
 ```
 
-Run the local test suite:
+Node.js 20.19.0 or newer is required.
+
+## CLI Quickstart
+
+Initialize OptimizeSpec files in a target project:
 
 ```bash
-pytest -q
+optimizespec init
 ```
 
-Run the deterministic local eval example:
+Create a new optimization-system change:
 
 ```bash
-agent-gepa self-eval \
-  --cases skills/gepa-evals-common/assets/templates/eval-cases.yaml \
-  --candidate skills/gepa-evals-common/assets/templates/seed-candidate.yaml \
-  --run-dir runs/self-eval-smoke
+optimizespec new change improve-agent-output \
+  --description "Improve the agent's answer quality on support triage tasks."
 ```
 
-This does not call the live API. It proves the eval runner can load cases, run rollouts, score them, and write artifacts.
-
-## Run The Live Example
-
-Live runs require Anthropic Research Preview access for Claude Managed Agents.
-
-Install the preview SDK:
+Inspect and validate the change:
 
 ```bash
-uv pip install -r requirements-managed-agents-preview.txt
+optimizespec status --change improve-agent-output
+optimizespec validate improve-agent-output
 ```
 
-Set your API key:
+Generate TypeScript runner files into the target repository:
 
 ```bash
-export ANTHROPIC_API_KEY=...
+optimizespec apply \
+  --change improve-agent-output \
+  --target . \
+  --stack typescript
 ```
 
-Run one live evaluation:
+Agent-compatible commands support `--json`:
 
 ```bash
-agent-gepa eval-demo --max-runtime-seconds 300
+optimizespec status --change improve-agent-output --json
+optimizespec validate improve-agent-output --json
 ```
 
-Run a small optimization loop:
-
-```bash
-agent-gepa optimize-demo --max-metric-calls 1 --max-runtime-seconds 300
-```
-
-What those commands do:
-
-- `eval-demo`: runs the example Claude Managed Agent once and scores it
-- `optimize-demo`: runs a small GEPA loop and tests candidate improvements
-
-`--max-metric-calls` is the eval budget for GEPA. A higher value gives it more chances to test improvements, but also means more live rollouts.
-
-## What Happens When You Run It
-
-1. You define success criteria and representative eval cases.
-2. The system runs your agent on those cases.
-3. Each rollout gets scored.
-4. GEPA uses the results and feedback to propose changes.
-5. New candidates are evaluated against the same cases.
-6. You compare the baseline and improved versions before accepting a change.
-
-## Start With The Example
-
-The fastest path is to use the included Claude Managed Agent example first. Once that works, adapt the eval cases, scoring logic, and candidate fields to match your own agent.
-
-## Use The Skills
+## Skills
 
 The repo includes a `skills/` folder for coding agents that can use repo-local skills:
 
 ```text
 skills/
-  gepa-evals-new/
-  gepa-evals-continue/
-  gepa-evals-apply/
-  gepa-evals-verify/
-  gepa-evals-common/
+  optimizespec-new/
+  optimizespec-continue/
+  optimizespec-apply/
+  optimizespec-verify/
+  optimizespec-common/
 ```
 
 Use them in this order:
 
-1. `gepa-evals-new`: draft the eval contract from intent and examples
-2. `gepa-evals-continue`: create the design, specs, and tasks
-3. `gepa-evals-apply`: implement the eval runner and optimizer
-4. `gepa-evals-verify`: check that eval, compare, and optimize flows are ready
+1. `optimizespec-new`: draft the eval contract from intent and examples.
+2. `optimizespec-continue`: create the design, specs, and tasks.
+3. `optimizespec-apply`: implement the eval runner and optimizer in the target repo.
+4. `optimizespec-verify`: check eval, compare, optimize, and evidence readiness.
+
+## Python Reference Example
+
+The original Python Managed Agents + GEPA prototype moved to:
+
+```text
+examples/python-managed-agent/
+```
+
+It remains useful as a runnable reference for candidate compilation, Claude Managed Agents sessions, GEPA evaluator wiring, and evidence-ledger structure. It is not the public OptimizeSpec package and is not required for normal CLI usage.
+
+Run its deterministic tests from the repo root:
+
+```bash
+pytest -q
+```
+
+Live Managed Agents example runs require Anthropic preview access and the example requirements:
+
+```bash
+uv pip install -e examples/python-managed-agent[dev]
+uv pip install -r examples/python-managed-agent/requirements-managed-agents-preview.txt
+export ANTHROPIC_API_KEY=...
+```
 
 ## Learn More
 
-- [TECHNICAL.md](TECHNICAL.md) for architecture, runtime details, candidate fields, and command reference
-- [skills/gepa-evals-new/SKILL.md](skills/gepa-evals-new/SKILL.md) for creating a new GEPA eval workflow
-- [skills/gepa-evals-common/references/criteria-first-evals.md](skills/gepa-evals-common/references/criteria-first-evals.md) for criteria-first eval design
-- [skills/gepa-evals-apply/SKILL.md](skills/gepa-evals-apply/SKILL.md) for implementing the resulting system
+- [TECHNICAL.md](TECHNICAL.md) for architecture and release notes.
+- [skills/optimizespec-new/SKILL.md](skills/optimizespec-new/SKILL.md) for creating a new OptimizeSpec workflow.
+- [skills/optimizespec-common/references/reference-contracts.md](skills/optimizespec-common/references/reference-contracts.md) for shared evidence, runner, grader, ASI, candidate, optimizer, runtime, and verification contracts.
 
 ## License
 

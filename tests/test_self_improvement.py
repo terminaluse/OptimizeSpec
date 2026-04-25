@@ -7,7 +7,7 @@ import importlib.util
 import pytest
 import yaml
 
-from agent_gepa.self_improvement import (
+from optimizespec.self_improvement import (
     EvalCase,
     GEPAEvaluator,
     RolloutResult,
@@ -147,7 +147,7 @@ def test_gepa_evaluator_supports_custom_scorers(tmp_path: Path) -> None:
 
 
 def test_package_optimizer_fixture_scores_required_terms(tmp_path: Path) -> None:
-    module_path = Path("gepa-evals/changes/agent-gepa-package-optimizer/package_optimizer.py")
+    module_path = Path("examples/python-managed-agent/optimizespec/changes/optimizespec-package-optimizer/package_optimizer.py")
     spec = importlib.util.spec_from_file_location("package_optimizer", module_path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -169,7 +169,9 @@ def test_package_optimizer_fixture_scores_required_terms(tmp_path: Path) -> None
 
 
 def test_existing_agent_eval_generator_scores_generated_artifacts(tmp_path: Path) -> None:
-    module_path = Path("gepa-evals/changes/agent-gepa-managed-agent-eval-generator/agent_eval_generator.py")
+    module_path = Path(
+        "examples/python-managed-agent/optimizespec/changes/optimizespec-managed-agent-eval-generator/agent_eval_generator.py"
+    )
     spec = importlib.util.spec_from_file_location("agent_eval_generator", module_path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -197,7 +199,9 @@ def test_existing_agent_eval_generator_scores_generated_artifacts(tmp_path: Path
 
 
 def test_existing_agent_eval_generator_writes_generated_artifacts(tmp_path: Path) -> None:
-    module_path = Path("gepa-evals/changes/agent-gepa-managed-agent-eval-generator/agent_eval_generator.py")
+    module_path = Path(
+        "examples/python-managed-agent/optimizespec/changes/optimizespec-managed-agent-eval-generator/agent_eval_generator.py"
+    )
     spec = importlib.util.spec_from_file_location("agent_eval_generator_generate", module_path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -214,11 +218,11 @@ def test_existing_agent_eval_generator_writes_generated_artifacts(tmp_path: Path
 @pytest.mark.parametrize(
     "skill_name",
     [
-        "gepa-evals-common",
-        "gepa-evals-new",
-        "gepa-evals-continue",
-        "gepa-evals-apply",
-        "gepa-evals-verify",
+        "optimizespec-common",
+        "optimizespec-new",
+        "optimizespec-continue",
+        "optimizespec-apply",
+        "optimizespec-verify",
     ],
 )
 def test_gepa_eval_skill_frontmatter(skill_name: str) -> None:
@@ -231,13 +235,22 @@ def test_gepa_eval_skill_frontmatter(skill_name: str) -> None:
 
 
 def test_common_skill_reference_paths_exist() -> None:
-    base = Path("skills") / "gepa-evals-common"
+    base = Path("skills") / "optimizespec-common"
     required = [
         "references/workflow.md",
+        "references/reference-contracts.md",
         "references/gepa-reflection.md",
         "references/managed-agents-runner.md",
         "references/scorers-and-asi.md",
         "references/repo-patterns.md",
+        "references/eval-system-evidence.md",
+        "references/runner-contract.md",
+        "references/grader-contract.md",
+        "references/asi-contract.md",
+        "references/candidate-surface.md",
+        "references/optimizer-contract.md",
+        "references/managed-agents-runtime-contract.md",
+        "references/verification-contract.md",
         "assets/templates/proposal.md",
         "assets/templates/design.md",
         "assets/templates/eval-cases.yaml",

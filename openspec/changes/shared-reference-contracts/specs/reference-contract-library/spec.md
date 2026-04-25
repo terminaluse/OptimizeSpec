@@ -1,10 +1,10 @@
 ## ADDED Requirements
 
-### Requirement: Shared GEPA eval contracts live in a common reference library
-The GEPA eval skill system SHALL maintain shared markdown contracts for cross-cutting eval-system expectations under the common skill references directory.
+### Requirement: Shared OptimizeSpec contracts live in a common reference library
+The OptimizeSpec skill system SHALL maintain shared markdown contracts for cross-cutting eval-system expectations under the common skill references directory.
 
 #### Scenario: Common contracts are available
-- **WHEN** an agent works on proposal, design, apply, or verify phases for a GEPA eval system
+- **WHEN** an agent works on proposal, design, apply, or verify phases for an OptimizeSpec system
 - **THEN** the agent can find shared reference contracts for evidence, runner behavior, grader behavior, ASI, candidate surfaces, optimizer behavior, runtime invocation, and verification
 
 #### Scenario: A contract applies across multiple phases
@@ -12,7 +12,7 @@ The GEPA eval skill system SHALL maintain shared markdown contracts for cross-cu
 - **THEN** its durable requirements are documented in a shared reference contract instead of being duplicated independently in each phase skill
 
 ### Requirement: The common skill exposes a reference index
-The common GEPA eval skill SHALL provide an index that explains which reference contracts exist and when each should be loaded.
+The common OptimizeSpec skill SHALL provide an index that explains which reference contracts exist and when each should be loaded.
 
 #### Scenario: Proposal work begins
 - **WHEN** a skill drafts a new eval proposal

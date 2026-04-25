@@ -8,12 +8,12 @@ import sys
 
 import pytest
 
-from agent_gepa import eval_validation
-from agent_gepa.self_improvement import EvalCase, RolloutResult, ScorerSpec
+from optimizespec import eval_validation
+from optimizespec.self_improvement import EvalCase, RolloutResult, ScorerSpec
 
 
 def test_fixture_metadata_contract_loads_positive_fixture() -> None:
-    fixture = eval_validation.load_fixture("agent-gepa-managed-agent")
+    fixture = eval_validation.load_fixture("optimizespec-managed-agent")
 
     assert fixture.runtime == "Claude Managed Agents"
     assert fixture.is_positive
@@ -178,7 +178,7 @@ cases:
 
 
 def test_artifact_quality_scoring_penalizes_missing_criteria_terms() -> None:
-    fixture = eval_validation.load_fixture("agent-gepa-managed-agent")
+    fixture = eval_validation.load_fixture("optimizespec-managed-agent")
     case = next(case for case in eval_validation.default_eval_cases(fixture) if case.metadata.get("artifact_type") == "proposal")
     rollout = RolloutResult(
         case_id=case.case_id,
@@ -192,13 +192,14 @@ def test_artifact_quality_scoring_penalizes_missing_criteria_terms() -> None:
 
 
 def test_lightweight_user_flow_penalizes_long_questionnaire() -> None:
-    fixture = eval_validation.load_fixture("agent-gepa-managed-agent")
+    fixture = eval_validation.load_fixture("optimizespec-managed-agent")
     case = next(case for case in eval_validation.default_eval_cases(fixture) if case.metadata.get("artifact_type") == "proposal")
     rollout = RolloutResult(
         case_id=case.case_id,
         actual=(
             "target agent Claude Managed Agents eval objective input expected output numeric scoring qualitative rubric ASI "
             "primary criterion secondary criteria guardrails thresholds non-goals blind spots "
+            "evidence model candidate versions scoring records judge records ASI records promotion evidence contract references "
             "draft eval contract confirm or correct focused open questions "
             "What is metric one? What is metric two? What is metric three? "
             "What is metric four? What is metric five? What is metric six?"
@@ -209,6 +210,25 @@ def test_lightweight_user_flow_penalizes_long_questionnaire() -> None:
 
     assert score.subscores["semantic_concept_coverage"] == 1.0
     assert score.subscores["lightweight_user_flow"] == 0.0
+    assert score.score < 1.0
+
+
+def test_design_evidence_contract_penalizes_aggregate_only_design() -> None:
+    fixture = eval_validation.load_fixture("optimizespec-managed-agent")
+    case = next(case for case in eval_validation.default_eval_cases(fixture) if case.metadata.get("artifact_type") == "design")
+    rollout = RolloutResult(
+        case_id=case.case_id,
+        actual=(
+            "direct eval rollout lifecycle scorer ASI GEPA compare credentials eval category real task distribution "
+            "edge cases failure modes split strategy what this eval does not measure grading strategy grader type "
+            "calibration examples reliability risks optimizer acceptance optimized metric diagnostic metrics guardrail metrics "
+            "promotion rule regression tolerance aggregate score"
+        ),
+    )
+
+    score = eval_validation.semantic_required_concepts_scorer(case, rollout)
+
+    assert score.subscores["evidence_contract_coverage"] < 0.5
     assert score.score < 1.0
 
 
@@ -242,9 +262,33 @@ def test_negative_fixture_scores_useful_failure() -> None:
     assert not rollout.errors
 
 
+def test_negative_evidence_gap_fixtures_load() -> None:
+    fixture_ids = [
+        "aggregate-only-scoring",
+        "missing-judge-records",
+        "missing-asi-records",
+        "missing-optimizer-lineage",
+        "missing-promotion-evidence",
+    ]
+
+    for fixture_id in fixture_ids:
+        fixture = eval_validation.load_fixture(fixture_id)
+        case = eval_validation.default_eval_cases(fixture)[0]
+        assert not fixture.is_positive
+        assert fixture.expected_failure
+        assert fixture.expected_failure in str(case.expected)
+
+
+def test_evidence_ledger_validation_detects_missing_records(tmp_path: Path) -> None:
+    errors = eval_validation.validate_evidence_ledger(tmp_path)
+
+    assert "evidence/manifest.json: missing" in errors
+    assert "evidence/promotion.json: missing" in errors
+
+
 def test_generate_eval_compare_optimize_verify_smoke(tmp_path: Path) -> None:
     run_dir = tmp_path / "eval-validation"
-    fixture = "agent-gepa-managed-agent"
+    fixture = "optimizespec-managed-agent"
 
     assert eval_validation.cmd_generate(fixture, str(run_dir), None, live=False) == 0
     assert eval_validation.cmd_eval(fixture, str(run_dir), None, None, 60.0, True, live=False) == 0
@@ -257,6 +301,11 @@ def test_generate_eval_compare_optimize_verify_smoke(tmp_path: Path) -> None:
     assert (run_dir / "compare" / "comparison.json").exists()
     assert (run_dir / "optimize" / "candidates.json").exists()
     assert (run_dir / "command-logs" / "generate.json").exists()
+    assert (run_dir / "evidence" / "manifest.json").exists()
+    assert (run_dir / "evidence" / "candidate-registry.json").exists()
+    assert (run_dir / "evidence" / "evaluations" / "candidate" / "summary.json").exists()
+    assert (run_dir / "evidence" / "optimizer" / "lineage.json").exists()
+    assert (run_dir / "evidence" / "promotion.json").exists()
     verification = json.loads((run_dir / "verification" / "verification.json").read_text(encoding="utf-8"))
     assert verification["success"] is True
 
@@ -264,27 +313,27 @@ def test_generate_eval_compare_optimize_verify_smoke(tmp_path: Path) -> None:
 def test_documented_module_commands_execute(tmp_path: Path) -> None:
     run_dir = tmp_path / "documented"
     commands = [
-        ["generate", "--fixture", "agent-gepa-package-guidance", "--run-dir", str(run_dir)],
-        ["eval", "--fixture", "agent-gepa-package-guidance", "--run-dir", str(run_dir), "--skip-system-loop"],
-        ["compare", "--fixture", "agent-gepa-package-guidance", "--run-dir", str(run_dir), "--skip-system-loop"],
+        ["generate", "--fixture", "optimizespec-package-guidance", "--run-dir", str(run_dir)],
+        ["eval", "--fixture", "optimizespec-package-guidance", "--run-dir", str(run_dir), "--skip-system-loop"],
+        ["compare", "--fixture", "optimizespec-package-guidance", "--run-dir", str(run_dir), "--skip-system-loop"],
         [
             "optimize",
             "--fixture",
-            "agent-gepa-package-guidance",
+            "optimizespec-package-guidance",
             "--run-dir",
             str(run_dir),
             "--max-metric-calls",
             "1",
             "--skip-system-loop",
         ],
-        ["verify", "--fixture", "agent-gepa-package-guidance", "--run-dir", str(run_dir)],
+        ["verify", "--fixture", "optimizespec-package-guidance", "--run-dir", str(run_dir)],
     ]
 
     for args in commands:
         env = os.environ.copy()
-        env["PYTHONPATH"] = str(Path.cwd() / "src")
+        env["PYTHONPATH"] = str(Path.cwd() / "examples" / "python-managed-agent" / "src")
         completed = subprocess.run(
-            [sys.executable, "-m", "agent_gepa.eval_validation", *args],
+            [sys.executable, "-m", "optimizespec.eval_validation", *args],
             cwd=Path.cwd(),
             text=True,
             capture_output=True,
@@ -297,7 +346,7 @@ def test_documented_module_commands_execute(tmp_path: Path) -> None:
 
 
 def test_system_loop_eval_scores_one(tmp_path: Path) -> None:
-    fixture = eval_validation.load_fixture("agent-gepa-managed-agent")
+    fixture = eval_validation.load_fixture("optimizespec-managed-agent")
     cases = [case for case in eval_validation.default_eval_cases(fixture) if case.metadata.get("artifact_type") == "system_loop"]
     summary = eval_validation.evaluate_candidate(
         candidate=eval_validation.default_seed_candidate(fixture),

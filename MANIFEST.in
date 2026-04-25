@@ -1,8 +1,0 @@
-include LICENSE
-include README.md
-include TECHNICAL.md
-include requirements-managed-agents-preview.txt
-recursive-include skills *
-recursive-include gepa-evals *
-prune openspec
-global-exclude *.py[cod]

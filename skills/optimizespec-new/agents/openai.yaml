@@ -1,0 +1,4 @@
+interface:
+  display_name: "OptimizeSpec New"
+  short_description: "Start OptimizeSpec self-improvement changes."
+  default_prompt: "Start an OptimizeSpec change."
