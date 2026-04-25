@@ -12,6 +12,9 @@ Anthropic's evaluation guidance starts with defining specific, measurable, achie
 - Separate system-loop success from agent-quality success so `system_loop_success == 1.0` proves the machinery ran, not that the target agent improved on a meaningful product eval.
 - Add optimizer acceptance criteria that define the metric GEPA optimizes, diagnostic metrics it observes, guardrail metrics that block promotion, and evidence required before accepting a candidate.
 - Update validation expectations so generated proposals, designs, and eval cases are scored for criteria quality, dataset fit, grading trust, and optimization target clarity.
+- Keep the user-facing workflow lightweight: criteria-first rigor should happen inside the proposal and design stages, not as extra phases or a long questionnaire.
+- Guide the skill to ask a small number of plain-language questions, draft the eval contract from the user's intent and examples, and ask the user to correct or confirm instead of forcing them to author eval theory from scratch.
+- Keep the first proposal concise: short bullets, only the examples needed to confirm direction, and deeper runner mechanics or grader calibration deferred to design.
 
 ## Capabilities
 
@@ -42,6 +45,10 @@ This change primarily affects repo-local skills and validation artifacts:
 - `README.md` if the public explanation needs to mention criteria-first eval design
 
 The runtime and optimizer code should only change if validation requires new structured fields for metrics, guardrails, or grader metadata. The default scope is to improve the workflow contracts first and keep the Claude Managed Agents runtime behavior stable.
+
+The change should not add more required user-facing steps. It should make the existing proposal and design steps smarter: the user provides the agent, desired behavior, examples, and obvious failure modes; the skill drafts criteria, scoring, grader trust, and optimizer acceptance; then the user confirms or corrects the draft.
+
+The proposal should remain a confirmation artifact rather than the full technical plan. It should be detailed enough to make the eval contract reviewable, but not so long that a new user feels they are reviewing an implementation design before agreeing on the eval.
 
 ## Source Motivation
 

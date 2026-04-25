@@ -1,0 +1,22 @@
+id: uncalibrated-llm-grader
+name: uncalibrated-llm-grader
+fixture_type: negative
+runtime: Claude Managed Agents
+description: Negative fixture where judgement-based grading is requested without rubric constraints or calibration.
+source_files:
+  runtime: src/agent_gepa/runtime.py
+existing_commands:
+  direct_eval: agent-gepa eval-demo
+candidate_fields:
+  - system_prompt
+expected_failure: uncalibrated llm grader
+runtime_facts:
+  - LLM grading can be appropriate, but only with a tight rubric and reliability checks.
+v1_constraints:
+  - The workflow must not use an uncalibrated LLM judge as optimization feedback.
+expected_behavior:
+  semantic_checks: {}
+  live:
+    requires_live: false
+    required_env:
+      - ANTHROPIC_API_KEY

@@ -9,6 +9,9 @@ Constraints:
 - Keep runtime scope focused on Claude Managed Agents.
 - Keep OpenSpec and GEPA eval artifacts readable Markdown/YAML.
 - Do not require users to know all answers up front; unknowns should become explicit discovery questions.
+- Do not add more user-facing stages for criteria work; fold criteria thinking into proposal and design.
+- Ask at most 3-5 plain-language questions before drafting when the user has not provided a complete eval contract.
+- Keep the first proposal concise; defer runner mechanics, calibration depth, and implementation design to the design artifact.
 - Do not over-schema prose artifacts; use structured fields only where validation or runtime behavior consumes them.
 - Preserve deterministic local validation as the default path.
 
@@ -23,6 +26,7 @@ Constraints:
 - Require every grader to state its method, reason for trust, calibration needs, and reliability risks.
 - Give GEPA a clear optimizer objective and promotion rule instead of a loose numeric score.
 - Update validation so low-quality eval design is caught before implementation is considered ready.
+- Keep the workflow approachable by having the agent draft criteria and ask the user to confirm or correct the draft.
 
 **Non-Goals:**
 
@@ -31,6 +35,7 @@ Constraints:
 - Add runtime support beyond Claude Managed Agents.
 - Require live API calls for criteria validation.
 - Force a single universal metric schema for every future agent runtime.
+- Turn the proposal step into a long intake form or eval theory lesson.
 
 ## Decisions
 
@@ -49,6 +54,24 @@ The proposal template should add a required section before examples:
 Rationale: GEPA should optimize against an explicit success definition. Examples and rubrics are downstream of that definition, not a substitute for it.
 
 Alternative considered: keep criteria inside the existing scoring section. That is simpler, but it makes criteria feel like implementation detail instead of the core product decision.
+
+### Keep criteria-first lightweight for users
+
+The workflow should not add new user-facing phases for primary metrics, diagnostics, guardrails, task distribution, grading, and promotion. Instead, the skill should collect a small amount of plain-language input:
+
+- What agent should improve?
+- What behavior should get better?
+- What are 2-3 representative tasks?
+- What would make an answer clearly bad?
+- Which concerns matter most, such as correctness, formatting, safety, cost, speed, or tool use?
+
+The skill should then draft the success criteria, scoring plan, grader strategy, and optimizer acceptance rules. The user should be asked to confirm or correct the draft, not to fill out every field from scratch. If more information is still needed, the proposal should record explicit unknowns and discovery questions rather than blocking on a long questionnaire.
+
+The first proposal should be a concise confirmation artifact. It should use short bullets, include only the examples needed to confirm the direction, and leave detailed runner mechanics, scorer calibration, rollout lifecycle, and implementation planning for `design.md`.
+
+Rationale: criteria-first rigor is valuable only if users can start quickly. The agent should carry the eval-design burden and use the user's feedback to refine the draft.
+
+Alternative considered: ask the user every criteria and grading question up front. That would produce complete inputs when answered, but it would make the skill feel too heavy and discourage adoption.
 
 ### Require eval design reasoning before implementation design
 
@@ -144,6 +167,22 @@ Proposal artifacts should add:
 - Blind spots:
 ```
 
+The proposal step should also include a short confirmation surface:
+
+```markdown
+## Draft Eval Contract
+
+I inferred this from your request:
+
+- Primary success:
+- Guardrails:
+- Scoring:
+- Grader:
+- Open questions:
+```
+
+The skill should only ask focused follow-up questions when the missing answer materially affects eval validity or implementation.
+
 Design artifacts should add:
 
 ```markdown
@@ -199,6 +238,8 @@ The change should add deterministic tests around:
 
 - Proposal template contains success criteria and trust sections.
 - `gepa-evals-new` requires criteria-first content and records unknowns when criteria are missing.
+- `gepa-evals-new` does not require a long questionnaire before drafting a proposal.
+- `gepa-evals-new` keeps first proposals concise and defers implementation depth to design.
 - Artifact quality scoring fails or lowers score when proposals omit primary metric, thresholds, guardrails, task distribution, or grader trust.
 - Negative fixtures with vague "make it better" requests are treated as clarification-needed, not as ready eval specs.
 - System-loop validation remains separate from agent-quality validation.
@@ -208,6 +249,7 @@ The default test suite should not require live Anthropic calls. Live Managed Age
 ## Risks / Trade-offs
 
 - [Risk] More proposal fields can make the workflow feel heavier. -> Mitigation: allow unknowns and discovery questions, but do not let missing criteria silently become a runnable optimization plan.
+- [Risk] Criteria-first guidance becomes a long form. -> Mitigation: cap initial user-facing questions, draft inferred criteria, and ask for correction instead of requiring complete authoring.
 - [Risk] Users may overfit to one primary metric. -> Mitigation: require diagnostics and guardrails even when GEPA optimizes a single objective.
 - [Risk] Criteria scoring can become subjective. -> Mitigation: score for explicitness, relevance, thresholds, and grader trust rather than perfect wording.
 - [Risk] Extra metadata can complicate simple deterministic evals. -> Mitigation: keep metadata optional at the runtime boundary while making it required in planning artifacts.
@@ -230,3 +272,4 @@ Rollback is simple because this change mainly adds planning and validation requi
 - Should optimizer acceptance rules be enforced by code immediately, or initially documented and scored in artifact validation?
 - What is the minimum calibration evidence for an LLM grader before it can be used for GEPA optimization?
 - Should `README.md` mention criteria-first eval design, or should that stay in technical and skill docs?
+- What exact question budget should the skill use before drafting: three questions, five questions, or a soft maximum based on ambiguity?

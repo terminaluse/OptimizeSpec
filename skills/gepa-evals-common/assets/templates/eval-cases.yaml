@@ -7,3 +7,29 @@ cases:
       type: exact_match
       expected: "hello"
     rubric: "Output must exactly match the expected string."
+    metadata:
+      criteria:
+        category: agent-quality
+        primary: "The agent returns the expected output exactly."
+        secondary:
+          - "No extra formatting."
+        guardrails:
+          - "Do not return unrelated content."
+      grader:
+        type: deterministic
+        rationale: "Exact string equality is sufficient for this success condition."
+        calibration:
+          - input: "hello"
+            expected_score: 1.0
+          - input: "hello!"
+            expected_score: 0.0
+        reliability_risks: []
+        human_review_triggers: []
+      acceptance:
+        optimized_metric: correctness
+        diagnostic_metrics:
+          - latency_inv
+          - cost_inv
+        guardrail_metrics: []
+        promotion_rule: "Promote only when correctness improves or stays at 1.0 without guardrail regressions."
+        regression_tolerance: 0.0

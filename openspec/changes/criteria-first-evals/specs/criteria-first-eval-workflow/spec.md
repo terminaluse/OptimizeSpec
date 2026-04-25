@@ -43,3 +43,22 @@ The GEPA eval workflow SHALL preserve missing criteria, missing task distributio
 #### Scenario: User needs help defining the eval
 - **WHEN** the user does not know the eval contract
 - **THEN** the proposal captures the current hypothesis and lists discovery questions needed before implementation
+
+### Requirement: Criteria-first workflow stays lightweight for users
+The GEPA eval workflow SHALL keep criteria-first rigor inside the proposal and design stages instead of adding extra user-facing phases or a long intake questionnaire.
+
+#### Scenario: User gives partial intent
+- **WHEN** the user provides the target agent, desired improvement, representative examples, or obvious failure modes
+- **THEN** the skill drafts a proposed eval contract with inferred criteria, scoring, grader strategy, guardrails, and open questions for confirmation
+
+#### Scenario: More information is needed
+- **WHEN** missing information materially affects eval validity or implementation
+- **THEN** the skill asks a small number of plain-language follow-up questions and records the remaining unknowns instead of blocking on exhaustive criteria collection
+
+#### Scenario: Proposal is ready for review
+- **WHEN** the proposal is drafted
+- **THEN** the user can review and correct a concise eval contract rather than authoring primary metrics, diagnostics, guardrails, task distribution, grading, and promotion rules from scratch
+
+#### Scenario: Proposal needs implementation depth
+- **WHEN** runner mechanics, detailed grader calibration, rollout lifecycle, or implementation planning are needed
+- **THEN** the workflow records only the proposal-level decision or unknown and defers the deeper detail to design

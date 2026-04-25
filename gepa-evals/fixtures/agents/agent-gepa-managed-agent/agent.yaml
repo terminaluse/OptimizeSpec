@@ -54,6 +54,15 @@ expected_behavior:
       - expected output
       - numeric scoring
       - qualitative rubric
+      - primary criterion
+      - secondary criteria
+      - guardrails
+      - thresholds
+      - non-goals
+      - blind spots
+      - draft eval contract
+      - confirm or correct
+      - focused open questions
       - ASI
     design:
       - direct eval
@@ -63,6 +72,22 @@ expected_behavior:
       - GEPA
       - compare
       - credentials
+      - eval category
+      - real task distribution
+      - edge cases
+      - failure modes
+      - split strategy
+      - what this eval does not measure
+      - grading strategy
+      - grader type
+      - calibration examples
+      - reliability risks
+      - optimizer acceptance
+      - optimized metric
+      - diagnostic metrics
+      - guardrail metrics
+      - promotion rule
+      - regression tolerance
     specs_tasks:
       - candidate surface
       - eval dataset
@@ -77,6 +102,9 @@ expected_behavior:
       - expected
       - scorer
       - metadata
+      - criteria
+      - grader
+      - acceptance
     apply_plan:
       - runnable commands
       - direct eval
@@ -84,6 +112,9 @@ expected_behavior:
       - compare
       - verify
       - unsupported runtimes
+      - optimized metric
+      - guardrail metrics
+      - promotion rule
   live:
     requires_live: false
     required_env:

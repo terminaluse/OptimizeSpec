@@ -49,6 +49,38 @@ HARD_CONTRACT_KEYS = {
     "summary",
     "comparison",
 }
+LIGHTWEIGHT_UX_REQUIRED_TERMS = [
+    "draft eval contract",
+    "confirm or correct",
+    "focused open questions",
+]
+PROPOSAL_CRITERIA_TERMS = [
+    "primary criterion",
+    "secondary criteria",
+    "guardrails",
+    "thresholds",
+    "non-goals",
+    "blind spots",
+]
+DESIGN_CRITERIA_TERMS = [
+    "eval category",
+    "real task distribution",
+    "edge cases",
+    "failure modes",
+    "split strategy",
+    "what this eval does not measure",
+    "grading strategy",
+    "grader type",
+    "calibration examples",
+    "reliability risks",
+    "optimizer acceptance",
+    "optimized metric",
+    "diagnostic metrics",
+    "guardrail metrics",
+    "promotion rule",
+    "regression tolerance",
+]
+EVAL_CASE_METADATA_TERMS = ["criteria", "grader", "acceptance"]
 DEFAULT_REQUIRED_ARTIFACTS = [
     "generated/proposal.md",
     "generated/design.md",
@@ -225,13 +257,17 @@ def default_seed_candidate(fixture: FixtureMetadata) -> dict[str, str]:
             f"Ground the workflow in {files}. Candidate fields: {fields}."
         ),
         "proposal_generation_guidance": (
-            "The proposal must state the target agent, eval objective, input examples, expected output examples, "
-            "numeric scoring, qualitative rubric, discovery questions, and ASI as a first-class output."
+            "The proposal must state the target agent, eval objective, success criteria, primary criterion, "
+            "secondary criteria, guardrails, thresholds, non-goals, blind spots, input examples, expected output examples, "
+            "numeric scoring, qualitative rubric, grader trust, optimizer acceptance, discovery questions, and ASI as a first-class output. "
+            "Ask at most 3-5 plain-language questions before drafting; include a draft eval contract for the user to confirm or correct."
         ),
         "design_generation_guidance": (
             f"The design must name direct eval, optimize, compare, and candidate inspection invocation. "
             f"Existing command references: {commands}. Describe rollout lifecycle, session setup, trace capture, "
-            "scorer execution, side_info/ASI, persistence, cleanup, and credential assumptions."
+            "scorer execution, side_info/ASI, persistence, cleanup, credential assumptions, eval category, real task distribution, "
+            "edge cases, failure modes, split strategy, grader type, calibration examples, reliability risks, optimizer acceptance, "
+            "optimized metric, diagnostic metrics, guardrail metrics, promotion rule, and regression tolerance."
         ),
         "spec_task_generation_guidance": (
             "Specs and tasks must cover fixture validation, eval dataset, candidate surface, rollout executor, "
@@ -243,7 +279,8 @@ def default_seed_candidate(fixture: FixtureMetadata) -> dict[str, str]:
         ),
         "scoring_asi_guidance": (
             "Scoring must separate hard contracts for machine-consumed data from semantic scoring for agent-written prose. "
-            "ASI must include input, expected, actual, feedback, errors, command traces, generated files, and field-specific feedback."
+            "ASI must include input, expected, actual, feedback, errors, command traces, generated files, criteria quality, grader trust, "
+            "system-loop versus agent-quality distinction, optimizer acceptance, and field-specific feedback."
         ),
     }
 
@@ -290,13 +327,70 @@ def required_terms_for_artifact(fixture: FixtureMetadata, artifact_type: str) ->
     if artifact_type in checks:
         return checks[artifact_type]
     defaults = {
-        "proposal": ["target agent", "eval objective", "input", "expected output", "numeric scoring", "qualitative rubric", "ASI"],
-        "design": ["direct eval", "rollout lifecycle", "scorer", "ASI", "GEPA", "compare", "credentials"],
+        "proposal": [
+            "target agent",
+            "eval objective",
+            "input",
+            "expected output",
+            "numeric scoring",
+            "qualitative rubric",
+            "ASI",
+            *PROPOSAL_CRITERIA_TERMS,
+            *LIGHTWEIGHT_UX_REQUIRED_TERMS,
+        ],
+        "design": [
+            "direct eval",
+            "rollout lifecycle",
+            "scorer",
+            "ASI",
+            "GEPA",
+            "compare",
+            "credentials",
+            *DESIGN_CRITERIA_TERMS,
+        ],
         "specs_tasks": ["candidate surface", "eval dataset", "scorer", "ASI", "GEPA optimization", "validation"],
-        "eval_cases": ["train", "val", "input", "expected", "scorer", "metadata"],
-        "apply_plan": ["runnable commands", "direct eval", "optimize", "compare", "verify", "unsupported runtimes"],
+        "eval_cases": ["train", "val", "input", "expected", "scorer", "metadata", *EVAL_CASE_METADATA_TERMS],
+        "apply_plan": [
+            "runnable commands",
+            "direct eval",
+            "optimize",
+            "compare",
+            "verify",
+            "unsupported runtimes",
+            "optimized metric",
+            "guardrail metrics",
+            "promotion rule",
+        ],
     }
     return defaults.get(artifact_type, [])
+
+
+def criteria_metadata_for_artifact(artifact_type: str) -> dict[str, Any]:
+    category = "system" if artifact_type == "system_loop" else "agent-quality"
+    if artifact_type == "apply_plan":
+        category = "optimizer-acceptance"
+    return {
+        "criteria": {
+            "category": category,
+            "primary": f"{artifact_type} artifact satisfies criteria-first eval workflow requirements.",
+            "secondary": ["semantic coverage", "artifact clarity"],
+            "guardrails": ["Do not treat system-loop readiness as product-quality improvement."],
+        },
+        "grader": {
+            "type": "deterministic",
+            "rationale": "Validation uses required concept checks and hard contract parsing where possible.",
+            "calibration": [],
+            "reliability_risks": ["Required-term scoring can reward keyword stuffing."],
+            "human_review_triggers": ["New grader type, new runtime, or launch-quality claim."],
+        },
+        "acceptance": {
+            "optimized_metric": "semantic_concept_coverage",
+            "diagnostic_metrics": ["lightweight_user_flow", "criteria_quality", "grader_trust"],
+            "guardrail_metrics": ["hard_contract_valid", "unsupported_runtime_blocked"],
+            "promotion_rule": "Promote only when the optimized metric improves and guardrails do not regress.",
+            "regression_tolerance": 0.0,
+        },
+    }
 
 
 def default_eval_cases(fixture: FixtureMetadata, *, include_system_loop: bool = True) -> list[EvalCase]:
@@ -320,7 +414,12 @@ def default_eval_cases(fixture: FixtureMetadata, *, include_system_loop: bool = 
             expected=", ".join(required_terms_for_artifact(fixture, "proposal")),
             scorer=ScorerSpec(type="custom", expected="semantic_required_concepts"),
             split="train",
-            metadata={"artifact_type": "proposal", "required_terms": required_terms_for_artifact(fixture, "proposal")},
+            metadata={
+                "artifact_type": "proposal",
+                "required_terms": required_terms_for_artifact(fixture, "proposal"),
+                "enforce_lightweight_ux": True,
+                **criteria_metadata_for_artifact("proposal"),
+            },
         ),
         EvalCase(
             case_id=f"{fixture.fixture_id}-design",
@@ -328,7 +427,11 @@ def default_eval_cases(fixture: FixtureMetadata, *, include_system_loop: bool = 
             expected=", ".join(required_terms_for_artifact(fixture, "design")),
             scorer=ScorerSpec(type="custom", expected="semantic_required_concepts"),
             split="train",
-            metadata={"artifact_type": "design", "required_terms": required_terms_for_artifact(fixture, "design")},
+            metadata={
+                "artifact_type": "design",
+                "required_terms": required_terms_for_artifact(fixture, "design"),
+                **criteria_metadata_for_artifact("design"),
+            },
         ),
         EvalCase(
             case_id=f"{fixture.fixture_id}-specs-tasks",
@@ -336,7 +439,11 @@ def default_eval_cases(fixture: FixtureMetadata, *, include_system_loop: bool = 
             expected=", ".join(required_terms_for_artifact(fixture, "specs_tasks")),
             scorer=ScorerSpec(type="custom", expected="semantic_required_concepts"),
             split="val",
-            metadata={"artifact_type": "specs_tasks", "required_terms": required_terms_for_artifact(fixture, "specs_tasks")},
+            metadata={
+                "artifact_type": "specs_tasks",
+                "required_terms": required_terms_for_artifact(fixture, "specs_tasks"),
+                **criteria_metadata_for_artifact("specs_tasks"),
+            },
         ),
         EvalCase(
             case_id=f"{fixture.fixture_id}-eval-cases",
@@ -344,7 +451,11 @@ def default_eval_cases(fixture: FixtureMetadata, *, include_system_loop: bool = 
             expected=", ".join(required_terms_for_artifact(fixture, "eval_cases")),
             scorer=ScorerSpec(type="custom", expected="eval_cases_artifact_quality"),
             split="val",
-            metadata={"artifact_type": "eval_cases", "required_terms": required_terms_for_artifact(fixture, "eval_cases")},
+            metadata={
+                "artifact_type": "eval_cases",
+                "required_terms": required_terms_for_artifact(fixture, "eval_cases"),
+                **criteria_metadata_for_artifact("eval_cases"),
+            },
         ),
         EvalCase(
             case_id=f"{fixture.fixture_id}-apply-plan",
@@ -352,7 +463,11 @@ def default_eval_cases(fixture: FixtureMetadata, *, include_system_loop: bool = 
             expected=", ".join(required_terms_for_artifact(fixture, "apply_plan")),
             scorer=ScorerSpec(type="custom", expected="semantic_required_concepts"),
             split="val",
-            metadata={"artifact_type": "apply_plan", "required_terms": required_terms_for_artifact(fixture, "apply_plan")},
+            metadata={
+                "artifact_type": "apply_plan",
+                "required_terms": required_terms_for_artifact(fixture, "apply_plan"),
+                **criteria_metadata_for_artifact("apply_plan"),
+            },
         ),
     ]
     if include_system_loop:
@@ -363,7 +478,11 @@ def default_eval_cases(fixture: FixtureMetadata, *, include_system_loop: bool = 
                 expected="SYSTEM_LOOP_SUCCESS",
                 scorer=ScorerSpec(type="custom", expected="system_loop_success"),
                 split="test",
-                metadata={"artifact_type": "system_loop", "required_terms": ["SYSTEM_LOOP_SUCCESS"]},
+                metadata={
+                    "artifact_type": "system_loop",
+                    "required_terms": ["SYSTEM_LOOP_SUCCESS"],
+                    **criteria_metadata_for_artifact("system_loop"),
+                },
             )
         )
     return cases
@@ -403,10 +522,50 @@ def load_eval_cases_strict(path: Path, custom_scorers: dict[str, Any]) -> list[E
             raise ContractValidationError(f"eval case {case.case_id} is missing input")
         if case.expected is None and case.expected_shape is None:
             raise ContractValidationError(f"eval case {case.case_id} is missing expected output or expected_shape")
+        validate_optional_eval_metadata(case)
         cases.append(case)
     if not any(case.split == "train" for case in cases) and len(cases) > 1:
         raise ContractValidationError("eval cases need at least one train split")
     return cases
+
+
+def validate_optional_eval_metadata(case: EvalCase) -> None:
+    criteria = case.metadata.get("criteria")
+    if criteria is not None:
+        if not isinstance(criteria, dict):
+            raise ContractValidationError(f"eval case {case.case_id} criteria metadata must be a mapping")
+        category = criteria.get("category")
+        if category is not None and category not in {"system", "agent-quality", "optimizer-acceptance"}:
+            raise ContractValidationError(f"eval case {case.case_id} criteria category is invalid")
+        if "primary" in criteria and not isinstance(criteria["primary"], str):
+            raise ContractValidationError(f"eval case {case.case_id} criteria primary must be a string")
+        for list_key in ("secondary", "guardrails"):
+            if list_key in criteria and not isinstance(criteria[list_key], list):
+                raise ContractValidationError(f"eval case {case.case_id} criteria {list_key} must be a list")
+
+    grader = case.metadata.get("grader")
+    if grader is not None:
+        if not isinstance(grader, dict):
+            raise ContractValidationError(f"eval case {case.case_id} grader metadata must be a mapping")
+        grader_type = str(grader.get("type") or "").strip()
+        if grader_type not in {"deterministic", "code", "llm", "human", "hybrid"}:
+            raise ContractValidationError(f"eval case {case.case_id} grader type is invalid or missing")
+        if "rationale" in grader and not isinstance(grader["rationale"], str):
+            raise ContractValidationError(f"eval case {case.case_id} grader rationale must be a string")
+        for list_key in ("calibration", "reliability_risks", "human_review_triggers"):
+            if list_key in grader and not isinstance(grader[list_key], list):
+                raise ContractValidationError(f"eval case {case.case_id} grader {list_key} must be a list")
+
+    acceptance = case.metadata.get("acceptance")
+    if acceptance is not None:
+        if not isinstance(acceptance, dict):
+            raise ContractValidationError(f"eval case {case.case_id} acceptance metadata must be a mapping")
+        for text_key in ("optimized_metric", "promotion_rule"):
+            if text_key in acceptance and not isinstance(acceptance[text_key], str):
+                raise ContractValidationError(f"eval case {case.case_id} acceptance {text_key} must be a string")
+        for list_key in ("diagnostic_metrics", "guardrail_metrics"):
+            if list_key in acceptance and not isinstance(acceptance[list_key], list):
+                raise ContractValidationError(f"eval case {case.case_id} acceptance {list_key} must be a list")
 
 
 def required_terms(case: EvalCase) -> list[str]:
@@ -416,20 +575,43 @@ def required_terms(case: EvalCase) -> list[str]:
     return [str(term) for term in terms]
 
 
+def lightweight_user_flow_score(case: EvalCase, actual: str) -> tuple[float, list[str]]:
+    if not case.metadata.get("enforce_lightweight_ux"):
+        return 1.0, []
+    lowered = actual.lower()
+    issues: list[str] = []
+    if actual.count("?") > 5:
+        issues.append("more than five user-facing questions")
+    heavy_markers = [
+        "long questionnaire",
+        "intake form",
+        "answer every",
+        "answer all",
+        "cannot draft until",
+    ]
+    matched_markers = [marker for marker in heavy_markers if marker in lowered]
+    issues.extend(matched_markers)
+    return (0.0 if issues else 1.0), issues
+
+
 def semantic_required_concepts_scorer(case: EvalCase, rollout: RolloutResult) -> ScoreResult:
     terms = required_terms(case)
     actual = str(rollout.actual or "").lower()
     matched = [term for term in terms if term.lower() in actual]
     missing = [term for term in terms if term not in matched]
-    score = len(matched) / max(len(terms), 1)
+    semantic_score = len(matched) / max(len(terms), 1)
+    ux_score, ux_issues = lightweight_user_flow_score(case, str(rollout.actual or ""))
+    score = semantic_score * ux_score if case.metadata.get("enforce_lightweight_ux") else semantic_score
+    missing_feedback = "" if not missing else f" Missing: {', '.join(missing)}."
+    ux_feedback = "" if not ux_issues else f" Lightweight UX issues: {', '.join(ux_issues)}."
     return ScoreResult(
         score=score,
         feedback=(
             f"Matched all {len(terms)} semantic concepts."
-            if not missing
-            else f"Matched {len(matched)}/{len(terms)} semantic concepts. Missing: {', '.join(missing)}."
+            if not missing and not ux_issues
+            else f"Matched {len(matched)}/{len(terms)} semantic concepts.{missing_feedback}{ux_feedback}"
         ),
-        subscores={"semantic_concept_coverage": score, "missing_concepts": float(len(missing))},
+        subscores={"semantic_concept_coverage": semantic_score, "missing_concepts": float(len(missing)), "lightweight_user_flow": ux_score},
     )
 
 
@@ -439,18 +621,27 @@ def eval_cases_artifact_quality_scorer(case: EvalCase, rollout: RolloutResult) -
         payload = yaml.safe_load(str(rollout.actual or "")) or {}
         raw_cases = payload.get("cases", payload) if isinstance(payload, dict) else payload
         parsed = [parse_eval_case(item) for item in raw_cases]
+        for item in parsed:
+            validate_optional_eval_metadata(item)
         split_ok = bool({item.split for item in parsed} & {"val", "test"}) and any(item.split == "train" for item in parsed)
         scorer_ok = all(item.scorer.type for item in parsed)
+        metadata_ok = any({"criteria", "grader", "acceptance"} <= set(item.metadata) for item in parsed)
         structure_score = 1.0 if parsed and split_ok and scorer_ok else 0.0
-        feedback = semantic.feedback if structure_score == 1.0 else "Eval-case artifact parsed but lacks train plus val/test splits or scorer definitions."
+        metadata_score = 1.0 if metadata_ok else 0.0
+        feedback = (
+            semantic.feedback
+            if structure_score == 1.0 and metadata_score == 1.0
+            else "Eval-case artifact parsed but lacks train plus val/test splits, scorer definitions, or criteria/grader/acceptance metadata."
+        )
     except Exception as exc:
         structure_score = 0.0
+        metadata_score = 0.0
         feedback = f"Eval-case artifact failed hard contract parsing: {exc}"
-    score = (semantic.score + structure_score) / 2.0
+    score = (semantic.score + structure_score + metadata_score) / 3.0
     return ScoreResult(
         score=score,
         feedback=feedback,
-        subscores={**semantic.subscores, "eval_case_structure": structure_score},
+        subscores={**semantic.subscores, "eval_case_structure": structure_score, "eval_case_criteria_metadata": metadata_score},
     )
 
 
@@ -558,6 +749,26 @@ Target agent: {fixture.name}. Runtime: {fixture.runtime}. Source files: {source_
 
 Create evals for the target agent with concrete input examples, expected output examples, numeric scoring from 0.0 to 1.0, qualitative rubric feedback, discovery questions, and ASI.
 
+## Success Criteria
+
+- User outcome: improve the target agent on representative tasks that matter for {fixture.name}.
+- Primary criterion: generated eval and optimization artifacts are specific, runnable, and grounded in the target agent.
+- Secondary criteria: artifact clarity, trace quality, scoring usefulness, and rollout evidence.
+- Guardrails: do not invent unsupported runtimes, credentials, source files, or success claims.
+- Thresholds: acceptable means the system-loop runs; good means agent-quality criteria are represented; promotion requires validation improvement without guardrail regressions.
+- Non-goals: do not claim production-quality agent improvement from system_loop_success alone.
+- Blind spots: deterministic validation cannot prove every live Managed Agents failure mode.
+
+## Draft Eval Contract
+
+I inferred this from the user request. The user should confirm or correct it.
+
+- Primary success: the workflow creates runnable eval artifacts and meaningful agent-quality criteria for {fixture.name}.
+- Guardrails: unsupported runtimes, missing invocation details, missing grader trust, and missing optimizer acceptance block promotion.
+- Scoring: use numeric scoring plus qualitative rubric feedback and field-specific ASI.
+- Grader: prefer deterministic or code-based checks; use LLM grading only with calibration examples and reliability risks.
+- Focused open questions: confirm the most important user outcome, representative edge cases, and any guardrail that must never regress.
+
 ## Candidate Surface
 
 Candidate fields: {fields}. GEPA treats the candidate as dict[str, str].
@@ -571,13 +782,39 @@ Candidate fields: {fields}. GEPA treats the candidate as dict[str, str].
 
 Existing commands: {commands}. The validation harness must expose direct eval, compare, optimize, verify, and candidate inspection.
 
+## Eval Design
+
+- Eval category: system evals plus agent-quality evals plus optimizer acceptance criteria.
+- Real task distribution: cover common target-agent tasks, rare edge cases, and ambiguous inputs from the fixture request.
+- Edge cases: missing eval contract, missing scoring guidance, unsupported runtime, missing invocation details, uncalibrated LLM grading, and missing optimizer acceptance.
+- Failure modes: runnable artifacts can exist while criteria are vague, graders are unreliable, or system_loop_success is mistaken for agent improvement.
+- Split strategy: use train cases for proposal/design feedback, validation cases for specs/eval/apply artifacts, and test cases for system-loop readiness.
+- What this eval does not measure: it does not prove live production quality unless an agent-quality eval and optional live gate also pass.
+
 ## Rollout Lifecycle
 
 One rollout loads a candidate and eval case, starts the Claude Managed Agents session or deterministic fixture executor, captures trace data, runs the scorer, builds side_info and ASI, persists artifacts, and performs cleanup.
 
+## Grading Strategy
+
+- Grader type: hybrid, with deterministic structure checks plus semantic artifact scoring.
+- Why this grader is appropriate: hard contracts protect machine-consumed data while semantic checks allow flexible proposal/design wording.
+- Calibration examples: complete criteria-first artifacts should score high; vague "make it better" artifacts or long questionnaires should score low.
+- Reliability risks: keyword stuffing, weak LLM-judge rubrics, and missing task distribution can inflate scores.
+- Human review triggers: new runtime support, LLM grader changes, guardrail failures, or claims of agent-quality improvement.
+
 ## Optimizer
 
 GEPA optimization uses optimize_candidate and optimize_anything with train/val splits, objective, background, max_metric_calls, command evidence, run logs, and candidate outputs.
+
+## Optimizer Acceptance
+
+- Optimized metric: agent-quality artifact score tied to the primary criterion.
+- Diagnostic metrics: semantic concept coverage, criteria quality, grader trust, ASI quality, latency_inv, and cost_inv.
+- Guardrail metrics: unsupported runtime handling, missing invocation handling, missing grader trust, and missing optimizer acceptance.
+- Promotion rule: promote only when validation improves and guardrail metrics do not regress beyond tolerance.
+- Regression tolerance: 0.0 for hard contracts and guardrails; limited tolerance for prose wording changes.
+- Required evidence: summary.json, comparison.json, candidates.json, run_log.txt, side_info.json, command evidence, and generated files.
 
 ## Credentials
 
@@ -617,7 +854,29 @@ The system SHALL validate the candidate surface, eval dataset, scorer behavior, 
                     "input": "Generate eval artifacts for the fixture.",
                     "expected": "input expected scorer metadata",
                     "scorer": {"type": "custom", "expected": "semantic_required_concepts"},
-                    "metadata": {"required_terms": ["input", "expected", "scorer", "metadata"]},
+                    "metadata": {
+                        "required_terms": ["input", "expected", "scorer", "metadata", "criteria", "grader", "acceptance"],
+                        "criteria": {
+                            "category": "agent-quality",
+                            "primary": "Generated artifacts include criteria-first eval design.",
+                            "secondary": ["Artifact clarity", "ASI usefulness"],
+                            "guardrails": ["Do not treat system-loop success as agent-quality improvement."],
+                        },
+                        "grader": {
+                            "type": "deterministic",
+                            "rationale": "Required concept and YAML structure checks are reliable for this fixture.",
+                            "calibration": [{"artifact": "complete proposal", "expected_score": 1.0}],
+                            "reliability_risks": ["Keyword stuffing can overstate quality."],
+                            "human_review_triggers": ["LLM grader or live runtime changes."],
+                        },
+                        "acceptance": {
+                            "optimized_metric": "semantic_concept_coverage",
+                            "diagnostic_metrics": ["lightweight_user_flow", "eval_case_criteria_metadata"],
+                            "guardrail_metrics": ["hard_contract_valid"],
+                            "promotion_rule": "Promote only when criteria coverage improves without hard-contract regressions.",
+                            "regression_tolerance": 0.0,
+                        },
+                    },
                 },
                 {
                     "id": "runner-validation-val",
@@ -625,7 +884,29 @@ The system SHALL validate the candidate surface, eval dataset, scorer behavior, 
                     "input": "Run direct eval and compare.",
                     "expected": "train val scorer side_info",
                     "scorer": {"type": "custom", "expected": "semantic_required_concepts"},
-                    "metadata": {"required_terms": ["train", "val", "scorer", "side_info"]},
+                    "metadata": {
+                        "required_terms": ["train", "val", "scorer", "side_info", "criteria", "grader", "acceptance"],
+                        "criteria": {
+                            "category": "system",
+                            "primary": "The runner and compare path execute and persist evidence.",
+                            "secondary": ["Command evidence", "Side info quality"],
+                            "guardrails": ["No unsupported runtime assumptions."],
+                        },
+                        "grader": {
+                            "type": "code",
+                            "rationale": "Command return codes and persisted artifacts are directly checkable.",
+                            "calibration": [],
+                            "reliability_risks": [],
+                            "human_review_triggers": ["Nonzero command return code."],
+                        },
+                        "acceptance": {
+                            "optimized_metric": "system_loop_success",
+                            "diagnostic_metrics": ["semantic_concept_coverage"],
+                            "guardrail_metrics": ["missing_files", "failed_commands"],
+                            "promotion_rule": "System-loop success is readiness evidence only, not an agent-quality claim.",
+                            "regression_tolerance": 0.0,
+                        },
+                    },
                 },
             ]
         }
@@ -636,6 +917,8 @@ The system SHALL validate the candidate surface, eval dataset, scorer behavior, 
 Expose runnable commands for generate, direct eval, compare, optimize, verify, and show candidate. Reuse the target repo runtime helpers where possible. Persist summary.json, comparison.json, candidates.json, run_log.txt, side_info.json, command evidence, and generated files.
 
 Unsupported runtimes are blocked. Live Managed Agents require {REQUIRED_LIVE_ENV}; deterministic fixtures remain the default.
+
+Optimizer acceptance must name the optimized metric, diagnostic metrics, guardrail metrics, promotion rule, regression tolerance, and required evidence. System-loop success proves machinery readiness only; agent-quality improvement requires criteria-tied comparison evidence.
 
 ## Command Shape
 

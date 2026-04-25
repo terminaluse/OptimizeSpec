@@ -107,6 +107,10 @@ def parse_eval_case(payload: dict[str, Any]) -> EvalCase:
     split = payload.get("split", "train")
     if split not in {"train", "val", "test"}:
         raise ValueError(f"eval case {case_id} has unsupported split {split!r}")
+    metadata = dict(payload.get("metadata") or {})
+    for optional_key in ("criteria", "grader", "acceptance"):
+        if optional_key in payload and optional_key not in metadata:
+            metadata[optional_key] = payload[optional_key]
     return EvalCase(
         case_id=case_id,
         input=payload.get("input"),
@@ -115,7 +119,7 @@ def parse_eval_case(payload: dict[str, Any]) -> EvalCase:
         rubric=payload.get("rubric", scorer.rubric),
         scorer=scorer,
         split=split,
-        metadata=dict(payload.get("metadata") or {}),
+        metadata=metadata,
     )
 
 

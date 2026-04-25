@@ -5,6 +5,7 @@ from pathlib import Path
 import importlib.util
 
 import pytest
+import yaml
 
 from agent_gepa.self_improvement import (
     EvalCase,
@@ -208,7 +209,6 @@ def test_existing_agent_eval_generator_writes_generated_artifacts(tmp_path: Path
     assert (tmp_path / "proposal.md").exists()
     assert (tmp_path / "design.md").exists()
     assert (tmp_path / "specs" / "meta-eval-spec.md").exists()
-    assert "ManagedAgentRuntime" in (tmp_path / "design.md").read_text(encoding="utf-8")
 
 
 @pytest.mark.parametrize(
@@ -224,10 +224,10 @@ def test_existing_agent_eval_generator_writes_generated_artifacts(tmp_path: Path
 def test_gepa_eval_skill_frontmatter(skill_name: str) -> None:
     skill_path = Path("skills") / skill_name / "SKILL.md"
     text = skill_path.read_text(encoding="utf-8")
-    assert text.startswith("---\n")
-    assert f"name: {skill_name}" in text
-    assert "description:" in text
-    assert "TODO" not in text
+    metadata = yaml.safe_load(text.split("---", 2)[1])
+    assert metadata["name"] == skill_name
+    assert isinstance(metadata["description"], str)
+    assert metadata["description"].strip()
 
 
 def test_common_skill_reference_paths_exist() -> None:

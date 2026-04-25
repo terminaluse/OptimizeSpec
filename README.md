@@ -2,7 +2,7 @@
 
 Create a self-improvement system for your agent.
 
-`agent-gepa` helps you take an existing agent, define evals for it, and run GEPA to improve it with evidence instead of guesswork. You decide what good behavior looks like. The system runs the agent, scores the results, proposes intelligent improvements, and tests whether those changes actually help.
+`agent-gepa` helps you take an existing agent, define evals for it, and run GEPA to improve it with evidence instead of guesswork. You decide what good behavior looks like. The system runs the agent, scores the results, proposes improvements, and tests whether those changes actually help.
 
 ## Why This Exists
 
@@ -16,43 +16,18 @@ That breaks down quickly. It is hard to tell whether the agent really improved, 
 
 `agent-gepa` gives you a repeatable loop:
 
-1. Define evals for your agent.
-2. Run the current agent on them.
-3. Score the outputs with numbers and qualitative feedback.
+1. Define what "better" means for your agent.
+2. Run the current agent on representative cases.
+3. Score the outputs with numbers and useful feedback.
 4. Let GEPA propose changes.
-5. Keep the changes that perform better.
+5. Keep the changes that perform better without violating guardrails.
 
-> qualitative feedback
-
-You can define a LLM as judge that's able to give detailed qualitative feedback such as:
-```
-The agent wasn't able to identify the close button to close the page
-```
-
-
-Define a small component that you put in prod
-
-then define the output you're storing
-
-
-Then 
-
-
-
-
-
-What's difficult?
-Coming up with the rubric
-
-
-
-
-
-
+The hard part is usually not running the optimizer. It is deciding what the eval should reward, what it should reject, and which evidence is strong enough to trust. The included skills help a coding agent draft that eval contract from your intent and examples, then ask you to confirm or correct it.
 
 ## What You Get
 
 - A way to define evals for an existing agent
+- A criteria-first workflow for success criteria, guardrails, grader trust, and promotion rules
 - A runner for executing those evals and storing rollout artifacts
 - A GEPA optimization loop that proposes and tests improvements
 - A working example for Claude Managed Agents
@@ -64,7 +39,7 @@ This repo is for you if:
 
 - you already have an agent
 - you want to improve it systematically
-- you can describe what "better" means with an eval
+- you can describe what "better" roughly means, even if you need help turning that into an eval
 - you want to start with Claude Managed Agents
 
 ## Quickstart
@@ -131,12 +106,12 @@ What those commands do:
 
 ## What Happens When You Run It
 
-1. You define eval cases for your agent.
+1. You define success criteria and representative eval cases.
 2. The system runs your agent on those cases.
 3. Each rollout gets scored.
 4. GEPA uses the results and feedback to propose changes.
 5. New candidates are evaluated against the same cases.
-6. You can compare the baseline and improved versions directly.
+6. You compare the baseline and improved versions before accepting a change.
 
 ## Start With The Example
 
@@ -157,7 +132,7 @@ skills/
 
 Use them in this order:
 
-1. `gepa-evals-new`: define the eval and what improvement means
+1. `gepa-evals-new`: draft the eval contract from intent and examples
 2. `gepa-evals-continue`: create the design, specs, and tasks
 3. `gepa-evals-apply`: implement the eval runner and optimizer
 4. `gepa-evals-verify`: check that eval, compare, and optimize flows are ready
@@ -166,6 +141,7 @@ Use them in this order:
 
 - [TECHNICAL.md](TECHNICAL.md) for architecture, runtime details, candidate fields, and command reference
 - [skills/gepa-evals-new/SKILL.md](skills/gepa-evals-new/SKILL.md) for creating a new GEPA eval workflow
+- [skills/gepa-evals-common/references/criteria-first-evals.md](skills/gepa-evals-common/references/criteria-first-evals.md) for criteria-first eval design
 - [skills/gepa-evals-apply/SKILL.md](skills/gepa-evals-apply/SKILL.md) for implementing the resulting system
 
 ## License

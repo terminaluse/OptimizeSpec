@@ -1,0 +1,22 @@
+id: vague-success-criteria
+name: vague-success-criteria
+fixture_type: negative
+runtime: Claude Managed Agents
+description: Negative fixture where the request asks to make the agent better without defining success criteria.
+source_files:
+  runtime: src/agent_gepa/runtime.py
+existing_commands:
+  direct_eval: agent-gepa eval-demo
+candidate_fields:
+  - system_prompt
+expected_failure: missing success criteria
+runtime_facts:
+  - The runtime is valid, but the user outcome and primary criterion are vague.
+v1_constraints:
+  - The workflow should draft a hypothesis and ask focused clarification questions instead of inventing a runnable optimizer contract.
+expected_behavior:
+  semantic_checks: {}
+  live:
+    requires_live: false
+    required_env:
+      - ANTHROPIC_API_KEY

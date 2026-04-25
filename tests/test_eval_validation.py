@@ -87,7 +87,144 @@ def test_semantic_prose_scoring_catches_critical_omission() -> None:
     score = eval_validation.semantic_required_concepts_scorer(case, rollout)
 
     assert score.score == 0.5
-    assert "GEPA" in score.feedback
+    assert score.subscores["missing_concepts"] == 1.0
+
+
+def test_legacy_eval_cases_still_load_without_criteria_metadata(tmp_path: Path) -> None:
+    cases = tmp_path / "legacy.yaml"
+    cases.write_text(
+        """
+cases:
+  - id: legacy
+    split: train
+    input: hello
+    expected: hello
+    scorer:
+      type: exact_match
+      expected: hello
+""",
+        encoding="utf-8",
+    )
+
+    loaded = eval_validation.load_eval_cases_strict(cases, eval_validation.custom_scorers())
+
+    assert loaded[0].case_id == "legacy"
+    assert loaded[0].metadata == {}
+
+
+def test_eval_case_top_level_criteria_metadata_is_preserved(tmp_path: Path) -> None:
+    cases = tmp_path / "criteria.yaml"
+    cases.write_text(
+        """
+cases:
+  - id: criteria-case
+    split: train
+    input: hello
+    expected: hello
+    scorer:
+      type: exact_match
+      expected: hello
+    criteria:
+      category: agent-quality
+      primary: exact output
+      secondary:
+        - no extra text
+      guardrails:
+        - no unrelated output
+    grader:
+      type: deterministic
+      rationale: exact match is reliable
+      calibration: []
+      reliability_risks: []
+      human_review_triggers: []
+    acceptance:
+      optimized_metric: correctness
+      diagnostic_metrics: []
+      guardrail_metrics: []
+      promotion_rule: promote on correctness
+""",
+        encoding="utf-8",
+    )
+
+    loaded = eval_validation.load_eval_cases_strict(cases, eval_validation.custom_scorers())
+
+    assert loaded[0].metadata["criteria"]["category"] == "agent-quality"
+    assert loaded[0].metadata["grader"]["type"] == "deterministic"
+    assert loaded[0].metadata["acceptance"]["optimized_metric"] == "correctness"
+
+
+def test_eval_case_metadata_rejects_uncalibrated_grader_shape(tmp_path: Path) -> None:
+    cases = tmp_path / "bad-grader.yaml"
+    cases.write_text(
+        """
+cases:
+  - id: bad-grader
+    split: train
+    input: hello
+    expected: hello
+    scorer:
+      type: exact_match
+      expected: hello
+    metadata:
+      grader:
+        type: llm
+        calibration: missing-list
+""",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(eval_validation.ContractValidationError, match="calibration"):
+        eval_validation.load_eval_cases_strict(cases, eval_validation.custom_scorers())
+
+
+def test_artifact_quality_scoring_penalizes_missing_criteria_terms() -> None:
+    fixture = eval_validation.load_fixture("agent-gepa-managed-agent")
+    case = next(case for case in eval_validation.default_eval_cases(fixture) if case.metadata.get("artifact_type") == "proposal")
+    rollout = RolloutResult(
+        case_id=case.case_id,
+        actual="Target agent and eval objective are present, with numeric scoring and qualitative rubric.",
+    )
+
+    score = eval_validation.semantic_required_concepts_scorer(case, rollout)
+
+    assert score.score < 0.5
+    assert score.subscores["missing_concepts"] > 0.0
+
+
+def test_lightweight_user_flow_penalizes_long_questionnaire() -> None:
+    fixture = eval_validation.load_fixture("agent-gepa-managed-agent")
+    case = next(case for case in eval_validation.default_eval_cases(fixture) if case.metadata.get("artifact_type") == "proposal")
+    rollout = RolloutResult(
+        case_id=case.case_id,
+        actual=(
+            "target agent Claude Managed Agents eval objective input expected output numeric scoring qualitative rubric ASI "
+            "primary criterion secondary criteria guardrails thresholds non-goals blind spots "
+            "draft eval contract confirm or correct focused open questions "
+            "What is metric one? What is metric two? What is metric three? "
+            "What is metric four? What is metric five? What is metric six?"
+        ),
+    )
+
+    score = eval_validation.semantic_required_concepts_scorer(case, rollout)
+
+    assert score.subscores["semantic_concept_coverage"] == 1.0
+    assert score.subscores["lightweight_user_flow"] == 0.0
+    assert score.score < 1.0
+
+
+def test_partial_intent_fixture_drafts_eval_contract() -> None:
+    fixture = eval_validation.load_fixture("partial-intent-examples")
+    case = next(case for case in eval_validation.default_eval_cases(fixture) if case.metadata.get("artifact_type") == "proposal")
+    rollout = eval_validation.EvalValidationExecutor(fixture=fixture, run_dir=Path("runs/test")).run(
+        eval_validation.default_seed_candidate(fixture),
+        case,
+        timeout_seconds=1.0,
+    )
+    score = eval_validation.semantic_required_concepts_scorer(case, rollout)
+
+    assert score.score == 1.0
+    assert score.subscores["semantic_concept_coverage"] == 1.0
+    assert score.subscores["lightweight_user_flow"] == 1.0
 
 
 def test_negative_fixture_scores_useful_failure() -> None:
@@ -102,7 +239,7 @@ def test_negative_fixture_scores_useful_failure() -> None:
     score = eval_validation.negative_fixture_useful_failure_scorer(case, rollout)
 
     assert score.score == 1.0
-    assert "unsupported runtime" in str(rollout.actual).lower()
+    assert not rollout.errors
 
 
 def test_generate_eval_compare_optimize_verify_smoke(tmp_path: Path) -> None:

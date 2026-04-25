@@ -15,6 +15,7 @@ Do not use this as the primary user-facing workflow. Use it as a shared referenc
 ## References
 
 - `references/workflow.md`: OpenSpec-inspired artifact flow and directory convention.
+- `references/criteria-first-evals.md`: lightweight criteria-first eval design, grader trust, and optimizer acceptance.
 - `references/gepa-reflection.md`: GEPA reflective evolution, ASI, candidate fields, and optimizer configuration.
 - `references/managed-agents-runner.md`: Claude Managed Agents rollout lifecycle.
 - `references/scorers-and-asi.md`: scorer templates and ASI shape.

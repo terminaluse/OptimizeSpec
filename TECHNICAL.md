@@ -194,13 +194,38 @@ gepa-evals/changes/<change-name>/
   seed-candidate.yaml
 ```
 
-The workflow works backward from GEPA reflection:
+The workflow works backward from GEPA reflection while keeping the user-facing intake light:
 
-1. Define the behavior to improve and mutable candidate fields.
-2. Define the Actionable Side Information GEPA needs after each rollout.
-3. Define eval cases and scorers.
-4. Design Claude Managed Agents rollouts and trace capture.
-5. Apply the design by adding direct eval, optimize, compare, and candidate-inspection operations.
+1. Ask for intent and examples, not a long eval-design form.
+2. Draft the eval contract: user outcome, primary criterion, diagnostics, guardrails, thresholds, non-goals, blind spots, and open questions.
+3. Ask the user to confirm or correct the draft.
+4. Define the behavior to improve and mutable candidate fields.
+5. Define the Actionable Side Information GEPA needs after each rollout.
+6. Define eval cases, scorer strategy, grader trust, and optimizer acceptance.
+7. Design Claude Managed Agents rollouts and trace capture.
+8. Apply the design by adding direct eval, optimize, compare, and candidate-inspection operations.
+
+## Criteria-first eval design
+
+Criteria-first does not add a new workflow phase. It makes the proposal and design phases stricter. The skill should ask at most 3-5 plain-language questions before drafting when the user has not provided a complete eval contract, then ask the user to confirm or correct the inferred criteria.
+
+Each proposal should distinguish:
+
+- primary success criterion
+- secondary or diagnostic criteria
+- guardrails that block promotion
+- acceptable, good, and promotion thresholds
+- non-goals and blind spots
+
+Each design should distinguish three kinds of evidence:
+
+- system evals: prove the runner, compare path, optimizer loop, persistence, and evidence artifacts work
+- agent quality evals: measure whether the target agent improved on meaningful behavior
+- optimizer acceptance criteria: decide whether a GEPA candidate should be promoted
+
+`system_loop_success == 1.0` means the machinery ran. It is not enough to claim the target agent got better. Agent-quality improvement requires criteria-tied eval cases, trustworthy grading, comparison evidence, and guardrails that did not regress.
+
+Graders should use the fastest reliable method. Prefer deterministic or code-based scoring for exact checks. Use LLM or human grading only when judgement is required, and then require a tight rubric, constrained score output, calibration examples, reliability risks, and human review triggers. This follows Anthropic's eval guidance to define success criteria before building task-specific evals: https://platform.claude.com/docs/en/test-and-evaluate/develop-tests
 
 ## Eval workflow validation
 
@@ -261,7 +286,7 @@ pytest tests/test_gepa_improvement_live.py -q
 
 This opt-in test starts with a deliberately weak `answer_template: wrong` candidate, runs GEPA with a small budget, and asserts that the optimized candidate changes and improves the direct eval score from 0.0 to 1.0.
 
-Negative fixtures live under `gepa-evals/fixtures/agents/` and cover missing eval contracts, missing scoring guidance, unsupported runtimes, and missing invocation details.
+Negative fixtures live under `gepa-evals/fixtures/agents/` and cover missing eval contracts, missing scoring guidance, unsupported runtimes, missing invocation details, vague success criteria, missing task distribution, uncalibrated LLM grading, and missing optimizer acceptance rules.
 
 ## Runtime notes
 

@@ -10,6 +10,16 @@
 
 Prefer deterministic scorers when the success condition is exact. Use qualitative rubric scoring for judgment-heavy tasks.
 
+Every scorer plan should state why the grader can be trusted. Include the grader type, calibration examples, known reliability risks, and human review triggers. LLM graders need a tight rubric and constrained score output before they are used as GEPA optimization feedback.
+
+## Metric Roles
+
+- Optimized metric: the score GEPA should improve.
+- Diagnostic metrics: extra signals GEPA can use for reflection, such as latency, cost, formatting, or tool-use quality.
+- Guardrail metrics: metrics that can block promotion even when the optimized metric improves.
+
+System-loop metrics prove the eval runner and optimizer executed. Agent quality metrics prove the target agent improved on behavior users care about. Keep these separate in compare output and ASI.
+
 ## ASI Shape
 
 ```json
