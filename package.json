@@ -9,13 +9,13 @@
     "optimization",
     "cli"
   ],
-  "homepage": "https://github.com/terminal-use/agent-gepa#readme",
+  "homepage": "https://github.com/terminal-use/OptimizeSpec#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/terminal-use/agent-gepa.git"
+    "url": "git+https://github.com/terminal-use/OptimizeSpec.git"
   },
   "bugs": {
-    "url": "https://github.com/terminal-use/agent-gepa/issues"
+    "url": "https://github.com/terminal-use/OptimizeSpec/issues"
   },
   "license": "MIT",
   "type": "module",
