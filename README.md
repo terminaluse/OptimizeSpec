@@ -6,7 +6,7 @@ OptimizeSpec is a TypeScript CLI and skill pack for spec-driven development of o
 
 - Turn vague agent-improvement goals into concrete eval and optimization specs.
 - Keep runner, scorer, optimizer, and evidence requirements reviewable before code is generated.
-- Generate implementation scaffolding that matches that project's stack instead of importing a bundled runtime.
+- Drive implementation through coding-agent skills that adapt to the project's real stack instead of importing a bundled runtime.
 
 ## Quick Start
 
@@ -68,7 +68,7 @@ The proposal records where the durable optimization-system code will live:
 - Path: <repo-relative path>
 ```
 
-Apply writes runner, scorer, optimizer, adapter, and evidence code to that recorded path. The optimization system should call into the real agent factory, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter.
+`$optimizespec-apply <change-name>` writes runner, scorer, optimizer, adapter, and evidence code to that recorded path. The TypeScript CLI creates, continues, inspects, and validates OptimizeSpec artifacts; the installed skills implement the optimization system. The optimization system should call into the real agent factory, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter.
 
 The core workflow is runtime-neutral. V1 apply support is Claude Managed Agent-specific, with runtime guidance bundled under the installed skill folders.
 
@@ -76,6 +76,10 @@ The core workflow is runtime-neutral. V1 apply support is Claude Managed Agent-s
 
 - [TECHNICAL.md](TECHNICAL.md) for architecture, package boundaries, reference agents, and release notes.
 - [skills/optimizespec-common/references/core/reference-contracts.md](skills/optimizespec-common/references/core/reference-contracts.md) for runner, grader, ASI, candidate, optimizer, runtime, evidence, and verification contracts.
+
+## Acknowledgements
+
+OptimizeSpec builds on [OpenSpec](https://github.com/Fission-AI/OpenSpec)'s spec-driven development approach. It also takes inspiration from [Symphony](https://github.com/openai/symphony)'s pattern of publishing the system as a Markdown specification that an agent can use to build or port the implementation.
 
 ## Development
 

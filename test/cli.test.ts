@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -23,7 +23,8 @@ describe('optimizespec cli', () => {
     expect(output).toContain('Spec-driven optimization system generator');
     expect(output).toContain('init');
     expect(output).toContain('continue');
-    expect(output).toContain('apply');
+    expect(output).toContain('validate');
+    expect(output).not.toMatch(/\bapply\b/);
   });
 
   it('creates, reports, and validates a change as JSON', () => {
@@ -71,95 +72,11 @@ describe('optimizespec cli', () => {
     );
   });
 
-  it('scaffolds TypeScript runner files in the agent project', () => {
-    const project = tempProject();
-    const target = tempProject();
-    run(['new', 'change', 'typed-runner', '--path', project, '--json']);
+  it('does not expose the removed apply command', () => {
+    const result = spawnSync(process.execPath, [cli, 'apply'], { encoding: 'utf8' });
 
-    const result = JSON.parse(
-      run([
-        'apply',
-        '--change',
-        'typed-runner',
-        '--path',
-        project,
-        '--target',
-        target,
-        '--stack',
-        'typescript',
-        '--json',
-      ]),
-    );
-    expect(result.stack).toBe('typescript');
-    expect(result.created).toEqual(expect.arrayContaining([expect.stringContaining('eval-runner.ts')]));
-
-    const runner = readFileSync(join(target, 'optimizespec', 'systems', 'typed-runner', 'eval-runner.ts'), 'utf8');
-    expect(runner).toContain('export async function runEvalCase');
-  });
-
-  it('uses the optimization-system path recorded in the proposal', () => {
-    const project = tempProject();
-    const target = tempProject();
-    run(['new', 'change', 'custom-location', '--path', project, '--json']);
-    const proposalPath = join(project, 'optimizespec', 'changes', 'custom-location', 'proposal.md');
-    const proposal = readFileSync(proposalPath, 'utf8').replace(
-      'Path: optimizespec/systems/custom-location',
-      'Path: tooling/agent-optimization/custom-location',
-    );
-    writeFileSync(proposalPath, proposal, 'utf8');
-
-    run([
-      'apply',
-      '--change',
-      'custom-location',
-      '--path',
-      project,
-      '--target',
-      target,
-      '--stack',
-      'typescript',
-      '--json',
-    ]);
-
-    const runner = readFileSync(join(target, 'tooling', 'agent-optimization', 'custom-location', 'eval-runner.ts'), 'utf8');
-    expect(runner).toContain('export async function runEvalCase');
-  });
-
-  it('can start from a committed reference-agent fixture and generate output in temp workspaces', () => {
-    const fixture = join(process.cwd(), 'tests', 'fixtures', 'reference-agents', 'optimizespec-managed-agent');
-    const project = tempProject();
-    const target = tempProject();
-    const request = readFileSync(join(fixture, 'request.md'), 'utf8').trim();
-    run([
-      'new',
-      'change',
-      'reference-agent-system',
-      '--path',
-      project,
-      '--description',
-      request || 'Generate an optimization system from the reference agent fixture.',
-      '--json',
-    ]);
-
-    const result = JSON.parse(
-      run([
-        'apply',
-        '--change',
-        'reference-agent-system',
-        '--path',
-        project,
-        '--target',
-        target,
-        '--stack',
-        'typescript',
-        '--json',
-      ]),
-    );
-
-    expect(result.created).toHaveLength(3);
-    expect(
-      readFileSync(join(target, 'optimizespec', 'systems', 'reference-agent-system', 'optimizer.ts'), 'utf8'),
-    ).toContain('meanScore');
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("unknown command 'apply'");
   });
 
   it('emits structured JSON errors for invalid changes', () => {

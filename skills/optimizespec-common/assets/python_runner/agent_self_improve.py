@@ -1,7 +1,8 @@
-"""Minimal OptimizeSpec runner scaffold.
+"""Internal starter for building a Python OptimizeSpec runner.
 
-Copy this file into an agent project, replace `TemplateEchoExecutor` with an executor
-that calls the real agent, and extend the scorer/evidence fields to match the spec.
+Adapt this file inside the recorded optimization-system path only after wiring
+`AgentExecutor` to the project's real agent. `TemplateEchoExecutor` is a local
+test double, not a completed apply result.
 """
 
 from __future__ import annotations

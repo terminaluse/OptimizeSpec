@@ -38,23 +38,28 @@ The npm package allowlist intentionally includes `bin`, `dist`, `skills`, and do
 
 ## CLI Commands
 
-The TypeScript CLI focuses on spec authoring and scaffolding for the agent project:
+The TypeScript CLI focuses on project setup, artifact creation, status, and validation:
 
 ```bash
 optimizespec init [path]
 optimizespec new change <name> [--description <text>]
 optimizespec status --change <name> [--json]
 optimizespec validate <name> [--json]
-optimizespec apply --change <name> --target <path> --stack typescript|python [--json]
 ```
 
-`apply` writes files to the optimization-system path recorded in the proposal's `Optimization System Location` section. If that section does not name a concrete path, the CLI falls back to:
+Implementation is handled by the installed apply skill:
+
+```text
+$optimizespec-apply <change-name>
+```
+
+That skill writes files to the optimization-system path recorded in the proposal's `Optimization System Location` section. If that section does not name a concrete path, the user and coding agent should update the proposal before implementation. A common default for new systems is:
 
 ```text
 optimizespec/systems/<change-name>/
 ```
 
-Generated code is deliberately local to the project being improved. A TypeScript project gets TypeScript runner files; a Python project can get Python runner files. The optimization system should import or adapt the project's real agent factory, tools, environment configuration, and command conventions instead of copying a parallel agent implementation. OptimizeSpec itself does not require projects to import a bundled Python runtime.
+Generated code is deliberately local to the project being improved. The optimization system should import or adapt the project's real agent factory, tools, environment configuration, and command conventions instead of copying a parallel agent implementation. OptimizeSpec itself does not require projects to import a bundled Python runtime.
 
 ## Reference Fixtures
 
