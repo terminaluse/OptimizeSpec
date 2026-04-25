@@ -1,6 +1,6 @@
 # OptimizeSpec
 
-OptimizeSpec is a TypeScript CLI and skill pack for creating spec-driven optimization systems for agents.
+OptimizeSpec is a TypeScript CLI and skill pack for spec-driven development of optimization systems for agents.
 
 It does not ship a Python optimization runtime as the product. Instead, it helps you define an eval contract, design the runner and optimizer, and generate target-repo files that match the target agent's stack.
 
