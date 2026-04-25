@@ -22,13 +22,6 @@ Install the CLI:
 
 ```bash
 npm install -g optimizespec
-optimizespec --help
-```
-
-Or run it without a global install:
-
-```bash
-npx optimizespec@latest --help
 ```
 
 Install the coding-agent skills separately with [skills](https://skills.sh/):
@@ -124,12 +117,6 @@ The npm package installs the `optimizespec` CLI. Coding-agent skills are install
 
 ```bash
 npx skills add terminal-use/OptimizeSpec --skill '*'
-```
-
-For a global skill install:
-
-```bash
-npx skills add terminal-use/OptimizeSpec --skill '*' -g
 ```
 
 The repo includes a `skills/` folder for coding agents that can use repo-local skills:
