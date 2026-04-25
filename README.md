@@ -4,9 +4,9 @@ OptimizeSpec is a TypeScript CLI and skill pack for spec-driven development of o
 
 ## Why Use It
 
-- Define what "better" means before tuning prompts, tools, or config.
-- Keep eval, scorer, optimizer, and evidence requirements reviewable.
-- Generate project-local optimization code that reuses your existing agent runtime instead of a bundled runtime.
+- Turn vague agent-improvement goals into concrete eval and optimization specs.
+- Keep runner, scorer, optimizer, and evidence requirements reviewable before code is generated.
+- Generate implementation scaffolding that matches that project's stack instead of importing a bundled runtime.
 
 ## Quick Start
 
