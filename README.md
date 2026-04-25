@@ -24,7 +24,7 @@ Install the CLI for project setup and CI checks:
 npm install -g optimizespec
 ```
 
-Install the coding-agent skills separately with [skills](https://skills.sh/):
+Install the coding-agent skills separately:
 
 ```bash
 npx skills add terminal-use/OptimizeSpec --skill '*'
@@ -38,6 +38,8 @@ optimizespec init
 
 Then drive the workflow through the coding-agent skills from inside the agent project:
 
+In Codex, invoke an installed skill with `$`, for example `$optimizespec-new`.
+
 ```text
 $optimizespec-new
 Create a change named improve-agent-output that improves the agent's answer quality on support triage tasks.
@@ -47,21 +49,18 @@ Continue the change until the proposal, design, specs, and tasks are complete:
 
 ```text
 $optimizespec-continue
-Continue improve-agent-output and create the next required artifact.
 ```
 
 Apply the completed plan to the current project:
 
 ```text
-$optimizespec-apply
-Apply improve-agent-output in this repository using the TypeScript stack.
+$optimizespec-apply improve-agent-output
 ```
 
 Verify the resulting eval, compare, optimize, and evidence-ledger behavior:
 
 ```text
-$optimizespec-verify
-Verify improve-agent-output end to end.
+$optimizespec-verify improve-agent-output
 ```
 
 For scripted checks, use the CLI's machine-readable output:
@@ -116,7 +115,7 @@ Node.js 20.19.0 or newer is required.
 
 ## Skills For Coding Agents
 
-The npm package installs the `optimizespec` CLI. Coding-agent skills are installed separately with `skills`:
+The npm package installs the `optimizespec` CLI. Coding-agent skills are installed separately:
 
 ```bash
 npx skills add terminal-use/OptimizeSpec --skill '*'
