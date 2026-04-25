@@ -8,7 +8,7 @@ This repository now has two clear layers:
 
 ## TypeScript CLI
 
-The release CLI follows an OpenSpec-style Node package layout:
+The release CLI follows an OpenSpec-style TypeScript package layout:
 
 ```text
 package.json
@@ -18,20 +18,20 @@ dist/
 skills/
 ```
 
-The package entrypoint is `bin/optimizespec.js`, which imports the compiled JavaScript from `dist/`. The CLI is implemented with `commander` and targets Node.js 20.19.0 or newer.
+The package entrypoint is `bin/optimizespec.js`, which imports the compiled JavaScript from `dist/`. The CLI is implemented with `commander` and targets Bun 1.3.0 or newer.
 
 Build and test:
 
 ```bash
-npm install
-npm run build
-npm test
+bun install
+bun run build
+bun run test
 ```
 
 Package inspection:
 
 ```bash
-npm run pack:check
+bun run pack:check
 ```
 
 The npm package allowlist intentionally includes `bin`, `dist`, `skills`, and documentation. It does not include `examples/py-claude-managed-agent/`, `tests/fixtures/reference-agents/`, root run artifacts, Python package metadata, caches, generated optimization systems, or OpenSpec planning history.
@@ -154,8 +154,8 @@ Live tests remain opt-in through environment flags such as `OPTIMIZESPEC_RUN_LIV
 
 Before release, verify:
 
-- `npm test` passes.
-- `npm run pack:check` does not include `examples/py-claude-managed-agent/`, `tests/fixtures/reference-agents/`, or generated optimization systems.
+- `bun run test` passes.
+- `bun run pack:check` does not include `examples/py-claude-managed-agent/`, `tests/fixtures/reference-agents/`, or generated optimization systems.
 - `pytest -q` passes for the Python reference example.
 - Documentation presents the TypeScript CLI as the public command surface.
 - Python commands are documented only as reference harness workflows.

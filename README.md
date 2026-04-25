@@ -1,6 +1,6 @@
 # OptimizeSpec
 
-OptimizeSpec is a TypeScript CLI and skill pack for spec-driven development of optimization systems for agents. It helps turn an improvement goal into reviewable specs, eval criteria, runner design, optimizer wiring, and evidence that a proposed change is actually better.
+OptimizeSpec is a CLI and skill pack for spec-driven development of optimization systems for agents. It helps turn an improvement goal into reviewable specs, eval criteria, runner design, optimizer wiring, and evidence that a proposed change is actually better.
 
 ## Why Use It
 
@@ -10,7 +10,7 @@ OptimizeSpec is a TypeScript CLI and skill pack for spec-driven development of o
 
 ## Quick Start
 
-Install the CLI for project setup and CI checks:
+Install the CLI for project setup and CI checks. The installed command expects Bun on your `PATH`.
 
 ```bash
 npm install -g optimizespec
@@ -83,12 +83,12 @@ OptimizeSpec builds on [OpenSpec](https://github.com/Fission-AI/OpenSpec)'s spec
 
 ## Development
 
-Node.js 20.19.0 or newer is required.
+Bun 1.3.0 or newer is required for local development and CLI execution.
 
 ```bash
-npm install
-npm test
-npm run pack:check
+bun install
+bun run test
+bun run pack:check
 ```
 
 The Python Claude Managed Agent reference harness lives under `examples/py-claude-managed-agent/` and is not part of the npm package.

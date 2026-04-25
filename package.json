@@ -31,16 +31,16 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "node build.js",
-    "dev": "tsc --watch",
-    "dev:cli": "npm run build --silent && node bin/optimizespec.js",
-    "test": "npm run build --silent && vitest run",
+    "build": "bun -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && bunx tsc",
+    "dev": "bunx tsc --watch",
+    "dev:cli": "bun run build && bun bin/optimizespec.js",
+    "test": "bun run build && bunx vitest run",
     "pack:check": "npm pack --dry-run --json",
-    "prepack": "npm run build",
-    "prepublishOnly": "npm test && npm run pack:check"
+    "prepack": "bun run build",
+    "prepublishOnly": "bun run test && bun run pack:check"
   },
   "engines": {
-    "node": ">=20.19.0"
+    "bun": ">=1.3.0"
   },
   "dependencies": {
     "commander": "^14.0.0"

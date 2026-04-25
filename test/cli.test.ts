@@ -5,9 +5,10 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const cli = join(process.cwd(), 'bin', 'optimizespec.js');
+const bun = process.env.BUN_BIN ?? 'bun';
 
 function run(args: string[], cwd = process.cwd()): string {
-  return execFileSync(process.execPath, [cli, ...args], {
+  return execFileSync(bun, [cli, ...args], {
     cwd,
     encoding: 'utf8',
   });
@@ -73,7 +74,7 @@ describe('optimizespec cli', () => {
   });
 
   it('does not expose the removed apply command', () => {
-    const result = spawnSync(process.execPath, [cli, 'apply'], { encoding: 'utf8' });
+    const result = spawnSync(bun, [cli, 'apply'], { encoding: 'utf8' });
 
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("unknown command 'apply'");
@@ -82,7 +83,7 @@ describe('optimizespec cli', () => {
   it('emits structured JSON errors for invalid changes', () => {
     const project = tempProject();
     const result = spawnSync(
-      process.execPath,
+      bun,
       [cli, 'validate', 'BadName', '--path', project, '--json'],
       { encoding: 'utf8' },
     );
