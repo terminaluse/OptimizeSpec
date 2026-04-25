@@ -17,7 +17,7 @@ Create exactly one next artifact for an existing change under `optimizespec/chan
 ## Rules
 
 - Read completed dependency artifacts before writing the next artifact.
-- Read `../optimizespec-common/references/reference-contracts.md` before choosing phase-specific context.
+- Read `references/reference-contracts.md` before choosing phase-specific context.
 - For design work, load runner, evidence, grader, ASI, candidate surface, optimizer, Managed Agents runtime, and verification contracts.
 - Do not skip artifacts.
 - Do not implement code.
@@ -26,9 +26,9 @@ Create exactly one next artifact for an existing change under `optimizespec/chan
 
 ## Templates
 
-- Proposal: `../optimizespec-common/assets/templates/proposal.md`
-- Design: `../optimizespec-common/assets/templates/design.md`
-- Spec: `../optimizespec-common/assets/templates/spec.md`
-- Tasks: `../optimizespec-common/assets/templates/tasks.md`
+- Proposal: `assets/templates/proposal.md`
+- Design: `assets/templates/design.md`
+- Spec: `assets/templates/spec.md`
+- Tasks: `assets/templates/tasks.md`
 
-The design artifact must include runner invocation, rollout lifecycle, trace capture, evidence ledger path and required files, scoring and judge records, ASI mapping, candidate fields, GEPA optimizer configuration, optimizer lineage, promotion decision, and verification plan. Read `../optimizespec-common/references/managed-agents-runner.md`, `../optimizespec-common/references/gepa-reflection.md`, and the relevant reference contracts before writing design.
+The design artifact must include runner invocation, rollout lifecycle, trace capture, evidence ledger path and required files, scoring and judge records, ASI mapping, candidate fields, GEPA optimizer configuration, optimizer lineage, promotion decision, and verification plan. Read `references/managed-agents-runner.md`, `references/gepa-reflection.md`, and the relevant reference contracts before writing design.

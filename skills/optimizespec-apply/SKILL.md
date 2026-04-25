@@ -27,9 +27,9 @@ If any are missing, stop and report the blocker.
    - command/CLI conventions
    - test conventions
 3. Verify the agent project uses Claude Managed Agents. If not, stop; v1 does not support other runtimes.
-4. Read `../optimizespec-common/references/reference-contracts.md`, then load the apply-phase contracts for runner, evidence, grader, ASI, optimizer, runtime, and verification.
+4. Read `references/reference-contracts.md`, then load the apply-phase contracts for runner, evidence, grader, ASI, optimizer, runtime, and verification.
 5. Implement tasks in order, marking each checkbox complete only after implementation and local verification.
-6. Adapt `../optimizespec-common/assets/python_runner/agent_self_improve.py` to the agent project when useful.
+6. Adapt `assets/python_runner/agent_self_improve.py` to the agent project when useful.
 
 ## Implementation Contract
 
@@ -42,16 +42,16 @@ The applied system must expose operations equivalent to:
 
 The rollout executor must produce score plus ASI for every candidate/eval-case pair. The applied system must persist a durable evidence ledger with run manifest, candidate registry, per-case scores, judge records when present, ASI, rollout records, comparison records, optimizer lineage, leaderboard, and promotion or no-promotion decision. Read:
 
-- `../optimizespec-common/references/eval-system-evidence.md`
-- `../optimizespec-common/references/runner-contract.md`
-- `../optimizespec-common/references/grader-contract.md`
-- `../optimizespec-common/references/asi-contract.md`
-- `../optimizespec-common/references/candidate-surface.md`
-- `../optimizespec-common/references/optimizer-contract.md`
-- `../optimizespec-common/references/managed-agents-runtime-contract.md`
-- `../optimizespec-common/references/verification-contract.md`
-- `../optimizespec-common/references/managed-agents-runner.md`
-- `../optimizespec-common/references/scorers-and-asi.md`
-- `../optimizespec-common/references/repo-patterns.md`
+- `references/eval-system-evidence.md`
+- `references/runner-contract.md`
+- `references/grader-contract.md`
+- `references/asi-contract.md`
+- `references/candidate-surface.md`
+- `references/optimizer-contract.md`
+- `references/managed-agents-runtime-contract.md`
+- `references/verification-contract.md`
+- `references/managed-agents-runner.md`
+- `references/scorers-and-asi.md`
+- `references/repo-patterns.md`
 
 Never create a parallel Managed Agents path if the repo already has a factory or session runner that can be reused.

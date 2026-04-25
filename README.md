@@ -125,6 +125,8 @@ skills/
   optimizespec-common/
 ```
 
+Each phase skill is self-contained: the references, templates, or assets it instructs an agent to load are bundled inside that same skill folder.
+
 Use them in this order:
 
 1. `optimizespec-new`: draft the eval contract from intent and examples.

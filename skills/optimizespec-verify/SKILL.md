@@ -26,7 +26,7 @@ Verify an OptimizeSpec implementation without making unrelated changes.
 7. Confirm optimize can be invoked or explain missing live credentials/features.
 8. Separate system-loop readiness from agent-quality improvement claims.
 
-Use `../optimizespec-common/references/reference-contracts.md` to choose verification references.
-Use `../optimizespec-common/references/eval-system-evidence.md` as the evidence-ledger checklist.
-Use `../optimizespec-common/references/scorers-and-asi.md` as the ASI quality checklist.
-Use `../optimizespec-common/references/verification-contract.md` for readiness reporting.
+Use `references/reference-contracts.md` to choose verification references.
+Use `references/eval-system-evidence.md` as the evidence-ledger checklist.
+Use `references/scorers-and-asi.md` as the ASI quality checklist.
+Use `references/verification-contract.md` for readiness reporting.

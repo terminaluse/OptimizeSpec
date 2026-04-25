@@ -105,7 +105,7 @@ The skill pack remains repo-local and packageable:
 - `skills/optimizespec-verify`
 - `skills/optimizespec-common`
 
-Shared contracts live under `skills/optimizespec-common/references/`. The most important contract is the evidence ledger: applied systems should persist run manifest, candidate registry, per-case scores, judge records when present, ASI, rollout records, comparison records, optimizer lineage, and promotion decisions.
+Shared contracts originate under `skills/optimizespec-common/references/`, and phase skills vendor the references they need so each installed skill folder is self-contained. The most important contract is the evidence ledger: applied systems should persist run manifest, candidate registry, per-case scores, judge records when present, ASI, rollout records, comparison records, optimizer lineage, and promotion decisions.
 
 ## Python Reference Example
 

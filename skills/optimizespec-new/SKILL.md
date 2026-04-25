@@ -14,9 +14,9 @@ optimizespec/changes/<change-name>/
 ## Workflow
 
 1. Derive or confirm a kebab-case change name.
-2. Read `../optimizespec-common/references/reference-contracts.md`, then load only the proposal-phase references it names: criteria-first, candidate surface, grader, and evidence.
+2. Read `references/reference-contracts.md`, then load only the proposal-phase references it names: criteria-first, candidate surface, grader, and evidence.
 3. Create `optimizespec/changes/<change-name>/proposal.md`.
-4. Use `../optimizespec-common/assets/templates/proposal.md` as the structure.
+4. Use `assets/templates/proposal.md` as the structure.
 5. Capture known details without inventing missing information.
 6. Start from plain-language user intent and examples. Do not make the user fill out a long eval-design form.
 7. If the user has not provided enough information, ask at most 3-5 focused questions before drafting. Prefer questions like:
@@ -48,9 +48,9 @@ optimizespec/changes/<change-name>/
 - ASI fields needed for reflection.
 - Unknowns to resolve in design.
 
-For workflow motivation, read `../optimizespec-common/references/workflow.md`.
-For criteria-first eval design, read `../optimizespec-common/references/criteria-first-evals.md`.
-For evidence expectations, read `../optimizespec-common/references/eval-system-evidence.md`.
-For grader expectations, read `../optimizespec-common/references/grader-contract.md`.
-For candidate boundaries, read `../optimizespec-common/references/candidate-surface.md`.
-For ASI-first framing, read `../optimizespec-common/references/gepa-reflection.md`.
+For workflow motivation, read `references/workflow.md`.
+For criteria-first eval design, read `references/criteria-first-evals.md`.
+For evidence expectations, read `references/eval-system-evidence.md`.
+For grader expectations, read `references/grader-contract.md`.
+For candidate boundaries, read `references/candidate-surface.md`.
+For ASI-first framing, read `references/gepa-reflection.md`.
