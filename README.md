@@ -73,7 +73,6 @@ Apply writes runner, scorer, optimizer, adapter, and evidence code to that recor
 ## Learn More
 
 - [TECHNICAL.md](TECHNICAL.md) for architecture, package boundaries, reference agents, and release notes.
-- [skills/optimizespec-new/SKILL.md](skills/optimizespec-new/SKILL.md) for creating a new OptimizeSpec workflow.
 - [skills/optimizespec-common/references/reference-contracts.md](skills/optimizespec-common/references/reference-contracts.md) for runner, grader, ASI, candidate, optimizer, runtime, evidence, and verification contracts.
 
 ## Development
