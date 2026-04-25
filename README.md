@@ -107,7 +107,7 @@ Generated files are deliberately local to the project you are improving. A TypeS
 - A TypeScript/Node CLI for creating, validating, and applying OptimizeSpec artifacts.
 - Repo-local skills for proposal, design, implementation, and verification workflows.
 - Templates and reference contracts for runners, graders, ASI, candidates, optimizers, runtime integration, evidence ledgers, and promotion checks.
-- Target-repo scaffolding for eval runners and optimizer entrypoints.
+- Project-local scaffolding for eval runners and optimizer entrypoints.
 - Reference agent fixtures used to test the workflow without committing generated optimization systems as product examples.
 
 Node.js 20.19.0 or newer is required.
@@ -131,22 +131,6 @@ Use them in this order:
 2. `optimizespec-continue`: create the design, specs, and tasks.
 3. `optimizespec-apply`: implement the eval runner and optimizer in the agent project.
 4. `optimizespec-verify`: check eval, compare, optimize, and evidence readiness.
-
-## Development
-
-Install dependencies and run the local TypeScript checks:
-
-```bash
-npm install
-npm test
-```
-
-Build and inspect the package contents:
-
-```bash
-npm run build
-npm run pack:check
-```
 
 ## Reference Agents
 
@@ -185,6 +169,22 @@ export ANTHROPIC_API_KEY=...
 - [TECHNICAL.md](TECHNICAL.md) for architecture, package boundaries, and release notes.
 - [skills/optimizespec-new/SKILL.md](skills/optimizespec-new/SKILL.md) for creating a new OptimizeSpec workflow.
 - [skills/optimizespec-common/references/reference-contracts.md](skills/optimizespec-common/references/reference-contracts.md) for shared evidence, runner, grader, ASI, candidate, optimizer, runtime, and verification contracts.
+
+## Development
+
+Install dependencies and run the local TypeScript checks:
+
+```bash
+npm install
+npm test
+```
+
+Build and inspect the package contents:
+
+```bash
+npm run build
+npm run pack:check
+```
 
 ## License
 
