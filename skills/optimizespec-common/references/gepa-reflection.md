@@ -4,7 +4,7 @@ GEPA improves text-representable candidates by using reflective evolution. The e
 
 ## Candidate Surface
 
-Use `dict[str, str]` unless the target repo has a strong reason to do otherwise. Typical Claude Managed Agent fields:
+Use `dict[str, str]` unless the agent project has a strong reason to do otherwise. Typical Claude Managed Agent fields:
 
 - `system_prompt`
 - `task_prompt`

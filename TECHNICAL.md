@@ -38,7 +38,7 @@ The npm package allowlist intentionally includes `bin`, `dist`, `skills`, and do
 
 ## CLI Commands
 
-The TypeScript CLI focuses on spec authoring and target-repo scaffolding:
+The TypeScript CLI focuses on spec authoring and scaffolding for the agent project:
 
 ```bash
 optimizespec init [path]
@@ -48,13 +48,13 @@ optimizespec validate <name> [--json]
 optimizespec apply --change <name> --target <path> --stack typescript|python [--json]
 ```
 
-`apply` generates target-repo files under:
+`apply` generates files under:
 
 ```text
 optimizespec.generated/<change-name>/
 ```
 
-Generated code is deliberately local to the target repository. A TypeScript target gets TypeScript runner files; a Python target can get Python runner files. OptimizeSpec itself does not require target repos to import a bundled Python runtime.
+Generated code is deliberately local to the project being improved. A TypeScript project gets TypeScript runner files; a Python project can get Python runner files. OptimizeSpec itself does not require projects to import a bundled Python runtime.
 
 ## Reference Fixtures
 
@@ -74,7 +74,7 @@ To add a reference agent, create `tests/fixtures/reference-agents/<fixture-id>/a
 
 ## Artifact Layout
 
-The default artifact layout in a target project is:
+The default artifact layout in a project being improved is:
 
 ```text
 optimizespec/changes/<change-name>/
@@ -88,11 +88,11 @@ Specs use OpenSpec-style requirement blocks:
 
 ```markdown
 ### Requirement: Generated optimization system
-The target repository SHALL contain generated eval and optimization entrypoints.
+The agent project SHALL contain generated eval and optimization entrypoints.
 
 #### Scenario: Runner generated
 - **WHEN** the change is applied
-- **THEN** runner files are written in the selected target language
+- **THEN** runner files are written in the selected project language
 ```
 
 ## Skills And References

@@ -4,7 +4,7 @@ Every applied OptimizeSpec system must persist a run ledger that can be inspecte
 
 ## Required Ledger Records
 
-- Run manifest: run id, command, fixture or target agent, runtime, start time when available, candidate ids, eval case ids, and output roots.
+- Run manifest: run id, command, fixture or agent, runtime, start time when available, candidate ids, eval case ids, and output roots.
 - Candidate registry: candidate id, parent candidate id when applicable, mutable files or fields, creation reason, source path or diff, and rollback target.
 - Evaluation summary: aggregate score, split scores, case list, objective metric, diagnostic metrics, and guardrail metrics.
 - Per-case score: score, bounds or direction, criterion measured, scorer identity, feedback, errors, and abstention status when relevant.
@@ -34,11 +34,11 @@ runs/<run-id>/
     promotion.json
 ```
 
-The layout can be adapted to a target repo, but the same records must remain discoverable. Minimal smoke runs may store compact records, yet they still need a manifest, candidate id, case-level scores, rollout evidence, ASI, and a promotion decision or no-promotion record.
+The layout can be adapted to the agent project, but the same records must remain discoverable. Minimal smoke runs may store compact records, yet they still need a manifest, candidate id, case-level scores, rollout evidence, ASI, and a promotion decision or no-promotion record.
 
 ## Evidence Boundaries
 
-System-loop evidence proves the machinery ran: commands executed, files were written, scorers returned, and optimizer calls completed. Agent-quality evidence proves the target agent improved on user-meaningful criteria. Do not claim agent improvement from system-loop success alone.
+System-loop evidence proves the machinery ran: commands executed, files were written, scorers returned, and optimizer calls completed. Agent-quality evidence proves the agent improved on user-meaningful criteria. Do not claim agent improvement from system-loop success alone.
 
 ## Review Checklist
 

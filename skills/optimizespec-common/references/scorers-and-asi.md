@@ -18,7 +18,7 @@ Every scorer plan should state why the grader can be trusted. Include the grader
 - Diagnostic metrics: extra signals GEPA can use for reflection, such as latency, cost, formatting, or tool-use quality.
 - Guardrail metrics: metrics that can block promotion even when the optimized metric improves.
 
-System-loop metrics prove the eval runner and optimizer executed. Agent quality metrics prove the target agent improved on behavior users care about. Keep these separate in compare output and ASI.
+System-loop metrics prove the eval runner and optimizer executed. Agent quality metrics prove the agent improved on behavior users care about. Keep these separate in compare output and ASI.
 
 ## ASI Shape
 

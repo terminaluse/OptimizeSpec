@@ -1,10 +1,10 @@
 # Managed Agents Runtime Contract
 
-Claude Managed Agents are the only supported runtime for this skill pack. If a target repo does not use Claude Managed Agents, record the blocker and do not implement a parallel runtime path.
+Claude Managed Agents are the only supported runtime for this skill pack. If the agent project does not use Claude Managed Agents, record the blocker and do not implement a parallel runtime path.
 
 ## SDK and Headers
 
-Live runs require Anthropic Research Preview access and the Managed Agents SDK surfaces used by the target repo. The current preview setup in this repo uses the `managed-agents-2026-04-01-research-preview` beta for Managed Agents SDK calls. Runtime details can change while preview APIs evolve, so keep SDK/header setup isolated in runtime code and technical docs.
+Live runs require Anthropic Research Preview access and the Managed Agents SDK surfaces used by the agent project. The current preview setup in this repo uses the `managed-agents-2026-04-01-research-preview` beta for Managed Agents SDK calls. Runtime details can change while preview APIs evolve, so keep SDK/header setup isolated in runtime code and technical docs.
 
 ## Invocation Assumptions
 

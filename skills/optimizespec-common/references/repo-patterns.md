@@ -12,4 +12,4 @@ This repo provides concrete GEPA plus Claude Managed Agents patterns.
 
 ## Adaptation Rule
 
-Use these as reference patterns. Do not blindly copy the package layout into target repos. Reuse existing target repo factories, commands, test conventions, and dependency management.
+Use these as reference patterns. Do not blindly copy the package layout into agent projects. Reuse each project's existing factories, commands, test conventions, and dependency management.

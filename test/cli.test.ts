@@ -36,7 +36,7 @@ describe('optimizespec cli', () => {
         '--path',
         project,
         '--description',
-        'Improve the target agent output.',
+        'Improve the agent output.',
         '--json',
       ]),
     );
@@ -71,7 +71,7 @@ describe('optimizespec cli', () => {
     );
   });
 
-  it('scaffolds TypeScript runner files in the target repository', () => {
+  it('scaffolds TypeScript runner files in the agent project', () => {
     const project = tempProject();
     const target = tempProject();
     run(['new', 'change', 'typed-runner', '--path', project, '--json']);

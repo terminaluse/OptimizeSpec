@@ -4,13 +4,13 @@ OptimizeSpec is a TypeScript CLI and skill pack for spec-driven development of o
 
 Agent improvement is easy to start and hard to trust. A prompt tweak can fix one case while breaking another, and a real optimization loop needs more than a few examples: it needs an eval contract, runner design, scoring rules, candidate lineage, optimizer wiring, and evidence that the new agent is actually better.
 
-OptimizeSpec gives you a spec-first workflow for building that system inside the agent repository you already own. You describe what good behavior means, turn that into checked artifacts, and generate target-repo files for eval runners and optimizer entrypoints.
+OptimizeSpec gives you a spec-first workflow for building that system inside the agent repository you already own. You describe what good behavior means, turn that into checked artifacts, and generate files in that project for eval runners and optimizer entrypoints.
 
 ## Why Use It
 
 - Turn vague agent-improvement goals into concrete eval and optimization specs.
 - Keep runner, scorer, optimizer, and evidence requirements reviewable before code is generated.
-- Generate implementation scaffolding that matches the target repo's stack instead of importing a bundled runtime.
+- Generate implementation scaffolding that matches that project's stack instead of importing a bundled runtime.
 - Give coding agents a repeatable skill workflow for creating, applying, and verifying optimization systems.
 - Keep test/reference agents separate from the public CLI package.
 
@@ -51,7 +51,7 @@ optimizespec status --change improve-agent-output
 optimizespec validate improve-agent-output
 ```
 
-Generate runner scaffolding into the target repository:
+Generate runner scaffolding into your agent project:
 
 ```bash
 optimizespec apply \
@@ -59,6 +59,8 @@ optimizespec apply \
   --target . \
   --stack typescript
 ```
+
+Here `--target .` means "write the generated files into the current project."
 
 Agent-compatible commands support `--json`:
 
@@ -75,14 +77,14 @@ OptimizeSpec follows the same shape you would want from a careful engineering re
 2. Capture eval inputs, expected outputs, scoring criteria, and qualitative feedback needs.
 3. Design the runner, grader, optimizer, candidate surface, and evidence ledger.
 4. Validate that the spec is complete enough to implement.
-5. Generate target-repo files and wire them to the real agent runtime.
-6. Run eval, compare, optimize, and promotion checks in the target repo.
+5. Generate files in the project and wire them to the real agent runtime.
+6. Run eval, compare, optimize, and promotion checks in that project.
 
 The goal is not just to produce a benchmark. The goal is to make agent optimization reproducible: what changed, why it changed, which cases improved, which cases regressed, and what evidence supports promotion.
 
 ## Generated Artifacts
 
-OptimizeSpec creates planning artifacts under the target project:
+OptimizeSpec creates planning artifacts in the project you are improving:
 
 ```text
 optimizespec/changes/<change-name>/
@@ -98,7 +100,7 @@ When a change is applied, generated scaffolding is written under:
 optimizespec.generated/<change-name>/
 ```
 
-Generated files are deliberately local to the target repository. A TypeScript target gets TypeScript runner scaffolding; a Python target can get Python runner scaffolding. OptimizeSpec does not require the target repo to adopt a bundled optimization runtime.
+Generated files are deliberately local to the project you are improving. A TypeScript project gets TypeScript runner scaffolding; a Python project can get Python runner scaffolding. OptimizeSpec does not require your project to adopt a bundled optimization runtime.
 
 ## What You Get
 
@@ -127,7 +129,7 @@ Use them in this order:
 
 1. `optimizespec-new`: draft the eval contract from intent and examples.
 2. `optimizespec-continue`: create the design, specs, and tasks.
-3. `optimizespec-apply`: implement the eval runner and optimizer in the target repo.
+3. `optimizespec-apply`: implement the eval runner and optimizer in the agent project.
 4. `optimizespec-verify`: check eval, compare, optimize, and evidence readiness.
 
 ## Development

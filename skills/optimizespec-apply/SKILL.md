@@ -20,16 +20,16 @@ If any are missing, stop and report the blocker.
 
 ## Workflow
 
-1. Read all artifacts and summarize the planned target-repo changes.
-2. Inspect the target repo before editing:
+1. Read all artifacts and summarize the planned changes to the agent project.
+2. Inspect the agent project before editing:
    - language and dependency files
    - existing Claude Managed Agents creation/session code
    - command/CLI conventions
    - test conventions
-3. Verify the target repo uses Claude Managed Agents. If not, stop; v1 does not support other runtimes.
+3. Verify the agent project uses Claude Managed Agents. If not, stop; v1 does not support other runtimes.
 4. Read `../optimizespec-common/references/reference-contracts.md`, then load the apply-phase contracts for runner, evidence, grader, ASI, optimizer, runtime, and verification.
 5. Implement tasks in order, marking each checkbox complete only after implementation and local verification.
-6. Adapt `../optimizespec-common/assets/python_runner/agent_self_improve.py` to the target repo when useful.
+6. Adapt `../optimizespec-common/assets/python_runner/agent_self_improve.py` to the agent project when useful.
 
 ## Implementation Contract
 

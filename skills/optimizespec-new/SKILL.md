@@ -27,13 +27,13 @@ optimizespec/changes/<change-name>/
    - Which concerns matter most: correctness, formatting, safety, cost, speed, or tool use?
 8. Draft the success criteria, scoring plan, grader strategy, evidence model, and optimizer acceptance rules from the user's input.
 9. Ask the user to confirm or correct the inferred eval contract in the proposal rather than requiring them to author primary metrics, diagnostics, guardrails, task distribution, grading, evidence persistence, and promotion rules from scratch.
-10. If target agent, criteria, scorer, examples, grader trust, evidence model, or optimizer acceptance are incomplete, record explicit unknowns and candidate discovery questions.
+10. If the agent, criteria, scorer, examples, grader trust, evidence model, or optimizer acceptance are incomplete, record explicit unknowns and candidate discovery questions.
 11. Keep `proposal.md` concise. Prefer short bullets and no more than 2-3 eval examples. Defer deeper runner mechanics, calibration details, ledger file layout, and implementation design to `design.md` unless they are required to confirm the eval contract.
 12. Stop after creating `proposal.md`.
 
 ## Required Proposal Content
 
-- Target agent and runtime context.
+- Agent and runtime context.
 - Behavior to improve.
 - Candidate fields GEPA may mutate, if known.
 - Success criteria: user outcome, primary criterion, secondary criteria, guardrails, thresholds, non-goals, and blind spots.

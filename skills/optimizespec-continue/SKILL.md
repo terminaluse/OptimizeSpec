@@ -22,7 +22,7 @@ Create exactly one next artifact for an existing change under `optimizespec/chan
 - Do not skip artifacts.
 - Do not implement code.
 - Preserve explicit unknowns instead of guessing.
-- If the target repo is not a Claude Managed Agents project, record the v1 runtime blocker.
+- If the agent project is not a Claude Managed Agents project, record the v1 runtime blocker.
 
 ## Templates
 

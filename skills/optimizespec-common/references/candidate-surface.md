@@ -15,7 +15,7 @@ Common Claude Managed Agents fields include:
 - `resource_policy`
 - `subagent_specs`
 
-Target repos may use different names, but every field must compile into runtime behavior or be removed from the mutable surface.
+Agent projects may use different names, but every field must compile into runtime behavior or be removed from the mutable surface.
 
 ## Candidate Identifiers
 

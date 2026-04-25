@@ -19,8 +19,8 @@ optimizespec/
 
 ## Artifact Roles
 
-- `proposal.md`: self-improvement contract. Defines target agent, behavior to improve, success criteria, draft eval contract, examples, scoring intent, qualitative rubric, grader trust, optimizer acceptance, ASI needs, and unknowns.
-- `design.md`: technical design. Defines target repo discovery, Managed Agents runtime, eval design, runner invocation, rollout lifecycle, trace capture, scoring, grader strategy, ASI mapping, candidate fields, optimizer configuration, and acceptance rules.
+- `proposal.md`: self-improvement contract. Defines the agent being improved, behavior to improve, success criteria, draft eval contract, examples, scoring intent, qualitative rubric, grader trust, optimizer acceptance, ASI needs, and unknowns.
+- `design.md`: technical design. Defines what was found in the agent project, Managed Agents runtime, eval design, runner invocation, rollout lifecycle, trace capture, scoring, grader strategy, ASI mapping, candidate fields, optimizer configuration, and acceptance rules.
 - `specs/*.md`: testable requirements using SHALL/MUST and scenarios.
 - `tasks.md`: checkboxed implementation checklist.
 

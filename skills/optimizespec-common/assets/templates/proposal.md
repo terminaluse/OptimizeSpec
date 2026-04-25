@@ -95,4 +95,4 @@ List top-level ASI fields and field-specific ASI needs.
 
 ## Unknowns
 
-List missing target-agent, scorer, example, or runtime details to resolve in design.
+List missing agent, scorer, example, or runtime details to resolve in design.

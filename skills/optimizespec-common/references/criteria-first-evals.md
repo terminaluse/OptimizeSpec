@@ -35,10 +35,10 @@ If the user has not supplied these, infer a draft and list unknowns. Do not sile
 Separate three kinds of evidence:
 
 - System evals prove the runner, compare path, optimizer loop, persistence, and evidence artifacts work.
-- Agent quality evals measure whether the target agent improved on meaningful behavior.
+- Agent quality evals measure whether the agent improved on meaningful behavior.
 - Optimizer acceptance criteria decide whether a GEPA candidate should be promoted.
 
-`system_loop_success == 1.0` proves the machinery ran. It is not, by itself, proof that the target agent got better.
+`system_loop_success == 1.0` proves the machinery ran. It is not, by itself, proof that the agent got better.
 
 ## Grader Trust
 

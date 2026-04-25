@@ -4,7 +4,7 @@ The v1 runtime target is Claude Managed Agents only.
 
 ## Discovery Checklist
 
-Before implementation, inspect the target repo for:
+Before implementation, inspect the agent project for:
 
 - language and Anthropic SDK usage
 - Agent creation and version persistence
@@ -23,7 +23,7 @@ If the repo does not use Claude Managed Agents, stop. Other runtimes are out of 
 A rollout is one candidate on one eval case.
 
 1. Load change artifacts, eval case, scorer config, and candidate.
-2. Compile candidate fields into a target-agent configuration overlay.
+2. Compile candidate fields into an agent configuration overlay.
 3. Create or update candidate-specific Agent resources, or reuse existing factories reproducibly.
 4. Create or select the Environment.
 5. Start a Session pinned to the candidate Agent version.
@@ -44,4 +44,4 @@ Expose operations equivalent to:
 - `compare`: baseline vs candidate evaluation on the same cases.
 - `show-candidate`: print candidate fields.
 
-Adapt command shape to the target repo. Existing CLIs, package scripts, or module commands are all acceptable.
+Adapt command shape to the agent project. Existing CLIs, package scripts, or module commands are all acceptable.

@@ -138,10 +138,10 @@ function getArtifactStatus(root: string, change: string): ArtifactStatus[] {
 
 function changeArtifactFiles(summary: string): Record<string, string> {
   return {
-    'proposal.md': `## Why\n\n${summary}\n\n## What Changes\n\n- Define the target agent behavior to improve.\n- Specify eval cases, scoring, evidence, and generated runner expectations.\n\n## Capabilities\n\n### New Capabilities\n- \`optimization-system\`: Generated eval runner and optimizer for the target repository.\n\n### Modified Capabilities\n- None.\n\n## Impact\n\nTarget repository evals, generated runner files, optimizer configuration, and documentation.\n`,
-    'design.md': `## Context\n\nDocument the target repository stack, agent runtime, candidate surface, eval runner shape, and generated commands.\n\n## Goals / Non-Goals\n\n**Goals:**\n- Generate an optimization system that fits the target repository.\n- Keep evidence and scoring inspectable.\n\n**Non-Goals:**\n- Require a bundled OptimizeSpec runtime package in the target repo.\n\n## Decisions\n\nDescribe language choice, runner invocation, scorer strategy, and optimizer wiring.\n\n## Risks / Trade-offs\n\n- [Unknown target stack] -> Inspect the repository before applying.\n`,
-    'specs/optimization-system/spec.md': `## ADDED Requirements\n\n### Requirement: Generated optimization system\nThe target repository SHALL contain generated eval and optimization entrypoints based on this OptimizeSpec change.\n\n#### Scenario: Runner generated\n- **WHEN** the change is applied to a target repository\n- **THEN** the target repository contains runner files in the selected target language\n`,
-    'tasks.md': `## 1. Generate Optimization System\n\n- [ ] 1.1 Inspect the target repository stack and agent runtime.\n- [ ] 1.2 Generate eval runner files in the selected language.\n- [ ] 1.3 Generate optimizer entrypoint and README instructions.\n- [ ] 1.4 Run local validation for generated files.\n`,
+    'proposal.md': `## Why\n\n${summary}\n\n## What Changes\n\n- Define the agent behavior to improve.\n- Specify eval cases, scoring, evidence, and generated runner expectations.\n\n## Capabilities\n\n### New Capabilities\n- \`optimization-system\`: Generated eval runner and optimizer for the agent project.\n\n### Modified Capabilities\n- None.\n\n## Impact\n\nAgent-project evals, generated runner files, optimizer configuration, and documentation.\n`,
+    'design.md': `## Context\n\nDocument the project stack, agent runtime, candidate surface, eval runner shape, and generated commands.\n\n## Goals / Non-Goals\n\n**Goals:**\n- Generate an optimization system that fits the project being improved.\n- Keep evidence and scoring inspectable.\n\n**Non-Goals:**\n- Require a bundled OptimizeSpec runtime package in the project.\n\n## Decisions\n\nDescribe language choice, runner invocation, scorer strategy, and optimizer wiring.\n\n## Risks / Trade-offs\n\n- [Unknown project stack] -> Inspect the repository before applying.\n`,
+    'specs/optimization-system/spec.md': `## ADDED Requirements\n\n### Requirement: Generated optimization system\nThe agent project SHALL contain generated eval and optimization entrypoints based on this OptimizeSpec change.\n\n#### Scenario: Runner generated\n- **WHEN** the change is applied to an agent project\n- **THEN** the agent project contains runner files in the selected language\n`,
+    'tasks.md': `## 1. Generate Optimization System\n\n- [ ] 1.1 Inspect the project stack and agent runtime.\n- [ ] 1.2 Generate eval runner files in the selected language.\n- [ ] 1.3 Generate optimizer entrypoint and README instructions.\n- [ ] 1.4 Run local validation for generated files.\n`,
   };
 }
 
@@ -299,7 +299,7 @@ function renderTypeScriptOptimizer(change: string): string {
   return `import { runEvalCase, type EvalCase } from './eval-runner.js';
 
 const cases: EvalCase[] = [
-  { id: 'example', input: 'replace with target-agent input', expected: 'replace with expected output' },
+  { id: 'example', input: 'replace with agent input', expected: 'replace with expected output' },
 ];
 
 export async function main(): Promise<void> {
@@ -350,7 +350,7 @@ from eval_runner import EvalCase, run_eval_case
 
 
 def main() -> None:
-    cases = [EvalCase(id="example", input="replace with target-agent input", expected="replace with expected output")]
+    cases = [EvalCase(id="example", input="replace with agent input", expected="replace with expected output")]
     results = [run_eval_case(case) for case in cases]
     mean_score = sum(float(item["score"]) for item in results) / max(len(results), 1)
     print(json.dumps({"change": "${change}", "mean_score": mean_score, "results": results}, indent=2))
@@ -378,7 +378,7 @@ function scaffold(rootPath: string, change: string, targetPath: string, stack: s
     const files: Record<string, string> = {
       'eval-runner.ts': renderTypeScriptRunner(change),
       'optimizer.ts': renderTypeScriptOptimizer(change),
-      'README.md': `# Generated OptimizeSpec Runner\n\nGenerated from \`${change}\`.\n\nRun with your TypeScript build/test setup after replacing placeholder eval logic with target-agent calls.\n`,
+      'README.md': `# Generated OptimizeSpec Runner\n\nGenerated from \`${change}\`.\n\nRun with your TypeScript build/test setup after replacing placeholder eval logic with calls into your agent.\n`,
     };
     for (const [relative, content] of Object.entries(files)) {
       const path = join(out, relative);
@@ -391,7 +391,7 @@ function scaffold(rootPath: string, change: string, targetPath: string, stack: s
     const files: Record<string, string> = {
       'eval_runner.py': renderPythonRunner(change),
       'optimizer.py': renderPythonOptimizer(change),
-      'README.md': `# Generated OptimizeSpec Runner\n\nGenerated from \`${change}\`.\n\nRun with your Python test setup after replacing placeholder eval logic with target-agent calls.\n`,
+      'README.md': `# Generated OptimizeSpec Runner\n\nGenerated from \`${change}\`.\n\nRun with your Python test setup after replacing placeholder eval logic with calls into your agent.\n`,
     };
     for (const [relative, content] of Object.entries(files)) {
       const path = join(out, relative);
@@ -541,11 +541,11 @@ export function createProgram(): Command {
 
   program
     .command('apply')
-    .description('Generate target-repo runner files from an approved OptimizeSpec change.')
+    .description('Generate runner files in an agent project from an approved OptimizeSpec change.')
     .requiredOption('--change <name>', 'Change name')
     .option('--path <path>', 'Project containing optimizespec/changes', '.')
-    .option('--target <path>', 'Target repository path', '.')
-    .option('--stack <stack>', 'Target stack: typescript or python', 'typescript')
+    .option('--target <path>', 'Agent project path to write generated files into', '.')
+    .option('--stack <stack>', 'Project stack: typescript or python', 'typescript')
     .option('--json', 'Output machine-readable JSON')
     .action((options: { change: string; path?: string; target?: string; stack?: string; json?: boolean }) => {
       try {

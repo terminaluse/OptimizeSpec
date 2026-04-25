@@ -1,6 +1,6 @@
 # Runner Contract
 
-The runner is the command surface that turns eval artifacts into executable evidence. It must expose direct eval, compare, optimize, and candidate-inspection operations using the target repo's existing command conventions where possible.
+The runner is the command surface that turns eval artifacts into executable evidence. It must expose direct eval, compare, optimize, and candidate-inspection operations using the agent project's existing command conventions where possible.
 
 ## Required Operations
 
@@ -29,7 +29,7 @@ Each operation should print a concise structured summary and write durable files
 
 ## Rollout Lifecycle
 
-A rollout is one candidate on one eval case. It loads the candidate, compiles mutable fields into runtime behavior, invokes the target agent, captures output and runtime evidence, scores the result, builds ASI, writes per-case files, and cleans up or records cleanup warnings.
+A rollout is one candidate on one eval case. It loads the candidate, compiles mutable fields into runtime behavior, invokes the agent, captures output and runtime evidence, scores the result, builds ASI, writes per-case files, and cleans up or records cleanup warnings.
 
 ## Failure Behavior
 

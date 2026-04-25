@@ -39,6 +39,6 @@ Keep loading progressive: use only the references needed for the current phase, 
 ## Assets
 
 - `assets/templates/`: proposal, design, spec, task, eval case, and candidate templates.
-- `assets/python_runner/agent_self_improve.py`: portable runner/optimizer implementation template for target repos.
+- `assets/python_runner/agent_self_improve.py`: portable runner/optimizer implementation template for agent projects.
 
 Load only the specific reference or asset needed for the current task.

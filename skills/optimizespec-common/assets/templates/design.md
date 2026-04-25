@@ -1,6 +1,6 @@
 ## Context
 
-Summarize target repo discovery and Claude Managed Agents runtime shape.
+Summarize what you found in the agent project and describe its Claude Managed Agents runtime shape.
 
 ## Runner Invocation
 
@@ -12,7 +12,7 @@ List the reference contracts used for runner, evidence, grader, ASI, candidate s
 
 ## Candidate Surface
 
-Map each mutable candidate field to target repo runtime behavior.
+Map each mutable candidate field to the agent project's runtime behavior.
 
 ## Eval Design
 
