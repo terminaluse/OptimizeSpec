@@ -70,10 +70,12 @@ The proposal records where the durable optimization-system code will live:
 
 Apply writes runner, scorer, optimizer, adapter, and evidence code to that recorded path. The optimization system should call into the real agent factory, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter.
 
+The core workflow is runtime-neutral. V1 apply support is Claude Managed Agent-specific, with runtime guidance bundled under the installed skill folders.
+
 ## Learn More
 
 - [TECHNICAL.md](TECHNICAL.md) for architecture, package boundaries, reference agents, and release notes.
-- [skills/optimizespec-common/references/reference-contracts.md](skills/optimizespec-common/references/reference-contracts.md) for runner, grader, ASI, candidate, optimizer, runtime, evidence, and verification contracts.
+- [skills/optimizespec-common/references/core/reference-contracts.md](skills/optimizespec-common/references/core/reference-contracts.md) for runner, grader, ASI, candidate, optimizer, runtime, evidence, and verification contracts.
 
 ## Development
 

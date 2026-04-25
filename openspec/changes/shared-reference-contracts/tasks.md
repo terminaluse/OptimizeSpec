@@ -1,13 +1,13 @@
 ## 1. Reference Contracts
 
-- [x] 1.1 Add `skills/optimizespec-common/references/eval-system-evidence.md` defining run manifest, candidate registry, per-case scores, judge output, ASI, rollout artifacts, comparison records, optimizer lineage, leaderboard, and promotion decisions.
-- [x] 1.2 Add `skills/optimizespec-common/references/runner-contract.md` defining direct eval, compare, optimize, rollout lifecycle, command inputs, command outputs, and failure behavior.
-- [x] 1.3 Add `skills/optimizespec-common/references/grader-contract.md` defining numeric scores, qualitative judge output, grader type, calibration, reliability risks, and human review triggers.
-- [x] 1.4 Add `skills/optimizespec-common/references/asi-contract.md` defining how actionable side information is captured, stored, and passed into GEPA reflective evolution.
-- [x] 1.5 Add `skills/optimizespec-common/references/candidate-surface.md` defining mutable candidate files, immutable eval files, candidate ids, diffs, rollback, and promotion boundaries.
-- [x] 1.6 Add `skills/optimizespec-common/references/optimizer-contract.md` defining objective metric, diagnostics, guardrails, candidate selection, lineage, promotion, and rejection evidence.
-- [x] 1.7 Add `skills/optimizespec-common/references/managed-agents-runtime-contract.md` defining Claude Managed Agents SDK/header setup, invocation assumptions, rollout records, and preview-feature caveats.
-- [x] 1.8 Add `skills/optimizespec-common/references/verification-contract.md` defining deterministic smoke checks, live checks, evidence inspection, and release readiness.
+- [x] 1.1 Add `skills/optimizespec-common/references/core/eval-system-evidence.md` defining run manifest, candidate registry, per-case scores, judge output, ASI, rollout artifacts, comparison records, optimizer lineage, leaderboard, and promotion decisions.
+- [x] 1.2 Add `skills/optimizespec-common/references/core/runner-contract.md` defining direct eval, compare, optimize, rollout lifecycle, command inputs, command outputs, and failure behavior.
+- [x] 1.3 Add `skills/optimizespec-common/references/core/grader-contract.md` defining numeric scores, qualitative judge output, grader type, calibration, reliability risks, and human review triggers.
+- [x] 1.4 Add `skills/optimizespec-common/references/core/asi-contract.md` defining how actionable side information is captured, stored, and passed into GEPA reflective evolution.
+- [x] 1.5 Add `skills/optimizespec-common/references/core/candidate-surface.md` defining mutable candidate files, immutable eval files, candidate ids, diffs, rollback, and promotion boundaries.
+- [x] 1.6 Add `skills/optimizespec-common/references/core/optimizer-contract.md` defining objective metric, diagnostics, guardrails, candidate selection, lineage, promotion, and rejection evidence.
+- [x] 1.7 Add `skills/optimizespec-common/references/runtimes/claude-managed-agent/managed-agents-runtime-contract.md` defining Claude Managed Agents SDK/header setup, invocation assumptions, rollout records, and preview-feature caveats.
+- [x] 1.8 Add `skills/optimizespec-common/references/core/verification-contract.md` defining deterministic smoke checks, live checks, evidence inspection, and release readiness.
 - [x] 1.9 Update or add a common reference index so skills can discover which contract to load for each phase.
 
 ## 2. Skill Integration

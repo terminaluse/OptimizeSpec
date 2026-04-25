@@ -1,6 +1,6 @@
 ## Context
 
-Summarize what you found in the agent project and describe its Claude Managed Agents runtime shape.
+Summarize what you found in the agent project and describe the inferred target runtime, evidence, confidence, and important unknowns.
 
 ## Optimization System Location
 
@@ -30,6 +30,10 @@ Map each mutable candidate field to the agent project's runtime behavior.
 ## Rollout Lifecycle
 
 Describe one candidate x eval case execution from input preparation to cleanup.
+
+## Runtime-Specific Plan
+
+Name the runtime contracts used for this design. For Claude Managed Agents, include Agent, Environment, Session, resources, event streaming or polling, tools, skills, MCP servers, permissions, and cleanup behavior. For unsupported runtimes, record the v1 implementation blocker.
 
 ## Trace Capture
 
@@ -70,7 +74,7 @@ Define candidate ids, parent ids, mutation summaries, leaderboard records, optim
 
 ## Verification Plan
 
-Define deterministic smoke checks, live Managed Agents checks if credentials are available, emitted evidence inspection, and readiness reporting.
+Define deterministic smoke checks, runtime-specific live checks if credentials are available, emitted evidence inspection, and readiness reporting.
 
 ## Risks and Blockers
 

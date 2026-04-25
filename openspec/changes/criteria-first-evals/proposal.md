@@ -38,7 +38,8 @@ This change primarily affects repo-local skills and validation artifacts:
 - `skills/optimizespec-common/assets/templates/proposal.md`
 - `skills/optimizespec-common/assets/templates/design.md`
 - `skills/optimizespec-common/assets/templates/eval-cases.yaml`
-- `skills/optimizespec-common/references/*.md`
+- `skills/optimizespec-common/references/core/*.md`
+- `skills/optimizespec-common/references/runtimes/claude-managed-agent/*.md`
 - `src/optimizespec/eval_validation.py`
 - `optimizespec/fixtures/agents/*`
 - `TECHNICAL.md`

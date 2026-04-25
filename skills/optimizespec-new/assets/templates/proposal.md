@@ -1,7 +1,8 @@
 ## Target Agent
 
 - Name:
-- Runtime: Claude Managed Agents
+- Runtime: <inferred from repo inspection>
+- Runtime evidence and confidence:
 - Invocation:
 - Constraints:
 
@@ -104,4 +105,4 @@ List top-level ASI fields and field-specific ASI needs.
 
 ## Unknowns
 
-List missing agent, scorer, example, or runtime details to resolve in design.
+List missing agent, scorer, example, or runtime details to resolve in design. If runtime cannot be inferred from repo inspection, record the evidence gap instead of guessing.

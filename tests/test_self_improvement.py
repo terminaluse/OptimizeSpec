@@ -232,20 +232,20 @@ def test_gepa_eval_skill_frontmatter(skill_name: str) -> None:
 def test_common_skill_reference_paths_exist() -> None:
     base = Path("skills") / "optimizespec-common"
     required = [
-        "references/workflow.md",
-        "references/reference-contracts.md",
-        "references/gepa-reflection.md",
-        "references/managed-agents-runner.md",
-        "references/scorers-and-asi.md",
-        "references/repo-patterns.md",
-        "references/eval-system-evidence.md",
-        "references/runner-contract.md",
-        "references/grader-contract.md",
-        "references/asi-contract.md",
-        "references/candidate-surface.md",
-        "references/optimizer-contract.md",
-        "references/managed-agents-runtime-contract.md",
-        "references/verification-contract.md",
+        "references/core/workflow.md",
+        "references/core/reference-contracts.md",
+        "references/core/gepa-reflection.md",
+        "references/runtimes/claude-managed-agent/managed-agents-runner.md",
+        "references/runtimes/claude-managed-agent/scorers-and-asi.md",
+        "references/core/repo-patterns.md",
+        "references/core/eval-system-evidence.md",
+        "references/core/runner-contract.md",
+        "references/core/grader-contract.md",
+        "references/core/asi-contract.md",
+        "references/core/candidate-surface.md",
+        "references/core/optimizer-contract.md",
+        "references/runtimes/claude-managed-agent/managed-agents-runtime-contract.md",
+        "references/core/verification-contract.md",
         "assets/templates/proposal.md",
         "assets/templates/design.md",
         "assets/templates/eval-cases.yaml",
@@ -255,3 +255,12 @@ def test_common_skill_reference_paths_exist() -> None:
 
     for relative in required:
         assert (base / relative).exists(), relative
+
+
+def test_all_skill_references_are_scoped() -> None:
+    for skill_dir in Path("skills").glob("optimizespec-*"):
+        references = skill_dir / "references"
+        assert (references / "core").is_dir(), skill_dir
+        assert (references / "runtimes" / "claude-managed-agent").is_dir(), skill_dir
+        root_markdown = [path.name for path in references.glob("*.md")]
+        assert root_markdown == []

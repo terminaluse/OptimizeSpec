@@ -33,7 +33,8 @@ We should move these cross-cutting expectations into markdown reference contract
 
 This change affects repo-local skills, reference docs, templates, validation, and documentation:
 
-- `skills/optimizespec-common/references/*.md`
+- `skills/optimizespec-common/references/core/*.md`
+- `skills/optimizespec-common/references/runtimes/claude-managed-agent/*.md`
 - `skills/optimizespec-common/SKILL.md`
 - `skills/optimizespec-new/SKILL.md`
 - Future apply, continue, and verify skill files if present in this repo
