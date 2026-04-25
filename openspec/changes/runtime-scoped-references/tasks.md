@@ -8,15 +8,15 @@
 
 ## 2. Skill Integration
 
-- [ ] 2.1 Update `optimizespec-new` to load core proposal references and record target runtime without hardcoding Claude Managed Agents in generic template fields.
-- [ ] 2.2 Update `optimizespec-continue` to load core design references plus Claude Managed Agent runtime references only when that runtime is selected.
+- [ ] 2.1 Update `optimizespec-new` to load core proposal references, infer target runtime from repo inspection, and record confidence or unknowns without hardcoding Claude Managed Agents in generic template fields.
+- [ ] 2.2 Update `optimizespec-continue` to load core design references plus Claude Managed Agent runtime references only when repo inspection or prior artifacts identify that runtime.
 - [ ] 2.3 Update `optimizespec-apply` to require a supported runtime subtree and keep Claude Managed Agents as the only v1 implementation target.
 - [ ] 2.4 Update `optimizespec-verify` to load core verification/evidence references plus runtime-specific evidence expectations when applicable.
 - [ ] 2.5 Update common reference index guidance so phase skills can discover core and runtime-specific contract paths.
 
 ## 3. Templates And Docs
 
-- [ ] 3.1 Update proposal templates so `Runtime:` is a target-agent field rather than a hardcoded Claude Managed Agents value.
+- [ ] 3.1 Update proposal templates so `Runtime:` is an inferred target-agent field rather than a hardcoded Claude Managed Agents value or a required user-provided answer.
 - [ ] 3.2 Update design templates to separate generic optimization-system sections from Claude Managed Agent runtime sections.
 - [ ] 3.3 Update README or TECHNICAL wording to state that the workflow is general but v1 apply support is Claude Managed Agent-specific.
 - [ ] 3.4 Update any OpenSpec artifacts or comments that mention old root reference paths if they would confuse future maintainers.

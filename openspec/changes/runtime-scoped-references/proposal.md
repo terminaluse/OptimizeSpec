@@ -8,8 +8,8 @@ The cleaner structure is to keep `optimizespec-common` as the shared skill, but 
 
 - Reorganize `skills/optimizespec-common/references/` into generic `core/` references and runtime-specific `runtimes/claude-managed-agent/` references.
 - Move Claude Managed Agent-specific contracts, runner details, and scorer/ASI runtime notes out of the root common reference namespace.
-- Update phase skills to load core references for every OptimizeSpec workflow and load `runtimes/claude-managed-agent/` only when the target runtime is Claude Managed Agents.
-- Update templates so proposals/designs record a target runtime without hardcoding Claude Managed Agents as the only possible value in generic sections.
+- Update phase skills to load core references for every OptimizeSpec workflow and load `runtimes/claude-managed-agent/` only when repo inspection identifies the target runtime as Claude Managed Agents.
+- Update templates so proposals/designs record the runtime inferred from repo inspection without hardcoding Claude Managed Agents as the only possible value in generic sections.
 - Preserve v1 behavior: apply still blocks non-Claude Managed Agent implementation unless another runtime adapter is added later.
 - Update tests and package checks so installed skills remain self-contained after references move.
 

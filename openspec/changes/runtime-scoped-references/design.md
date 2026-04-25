@@ -58,8 +58,8 @@ Alternative considered: create a separate `optimizespec-claude-managed-agent` sk
 `reference-contracts.md` should become the small index that tells phase skills what to load:
 
 - Always load `core/` contracts relevant to the phase.
-- Load `runtimes/claude-managed-agent/` only when the target runtime is Claude Managed Agents.
-- If the target runtime is unknown, proposal/design may record unknowns, but apply must block until a supported runtime adapter is selected.
+- Load `runtimes/claude-managed-agent/` only when repo inspection identifies the target runtime as Claude Managed Agents.
+- If repo inspection cannot determine the target runtime, proposal/design may ask a focused question or record unknowns, but apply must block until a supported runtime adapter is selected.
 - If the target runtime is not Claude Managed Agents, v1 apply records an unsupported-runtime blocker unless a new runtime subtree exists.
 
 Rationale: The product remains general, while implementation support remains honest.
@@ -75,12 +75,12 @@ The phase order stays the same:
 
 The difference is only reference selection:
 
-- New/proposal work uses core contracts and records the target runtime.
+- New/proposal work uses core contracts, inspects the repo, and records the inferred target runtime.
 - Continue/design work uses core contracts and, for Claude Managed Agents, runtime contracts.
 - Apply work requires a supported runtime subtree and writes implementation code according to that runtime.
 - Verify work uses core evidence/verification contracts plus runtime-specific evidence expectations.
 
-Templates should not hardcode `Runtime: Claude Managed Agents` in generic proposal sections. They should ask for `Runtime:` and allow Claude Managed Agents to be the v1-supported value.
+Templates should not hardcode `Runtime: Claude Managed Agents` in generic proposal sections. They should include an inferred `Runtime:` field that the coding agent fills from repo inspection, asking the user only when the runtime cannot be determined from code, dependency files, config, or docs. Claude Managed Agents remains the only v1-supported apply runtime.
 
 ### 4. Keep vendored phase references self-contained
 

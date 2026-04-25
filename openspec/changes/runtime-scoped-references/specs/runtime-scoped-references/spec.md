@@ -13,12 +13,18 @@ The OptimizeSpec skill references SHALL separate runtime-neutral contracts from 
 - **THEN** Claude Managed Agent-specific contracts are available under `references/runtimes/claude-managed-agent/`
 
 ### Requirement: Phase skills load references by target runtime
-Phase skills SHALL load core contracts for generic OptimizeSpec work and load runtime-specific contracts only when the target runtime requires them.
+Phase skills SHALL inspect the repository to infer the target runtime, load core contracts for generic OptimizeSpec work, and load runtime-specific contracts only when the inferred runtime requires them.
 
 #### Scenario: Proposal work starts
 - **WHEN** `optimizespec-new` drafts a proposal
 - **THEN** it loads the relevant `core/` contracts
-- **AND** it records the target runtime and runtime unknowns without requiring runtime-specific implementation details too early
+- **AND** it inspects code, dependency files, config, docs, and existing agent entrypoints to infer the target runtime
+- **AND** it records the inferred target runtime and confidence or unresolved runtime unknowns without making the user provide runtime details up front
+
+#### Scenario: Runtime cannot be inferred
+- **WHEN** repo inspection does not provide enough evidence to identify the target runtime
+- **THEN** the skill asks a focused clarification question or records an explicit runtime unknown
+- **AND** it does not guess a runtime-specific implementation path
 
 #### Scenario: Design targets Claude Managed Agents
 - **WHEN** `optimizespec-continue` writes a design for a Claude Managed Agent project
@@ -40,11 +46,11 @@ Each installed OptimizeSpec skill folder SHALL contain every reference path name
 - **THEN** that file exists inside the same phase skill folder
 
 ### Requirement: Generic templates do not hardcode Claude Managed Agents as universal
-Generic OptimizeSpec templates SHALL describe target runtime as a field and reserve Claude Managed Agent-specific requirements for runtime-specific design guidance.
+Generic OptimizeSpec templates SHALL include an inferred target runtime field and reserve Claude Managed Agent-specific requirements for runtime-specific design guidance.
 
 #### Scenario: A proposal template is opened
 - **WHEN** the template includes target agent metadata
-- **THEN** it includes a runtime field without presenting Claude Managed Agents as the only possible product concept
+- **THEN** it includes a runtime field for the coding agent to fill from repo inspection without presenting Claude Managed Agents as the only possible product concept
 
 #### Scenario: Apply support is documented
 - **WHEN** docs or skill instructions describe v1 apply support
