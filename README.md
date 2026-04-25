@@ -31,6 +31,12 @@ Or run it without a global install:
 npx optimizespec@latest --help
 ```
 
+Install the coding-agent skills separately with [skills](https://skills.sh/):
+
+```bash
+npx skills add terminal-use/OptimizeSpec --skill '*'
+```
+
 Initialize OptimizeSpec in an agent project:
 
 ```bash
@@ -113,6 +119,18 @@ Generated files are deliberately local to the project you are improving. A TypeS
 Node.js 20.19.0 or newer is required.
 
 ## Skills For Coding Agents
+
+The npm package installs the `optimizespec` CLI. Coding-agent skills are installed separately with `skills`:
+
+```bash
+npx skills add terminal-use/OptimizeSpec --skill '*'
+```
+
+For a global skill install:
+
+```bash
+npx skills add terminal-use/OptimizeSpec --skill '*' -g
+```
 
 The repo includes a `skills/` folder for coding agents that can use repo-local skills:
 
