@@ -18,7 +18,7 @@ OptimizeSpec is not a Python optimization runtime. The public package is the Typ
 
 ## Quick Start
 
-Install the CLI:
+Install the CLI for project setup and CI checks:
 
 ```bash
 npm install -g optimizespec
@@ -30,38 +30,41 @@ Install the coding-agent skills separately with [skills](https://skills.sh/):
 npx skills add terminal-use/OptimizeSpec --skill '*'
 ```
 
-Initialize OptimizeSpec in an agent project:
+Initialize the project metadata once:
 
 ```bash
 optimizespec init
 ```
 
-Create a change for an optimization system:
+Then drive the workflow through the coding-agent skills from inside the agent project:
 
-```bash
-optimizespec new change improve-agent-output \
-  --description "Improve the agent's answer quality on support triage tasks."
+```text
+$optimizespec-new
+Create a change named improve-agent-output that improves the agent's answer quality on support triage tasks.
 ```
 
-Inspect and validate the artifacts:
+Continue the change until the proposal, design, specs, and tasks are complete:
 
-```bash
-optimizespec status --change improve-agent-output
-optimizespec validate improve-agent-output
+```text
+$optimizespec-continue
+Continue improve-agent-output and create the next required artifact.
 ```
 
-Generate runner scaffolding into your agent project:
+Apply the completed plan to the current project:
 
-```bash
-optimizespec apply \
-  --change improve-agent-output \
-  --target . \
-  --stack typescript
+```text
+$optimizespec-apply
+Apply improve-agent-output in this repository using the TypeScript stack.
 ```
 
-Here `--target .` means "write the generated files into the current project."
+Verify the resulting eval, compare, optimize, and evidence-ledger behavior:
 
-Agent-compatible commands support `--json`:
+```text
+$optimizespec-verify
+Verify improve-agent-output end to end.
+```
+
+For scripted checks, use the CLI's machine-readable output:
 
 ```bash
 optimizespec status --change improve-agent-output --json
