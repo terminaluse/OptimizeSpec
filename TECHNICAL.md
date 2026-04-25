@@ -1,10 +1,6 @@
 # Technical Notes
 
-This repository now has two clear layers:
-
-- The public product is the TypeScript CLI and OptimizeSpec skill/template system.
-- The Python Claude Managed Agents + GEPA implementation is a reference harness under `examples/py-claude-managed-agent/`.
-- Reference agents are committed as test inputs under `tests/fixtures/reference-agents/`; optimization systems are generated outputs.
+This repository contains the public TypeScript CLI and OptimizeSpec skill/template system.
 
 ## TypeScript CLI
 
@@ -34,7 +30,7 @@ Package inspection:
 bun run pack:check
 ```
 
-The npm package allowlist intentionally includes `bin`, `dist`, `skills`, and documentation. It does not include `examples/py-claude-managed-agent/`, `tests/fixtures/reference-agents/`, root run artifacts, Python package metadata, caches, generated optimization systems, or OpenSpec planning history.
+The npm package allowlist intentionally includes `bin`, `dist`, `skills`, and documentation. It does not include source tests, root run artifacts, caches, generated optimization systems, or local OpenSpec/OptimizeSpec planning history.
 
 ## CLI Commands
 
@@ -60,22 +56,6 @@ optimizespec/systems/<change-name>/
 ```
 
 Generated code is deliberately local to the project being improved. The optimization system should import or adapt the project's real agent factory, tools, environment configuration, and command conventions instead of copying a parallel agent implementation. OptimizeSpec itself does not require projects to import a bundled Python runtime.
-
-## Reference Fixtures
-
-Committed reference agents live under:
-
-```text
-tests/fixtures/reference-agents/<fixture-id>/
-  agent.yaml
-  request.md
-```
-
-These files are source inputs for tests and skills. They should stay narrow and hand-authored. Do not commit full generated `optimizespec/changes/<change-name>/` systems, generated optimization-system folders, run ledgers, optimizer traces, or generated runner directories as examples.
-
-Tests that need an optimization system should generate one in a temporary workspace or an ignored `runs/` directory. If deterministic comparison data is needed, keep it as a focused expected-output fixture rather than a complete runnable system.
-
-To add a reference agent, create `tests/fixtures/reference-agents/<fixture-id>/agent.yaml` and `request.md`, then add or update a test that generates the optimization-system artifacts from that fixture in a temporary directory. Keep the fixture limited to source inputs and metadata. If a regression needs expected output, store only the stable contract being asserted, such as a CLI JSON shape or a short generated-file excerpt, and regenerate it through an explicit test update rather than committing a full runnable system.
 
 ## Artifact Layout
 
@@ -116,46 +96,10 @@ Shared contracts originate under `skills/optimizespec-common/references/`, and p
 
 The most important contract is the evidence ledger: applied systems should persist run manifest, candidate registry, per-case scores, judge records when present, ASI, rollout records, comparison records, optimizer lineage, and promotion decisions.
 
-## Python Reference Example
-
-The Python reference harness lives at:
-
-```text
-examples/py-claude-managed-agent/
-```
-
-It contains the original modules for:
-
-- candidate compilation into Claude Managed Agents config
-- Managed Agents runtime sessions and event collection
-- GEPA evaluator and optimizer wiring
-- deterministic validation harness
-- evidence-ledger generation in temporary or ignored run directories
-
-Run Python regression tests from the repo root:
-
-```bash
-pytest -q
-```
-
-The root `pytest.ini` adds `examples/py-claude-managed-agent/src` to `PYTHONPATH`.
-
-Live example runs require:
-
-```bash
-uv pip install -e examples/py-claude-managed-agent[dev]
-uv pip install -r examples/py-claude-managed-agent/requirements-managed-agents-preview.txt
-export ANTHROPIC_API_KEY=...
-```
-
-Live tests remain opt-in through environment flags such as `OPTIMIZESPEC_RUN_LIVE_IMPROVEMENT=1`.
-
 ## Release Boundary
 
 Before release, verify:
 
 - `bun run test` passes.
-- `bun run pack:check` does not include `examples/py-claude-managed-agent/`, `tests/fixtures/reference-agents/`, or generated optimization systems.
-- `pytest -q` passes for the Python reference example.
+- `bun run pack:check` does not include source tests, local planning artifacts, or generated optimization systems.
 - Documentation presents the TypeScript CLI as the public command surface.
-- Python commands are documented only as reference harness workflows.

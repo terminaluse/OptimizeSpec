@@ -1,1 +1,0 @@
-https://app.stainless.com/pkg/s/anthropic-python/95f2bb40abe046da8645c3c0de4b0f164dd930/anthropic-0.91.0-py3-none-any.whl

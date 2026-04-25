@@ -74,7 +74,7 @@ The core workflow is runtime-neutral. V1 apply support is Claude Managed Agent-s
 
 ## Learn More
 
-- [TECHNICAL.md](TECHNICAL.md) for architecture, package boundaries, reference agents, and release notes.
+- [TECHNICAL.md](TECHNICAL.md) for architecture, package boundaries, and release notes.
 - [skills/optimizespec-common/references/core/reference-contracts.md](skills/optimizespec-common/references/core/reference-contracts.md) for runner, grader, ASI, candidate, optimizer, runtime, evidence, and verification contracts.
 
 ## Acknowledgements
@@ -90,8 +90,6 @@ bun install
 bun run test
 bun run pack:check
 ```
-
-The Python Claude Managed Agent reference harness lives under `examples/py-claude-managed-agent/` and is not part of the npm package.
 
 ## License
 

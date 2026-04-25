@@ -17,7 +17,7 @@ function listFiles(root: string): string[] {
 }
 
 describe('package contents', () => {
-  it('keeps the Python prototype out of the npm package', () => {
+  it('keeps source-only and local artifact paths out of the npm package', () => {
     const output = execFileSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], {
       encoding: 'utf8',
     });
@@ -26,29 +26,12 @@ describe('package contents', () => {
 
     expect(files).toContain('bin/optimizespec.js');
     expect(files).toContain('dist/cli/index.js');
-    expect(files.some((file) => file.startsWith('examples/py-claude-managed-agent/'))).toBe(false);
-    expect(files.some((file) => file.startsWith('tests/fixtures/reference-agents/'))).toBe(false);
-    expect(files.some((file) => file === 'pyproject.toml')).toBe(false);
-    expect(files.some((file) => file.startsWith('src/optimizespec/'))).toBe(false);
-  });
-
-  it('keeps committed reference agents narrow and generated systems out of examples', () => {
-    const fixtureRoot = join(process.cwd(), 'tests', 'fixtures', 'reference-agents');
-    const allowedFixtureFiles = new Set(['agent.yaml', 'request.md']);
-
-    expect(existsSync(join(fixtureRoot, 'optimizespec-managed-agent', 'agent.yaml'))).toBe(true);
-    expect(existsSync(join(process.cwd(), 'examples', 'py-claude-managed-agent', 'optimizespec', 'changes'))).toBe(false);
-    expect(existsSync(join(process.cwd(), 'optimizespec', 'systems'))).toBe(false);
-
-    for (const fixtureId of readdirSync(fixtureRoot)) {
-      const fixturePath = join(fixtureRoot, fixtureId);
-      if (!statSync(fixturePath).isDirectory()) {
-        continue;
-      }
-      for (const fileName of readdirSync(fixturePath)) {
-        expect(allowedFixtureFiles.has(fileName)).toBe(true);
-      }
-    }
+    expect(files.some((file) => file.startsWith('examples/'))).toBe(false);
+    expect(files.some((file) => file.startsWith('test/'))).toBe(false);
+    expect(files.some((file) => file.startsWith('tests/'))).toBe(false);
+    expect(files.some((file) => file.startsWith('src/'))).toBe(false);
+    expect(files.some((file) => file.startsWith('openspec/'))).toBe(false);
+    expect(files.some((file) => file.startsWith('optimizespec/'))).toBe(false);
   });
 
   it('keeps installed skill folders self-contained', () => {
