@@ -4,9 +4,9 @@ fixture_type: positive
 runtime: Claude Managed Agents
 description: Package-guidance fixture that validates whether eval validation skills can explain and optimize the repo-local OptimizeSpec workflow.
 source_files:
-  self_improvement: examples/python-managed-agent/src/optimizespec/self_improvement.py
-  eval_validation: examples/python-managed-agent/src/optimizespec/eval_validation.py
-  cli: examples/python-managed-agent/src/optimizespec/cli.py
+  self_improvement: examples/py-claude-managed-agent/src/optimizespec/self_improvement.py
+  eval_validation: examples/py-claude-managed-agent/src/optimizespec/eval_validation.py
+  cli: examples/py-claude-managed-agent/src/optimizespec/cli.py
 existing_commands:
   direct_eval: python -m optimizespec.eval_validation eval --fixture optimizespec-package-guidance
   optimize: python -m optimizespec.eval_validation optimize --fixture optimizespec-package-guidance --max-metric-calls 1

@@ -11,11 +11,11 @@ Reference agent inputs live at `tests/fixtures/reference-agents/`. Generated opt
 ```bash
 uv venv
 source .venv/bin/activate
-uv pip install -e examples/python-managed-agent[dev]
+uv pip install -e examples/py-claude-managed-agent[dev]
 ```
 
 Live Managed Agents runs also require the preview SDK requirements:
 
 ```bash
-uv pip install -r examples/python-managed-agent/requirements-managed-agents-preview.txt
+uv pip install -r examples/py-claude-managed-agent/requirements-managed-agents-preview.txt
 ```

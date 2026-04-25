@@ -4,7 +4,7 @@ fixture_type: negative
 runtime: Claude Managed Agents
 description: Negative fixture where optimization output exists but candidate lineage and leaderboard evidence are missing.
 source_files:
-  runtime: examples/python-managed-agent/src/optimizespec/runtime.py
+  runtime: examples/py-claude-managed-agent/src/optimizespec/runtime.py
 existing_commands:
   direct_eval: optimizespec eval-demo
   optimize: optimizespec optimize-demo

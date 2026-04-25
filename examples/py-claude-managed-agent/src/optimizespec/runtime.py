@@ -23,7 +23,7 @@ STREAM_BETAS = MANAGED_AGENTS_BETAS
 OUTCOME_SEND_BETA = "agent-api-2026-03-01"
 MULTI_AGENT_FLAG_ENV = "OPTIMIZESPEC_ENABLE_MULTI_AGENT"
 MAX_MANAGED_AGENT_SKILLS_PER_SESSION = 20
-PREVIEW_SDK_INSTALL_COMMAND = "uv pip install -r examples/python-managed-agent/requirements-managed-agents-preview.txt"
+PREVIEW_SDK_INSTALL_COMMAND = "uv pip install -r examples/py-claude-managed-agent/requirements-managed-agents-preview.txt"
 
 
 @dataclass

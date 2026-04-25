@@ -5,6 +5,15 @@
 - Invocation:
 - Constraints:
 
+## Optimization System Location
+
+- Decision: create new folder|use existing folder
+- Path:
+- Why this path fits the repo:
+- Existing agent code to reuse:
+- Existing tools, skills, MCP servers, env vars, or permissions to reuse:
+- Run outputs path:
+
 ## Improvement Target
 
 Describe the behavior GEPA should improve and why it matters.

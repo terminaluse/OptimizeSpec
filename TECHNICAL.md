@@ -3,7 +3,7 @@
 This repository now has two clear layers:
 
 - The public product is the TypeScript CLI and OptimizeSpec skill/template system.
-- The Python Claude Managed Agents + GEPA implementation is a reference harness under `examples/python-managed-agent/`.
+- The Python Claude Managed Agents + GEPA implementation is a reference harness under `examples/py-claude-managed-agent/`.
 - Reference agents are committed as test inputs under `tests/fixtures/reference-agents/`; optimization systems are generated outputs.
 
 ## TypeScript CLI
@@ -34,7 +34,7 @@ Package inspection:
 npm run pack:check
 ```
 
-The npm package allowlist intentionally includes `bin`, `dist`, `skills`, and documentation. It does not include `examples/python-managed-agent/`, `tests/fixtures/reference-agents/`, root run artifacts, Python package metadata, caches, generated optimization systems, or OpenSpec planning history.
+The npm package allowlist intentionally includes `bin`, `dist`, `skills`, and documentation. It does not include `examples/py-claude-managed-agent/`, `tests/fixtures/reference-agents/`, root run artifacts, Python package metadata, caches, generated optimization systems, or OpenSpec planning history.
 
 ## CLI Commands
 
@@ -48,13 +48,13 @@ optimizespec validate <name> [--json]
 optimizespec apply --change <name> --target <path> --stack typescript|python [--json]
 ```
 
-`apply` generates files under:
+`apply` writes files to the optimization-system path recorded in the proposal's `Optimization System Location` section. If that section does not name a concrete path, the CLI falls back to:
 
 ```text
-optimizespec.generated/<change-name>/
+optimizespec/systems/<change-name>/
 ```
 
-Generated code is deliberately local to the project being improved. A TypeScript project gets TypeScript runner files; a Python project can get Python runner files. OptimizeSpec itself does not require projects to import a bundled Python runtime.
+Generated code is deliberately local to the project being improved. A TypeScript project gets TypeScript runner files; a Python project can get Python runner files. The optimization system should import or adapt the project's real agent factory, tools, environment configuration, and command conventions instead of copying a parallel agent implementation. OptimizeSpec itself does not require projects to import a bundled Python runtime.
 
 ## Reference Fixtures
 
@@ -66,7 +66,7 @@ tests/fixtures/reference-agents/<fixture-id>/
   request.md
 ```
 
-These files are source inputs for tests and skills. They should stay narrow and hand-authored. Do not commit full generated `optimizespec/changes/<change-name>/` systems, `optimizespec.generated/<change-name>/` output, run ledgers, optimizer traces, or generated runner directories as examples.
+These files are source inputs for tests and skills. They should stay narrow and hand-authored. Do not commit full generated `optimizespec/changes/<change-name>/` systems, generated optimization-system folders, run ledgers, optimizer traces, or generated runner directories as examples.
 
 Tests that need an optimization system should generate one in a temporary workspace or an ignored `runs/` directory. If deterministic comparison data is needed, keep it as a focused expected-output fixture rather than a complete runnable system.
 
@@ -83,6 +83,8 @@ optimizespec/changes/<change-name>/
   specs/
   tasks.md
 ```
+
+`proposal.md` must include an `Optimization System Location` section with a create-or-reuse decision, the repo-relative path where implementation code will live, why that path fits the repo, and which existing agent code/dependencies the system will reuse.
 
 Specs use OpenSpec-style requirement blocks:
 
@@ -112,7 +114,7 @@ Shared contracts originate under `skills/optimizespec-common/references/`, and p
 The Python reference harness lives at:
 
 ```text
-examples/python-managed-agent/
+examples/py-claude-managed-agent/
 ```
 
 It contains the original modules for:
@@ -129,13 +131,13 @@ Run Python regression tests from the repo root:
 pytest -q
 ```
 
-The root `pytest.ini` adds `examples/python-managed-agent/src` to `PYTHONPATH`.
+The root `pytest.ini` adds `examples/py-claude-managed-agent/src` to `PYTHONPATH`.
 
 Live example runs require:
 
 ```bash
-uv pip install -e examples/python-managed-agent[dev]
-uv pip install -r examples/python-managed-agent/requirements-managed-agents-preview.txt
+uv pip install -e examples/py-claude-managed-agent[dev]
+uv pip install -r examples/py-claude-managed-agent/requirements-managed-agents-preview.txt
 export ANTHROPIC_API_KEY=...
 ```
 
@@ -146,7 +148,7 @@ Live tests remain opt-in through environment flags such as `OPTIMIZESPEC_RUN_LIV
 Before release, verify:
 
 - `npm test` passes.
-- `npm run pack:check` does not include `examples/python-managed-agent/`, `tests/fixtures/reference-agents/`, or generated optimization systems.
+- `npm run pack:check` does not include `examples/py-claude-managed-agent/`, `tests/fixtures/reference-agents/`, or generated optimization systems.
 - `pytest -q` passes for the Python reference example.
 - Documentation presents the TypeScript CLI as the public command surface.
 - Python commands are documented only as reference harness workflows.

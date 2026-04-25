@@ -2,6 +2,10 @@
 
 Summarize what you found in the agent project and describe its Claude Managed Agents runtime shape.
 
+## Optimization System Location
+
+Confirm the proposal's create-or-reuse decision, the path where optimization code will live, the existing agent code it will import or adapt, and where run outputs will be written.
+
 ## Runner Invocation
 
 Define direct eval, optimize, compare, and show-candidate commands or scripts.

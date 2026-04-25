@@ -7,7 +7,7 @@
 
 ## 2. Generated Output Cleanup
 
-- [x] 2.1 Remove or relocate committed full optimization-system directories from `examples/python-managed-agent/optimizespec/changes/`.
+- [x] 2.1 Remove or relocate committed full optimization-system directories from `examples/py-claude-managed-agent/optimizespec/changes/`.
 - [x] 2.2 Replace imports of committed optimization-system scripts with generated temp-workspace flows or test-support helpers.
 - [x] 2.3 Move any useful deterministic comparison data into narrow expected-output fixtures.
 - [x] 2.4 Ensure run directories, generated systems, and optimizer traces are ignored or created under temporary test directories.

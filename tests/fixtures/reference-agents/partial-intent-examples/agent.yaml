@@ -4,8 +4,8 @@ fixture_type: positive
 runtime: Claude Managed Agents
 description: Positive fixture where the user gives partial intent and examples, and the workflow should draft criteria with focused open questions.
 source_files:
-  runtime: examples/python-managed-agent/src/optimizespec/runtime.py
-  cli: examples/python-managed-agent/src/optimizespec/cli.py
+  runtime: examples/py-claude-managed-agent/src/optimizespec/runtime.py
+  cli: examples/py-claude-managed-agent/src/optimizespec/cli.py
 existing_commands:
   direct_eval: optimizespec eval-demo
   optimize: optimizespec optimize-demo --max-metric-calls 1

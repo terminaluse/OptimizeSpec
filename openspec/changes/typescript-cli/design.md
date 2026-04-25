@@ -66,8 +66,8 @@ Alternatives considered:
 
 Move the current Python implementation out of `src/optimizespec/` before release. Candidate locations:
 
-- `examples/python-managed-agent/` for a runnable example
-- `tests/fixtures/python-managed-agent/` for regression tests
+- `examples/py-claude-managed-agent/` for a runnable example
+- `tests/fixtures/py-claude-managed-agent/` for regression tests
 - `reference/python-gepa-managed-agent/` for source material used by skills/templates
 
 The release package may include selected example/reference files only if they are intentionally part of the CLI's templates or examples. It should not publish a Python package as the primary product.

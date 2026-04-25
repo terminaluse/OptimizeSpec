@@ -23,4 +23,4 @@ The repo currently blurs reference inputs with generated optimization systems by
 
 ## Impact
 
-Affected areas include `examples/python-managed-agent/optimizespec/fixtures/agents`, `examples/python-managed-agent/optimizespec/changes`, Python regression tests that import committed example optimization systems, TypeScript CLI tests that generate scaffolding, documentation, ignore rules, and package contents verification. The change should preserve coverage of the Claude Managed Agent reference path while making generated systems ephemeral or fixture-snapshot-only.
+Affected areas include `examples/py-claude-managed-agent/optimizespec/fixtures/agents`, `examples/py-claude-managed-agent/optimizespec/changes`, Python regression tests that import committed example optimization systems, TypeScript CLI tests that generate scaffolding, documentation, ignore rules, and package contents verification. The change should preserve coverage of the Claude Managed Agent reference path while making generated systems ephemeral or fixture-snapshot-only.

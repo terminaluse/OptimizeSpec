@@ -2,7 +2,7 @@
 
 OptimizeSpec is a TypeScript CLI and skill pack for spec-driven development of optimization systems for agents.
 
-Agent improvement is easy to start and hard to trust. A prompt tweak can fix one case while breaking another, and a real optimization loop needs more than a few examples: it needs an eval contract, runner design, scoring rules, candidate lineage, optimizer wiring, and evidence that the new agent is actually better.
+Agent improvement is easy to start and hard to trust. A prompt tweak can fix one case while breaking another, and a real optimization loop needs more than a few examples: it needs an eval contract, runner design, scoring rules, optimizer wiring, and evidence that the new agent is actually better.
 
 OptimizeSpec gives you a spec-first workflow for building that system inside the agent repository you already own. You describe what good behavior means, turn that into checked artifacts, and generate files in that project for eval runners and optimizer entrypoints.
 
@@ -11,10 +11,7 @@ OptimizeSpec gives you a spec-first workflow for building that system inside the
 - Turn vague agent-improvement goals into concrete eval and optimization specs.
 - Keep runner, scorer, optimizer, and evidence requirements reviewable before code is generated.
 - Generate implementation scaffolding that matches that project's stack instead of importing a bundled runtime.
-- Give coding agents a repeatable skill workflow for creating, applying, and verifying optimization systems.
-- Keep test/reference agents separate from the public CLI package.
 
-OptimizeSpec is not a Python optimization runtime. The public package is the TypeScript CLI plus the OptimizeSpec skill pack. The Python Claude Managed Agents + GEPA code in this repo is reference and regression-test material.
 
 ## Quick Start
 
@@ -54,13 +51,13 @@ $optimizespec-continue
 Apply the completed plan to the current project:
 
 ```text
-$optimizespec-apply improve-agent-output
+$optimizespec-apply
 ```
 
 Verify the resulting eval, compare, optimize, and evidence-ledger behavior:
 
 ```text
-$optimizespec-verify improve-agent-output
+$optimizespec-verify
 ```
 
 For scripted checks, use the CLI's machine-readable output:
@@ -83,9 +80,9 @@ OptimizeSpec follows the same shape you would want from a careful engineering re
 
 The goal is not just to produce a benchmark. The goal is to make agent optimization reproducible: what changed, why it changed, which cases improved, which cases regressed, and what evidence supports promotion.
 
-## Generated Artifacts
+## Artifacts And Code Location
 
-OptimizeSpec creates planning artifacts in the project you are improving:
+OptimizeSpec keeps its planning artifacts in one root folder:
 
 ```text
 optimizespec/changes/<change-name>/
@@ -95,44 +92,23 @@ optimizespec/changes/<change-name>/
   tasks.md
 ```
 
-When a change is applied, generated scaffolding is written under:
+The proposal also records where the durable optimization-system code will live:
 
 ```text
-optimizespec.generated/<change-name>/
+## Optimization System Location
+
+- Decision: create new folder|use existing folder
+- Path: <repo-relative path>
+- Why this path fits the repo:
+- Existing agent code to reuse:
 ```
 
-Generated files are deliberately local to the project you are improving. A TypeScript project gets TypeScript runner scaffolding; a Python project can get Python runner scaffolding. OptimizeSpec does not require your project to adopt a bundled optimization runtime.
+That code path is chosen from repo inspection and user confirmation. It can be an existing eval folder or a new folder such as `optimizespec/systems/<change-name>/`. Apply writes runner, scorer, optimizer, adapter, and evidence code to the recorded path instead of guessing late in the workflow.
 
-## What You Get
+The optimization system should call into the real agent factory, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter. It should not fork or copy the agent implementation.
 
-- A TypeScript/Node CLI for creating, validating, and applying OptimizeSpec artifacts.
-- Repo-local skills for proposal, design, implementation, and verification workflows.
-- Templates and reference contracts for runners, graders, ASI, candidates, optimizers, runtime integration, evidence ledgers, and promotion checks.
-- Project-local scaffolding for eval runners and optimizer entrypoints.
-- Reference agent fixtures used to test the workflow without committing generated optimization systems as product examples.
 
-Node.js 20.19.0 or newer is required.
-
-## Skills For Coding Agents
-
-The npm package installs the `optimizespec` CLI. Coding-agent skills are installed separately:
-
-```bash
-npx skills add terminal-use/OptimizeSpec --skill '*'
-```
-
-The repo includes a `skills/` folder for coding agents that can use repo-local skills:
-
-```text
-skills/
-  optimizespec-new/
-  optimizespec-continue/
-  optimizespec-apply/
-  optimizespec-verify/
-  optimizespec-common/
-```
-
-Each phase skill is self-contained: the references, templates, or assets it instructs an agent to load are bundled inside that same skill folder.
+## Skills
 
 Use them in this order:
 
@@ -143,10 +119,10 @@ Use them in this order:
 
 ## Reference Agents
 
-The original Python Managed Agents + GEPA prototype lives in:
+An example Python Claude Managed Agent + GEPA prototype lives in:
 
 ```text
-examples/python-managed-agent/
+examples/py-claude-managed-agent/
 ```
 
 It remains useful as a reference harness for candidate compilation, Claude Managed Agents sessions, GEPA evaluator wiring, and evidence-ledger structure. It is not part of the public npm package and is not required for normal CLI usage.
@@ -157,7 +133,7 @@ Reference agents live in:
 tests/fixtures/reference-agents/
 ```
 
-Those fixtures are committed inputs. Generated optimization systems, run ledgers, optimizer traces, and `optimizespec.generated/` output should be created in temporary test workspaces or ignored local `runs/` directories, not committed as product examples.
+Those fixtures are committed inputs. Generated optimization systems, run ledgers, optimizer traces, and run outputs should be created in temporary test workspaces or ignored local `runs/` directories, not committed as product examples.
 
 Run deterministic Python reference tests from the repo root:
 
@@ -168,8 +144,8 @@ pytest -q
 Live Managed Agents example runs require Anthropic preview access and the example requirements:
 
 ```bash
-uv pip install -e examples/python-managed-agent[dev]
-uv pip install -r examples/python-managed-agent/requirements-managed-agents-preview.txt
+uv pip install -e examples/py-claude-managed-agent[dev]
+uv pip install -r examples/py-claude-managed-agent/requirements-managed-agents-preview.txt
 export ANTHROPIC_API_KEY=...
 ```
 

@@ -4,12 +4,12 @@ fixture_type: positive
 runtime: Claude Managed Agents
 description: Existing package prototype that optimizes Claude Managed Agents with GEPA optimize_anything.
 source_files:
-  candidate: examples/python-managed-agent/src/optimizespec/candidate.py
-  runtime: examples/python-managed-agent/src/optimizespec/runtime.py
-  evaluator: examples/python-managed-agent/src/optimizespec/evaluator.py
-  optimizer: examples/python-managed-agent/src/optimizespec/optimizer.py
-  tasks: examples/python-managed-agent/src/optimizespec/tasks.py
-  cli: examples/python-managed-agent/src/optimizespec/cli.py
+  candidate: examples/py-claude-managed-agent/src/optimizespec/candidate.py
+  runtime: examples/py-claude-managed-agent/src/optimizespec/runtime.py
+  evaluator: examples/py-claude-managed-agent/src/optimizespec/evaluator.py
+  optimizer: examples/py-claude-managed-agent/src/optimizespec/optimizer.py
+  tasks: examples/py-claude-managed-agent/src/optimizespec/tasks.py
+  cli: examples/py-claude-managed-agent/src/optimizespec/cli.py
 existing_commands:
   direct_eval: optimizespec eval-demo
   optimize: optimizespec optimize-demo

@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
@@ -136,9 +136,9 @@ function getArtifactStatus(root: string, change: string): ArtifactStatus[] {
   ];
 }
 
-function changeArtifactFiles(summary: string): Record<string, string> {
+function changeArtifactFiles(summary: string, change = '<change-name>'): Record<string, string> {
   return {
-    'proposal.md': `## Why\n\n${summary}\n\n## What Changes\n\n- Define the agent behavior to improve.\n- Specify eval cases, scoring, evidence, and generated runner expectations.\n\n## Capabilities\n\n### New Capabilities\n- \`optimization-system\`: Generated eval runner and optimizer for the agent project.\n\n### Modified Capabilities\n- None.\n\n## Impact\n\nAgent-project evals, generated runner files, optimizer configuration, and documentation.\n`,
+    'proposal.md': `## Why\n\n${summary}\n\n## Optimization System Location\n\n- Decision: create new folder unless repo inspection finds an existing eval or optimization folder to reuse.\n- Path: optimizespec/systems/${change}\n- Why: keep OptimizeSpec planning artifacts at the repo root while placing durable optimization code in one explicit, reviewable folder.\n- Existing code to reuse:\n  - Identify the real agent factory, tools, environment configuration, and test commands before applying.\n\n## What Changes\n\n- Define the agent behavior to improve.\n- Specify eval cases, scoring, evidence, and optimization-system code expectations.\n\n## Capabilities\n\n### New Capabilities\n- \`optimization-system\`: Eval runner and optimizer for the agent project.\n\n### Modified Capabilities\n- None.\n\n## Impact\n\nAgent-project evals, optimization-system files, optimizer configuration, and documentation.\n`,
     'design.md': `## Context\n\nDocument the project stack, agent runtime, candidate surface, eval runner shape, and generated commands.\n\n## Goals / Non-Goals\n\n**Goals:**\n- Generate an optimization system that fits the project being improved.\n- Keep evidence and scoring inspectable.\n\n**Non-Goals:**\n- Require a bundled OptimizeSpec runtime package in the project.\n\n## Decisions\n\nDescribe language choice, runner invocation, scorer strategy, and optimizer wiring.\n\n## Risks / Trade-offs\n\n- [Unknown project stack] -> Inspect the repository before applying.\n`,
     'specs/optimization-system/spec.md': `## ADDED Requirements\n\n### Requirement: Generated optimization system\nThe agent project SHALL contain generated eval and optimization entrypoints based on this OptimizeSpec change.\n\n#### Scenario: Runner generated\n- **WHEN** the change is applied to an agent project\n- **THEN** the agent project contains runner files in the selected language\n`,
     'tasks.md': `## 1. Generate Optimization System\n\n- [ ] 1.1 Inspect the project stack and agent runtime.\n- [ ] 1.2 Generate eval runner files in the selected language.\n- [ ] 1.3 Generate optimizer entrypoint and README instructions.\n- [ ] 1.4 Run local validation for generated files.\n`,
@@ -185,7 +185,7 @@ function createChange(rootPath: string, name: string, description: string | unde
   ensureDir(join(base, 'specs', 'optimization-system'));
   const created: string[] = [];
   const summary = description ?? 'Describe the optimization system to build.';
-  const files = changeArtifactFiles(summary);
+  const files = changeArtifactFiles(summary, name);
   for (const [relative, content] of Object.entries(files)) {
     const path = join(base, relative);
     writeFileIfMissing(path, content);
@@ -206,7 +206,7 @@ function continueChange(rootPath: string, name: string): ContinueResult {
     );
   }
 
-  const files = changeArtifactFiles('Describe the optimization system to build.');
+  const files = changeArtifactFiles('Describe the optimization system to build.', name);
   const artifactPaths: Record<string, string> = {
     proposal: 'proposal.md',
     design: 'design.md',
@@ -361,6 +361,54 @@ if __name__ == "__main__":
 `;
 }
 
+function cleanMarkdownValue(value: string): string {
+  return value.trim().replace(/^`|`$/g, '').trim();
+}
+
+function isUnresolvedOptimizationPath(value: string): boolean {
+  const normalized = value.trim().toLowerCase();
+  return (
+    normalized.length === 0 ||
+    normalized === 'tbd' ||
+    normalized === 'todo' ||
+    normalized === 'unknown' ||
+    normalized === '<path>' ||
+    normalized.includes('replace me')
+  );
+}
+
+function proposalOptimizationSystemPath(rootPath: string, change: string): string | null {
+  const proposal = readOptional(join(changeDir(resolve(rootPath), change), 'proposal.md'));
+  if (!proposal) {
+    return null;
+  }
+  const lines = proposal.split(/\r?\n/);
+  const sectionStart = lines.findIndex((line) => /^##\s+Optimization System Location\s*$/i.test(line.trim()));
+  if (sectionStart === -1) {
+    return null;
+  }
+  for (const line of lines.slice(sectionStart + 1)) {
+    if (/^##\s+/.test(line)) {
+      break;
+    }
+    const match = line.match(/^\s*-?\s*Path:\s*(.+?)\s*$/i);
+    if (!match) {
+      continue;
+    }
+    const selectedPath = cleanMarkdownValue(match[1]);
+    return isUnresolvedOptimizationPath(selectedPath) ? null : selectedPath;
+  }
+  return null;
+}
+
+function optimizationSystemOutputDir(rootPath: string, change: string, targetPath: string): string {
+  const selectedPath = proposalOptimizationSystemPath(rootPath, change);
+  if (selectedPath) {
+    return isAbsolute(selectedPath) ? selectedPath : resolve(targetPath, selectedPath);
+  }
+  return join(resolve(targetPath), 'optimizespec', 'systems', change);
+}
+
 function scaffold(rootPath: string, change: string, targetPath: string, stack: string): string[] {
   const validation = validateChange(rootPath, change);
   if (!validation.valid) {
@@ -370,8 +418,7 @@ function scaffold(rootPath: string, change: string, targetPath: string, stack: s
       validation.errors.join('; '),
     );
   }
-  const target = resolve(targetPath);
-  const out = join(target, 'optimizespec.generated', change);
+  const out = optimizationSystemOutputDir(rootPath, change, targetPath);
   ensureDir(out);
   const created: string[] = [];
   if (stack === 'typescript') {
@@ -544,7 +591,7 @@ export function createProgram(): Command {
     .description('Generate runner files in an agent project from an approved OptimizeSpec change.')
     .requiredOption('--change <name>', 'Change name')
     .option('--path <path>', 'Project containing optimizespec/changes', '.')
-    .option('--target <path>', 'Agent project path to write generated files into', '.')
+    .option('--target <path>', 'Agent project path used to resolve the proposal output path', '.')
     .option('--stack <stack>', 'Project stack: typescript or python', 'typescript')
     .option('--json', 'Output machine-readable JSON')
     .action((options: { change: string; path?: string; target?: string; stack?: string; json?: boolean }) => {

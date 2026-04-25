@@ -26,7 +26,7 @@ describe('package contents', () => {
 
     expect(files).toContain('bin/optimizespec.js');
     expect(files).toContain('dist/cli/index.js');
-    expect(files.some((file) => file.startsWith('examples/python-managed-agent/'))).toBe(false);
+    expect(files.some((file) => file.startsWith('examples/py-claude-managed-agent/'))).toBe(false);
     expect(files.some((file) => file.startsWith('tests/fixtures/reference-agents/'))).toBe(false);
     expect(files.some((file) => file === 'pyproject.toml')).toBe(false);
     expect(files.some((file) => file.startsWith('src/optimizespec/'))).toBe(false);
@@ -37,7 +37,8 @@ describe('package contents', () => {
     const allowedFixtureFiles = new Set(['agent.yaml', 'request.md']);
 
     expect(existsSync(join(fixtureRoot, 'optimizespec-managed-agent', 'agent.yaml'))).toBe(true);
-    expect(existsSync(join(process.cwd(), 'examples', 'python-managed-agent', 'optimizespec', 'changes'))).toBe(false);
+    expect(existsSync(join(process.cwd(), 'examples', 'py-claude-managed-agent', 'optimizespec', 'changes'))).toBe(false);
+    expect(existsSync(join(process.cwd(), 'optimizespec', 'systems'))).toBe(false);
 
     for (const fixtureId of readdirSync(fixtureRoot)) {
       const fixturePath = join(fixtureRoot, fixtureId);

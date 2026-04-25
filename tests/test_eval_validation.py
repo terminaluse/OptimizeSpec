@@ -26,7 +26,7 @@ def test_reference_agent_fixture_root_is_repo_test_data() -> None:
 
     assert eval_validation.FIXTURE_ROOT == fixture_root
     assert (fixture_root / "optimizespec-managed-agent" / "agent.yaml").exists()
-    assert not Path("examples/python-managed-agent/optimizespec/changes").exists()
+    assert not Path("examples/py-claude-managed-agent/optimizespec/changes").exists()
 
 
 def test_fixture_metadata_contract_rejects_missing_required_fields() -> None:
@@ -339,7 +339,7 @@ def test_documented_module_commands_execute(tmp_path: Path) -> None:
 
     for args in commands:
         env = os.environ.copy()
-        env["PYTHONPATH"] = str(Path.cwd() / "examples" / "python-managed-agent" / "src")
+        env["PYTHONPATH"] = str(Path.cwd() / "examples" / "py-claude-managed-agent" / "src")
         completed = subprocess.run(
             [sys.executable, "-m", "optimizespec.eval_validation", *args],
             cwd=Path.cwd(),

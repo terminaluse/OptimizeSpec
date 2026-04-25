@@ -1,6 +1,6 @@
 ## Context
 
-OptimizeSpec is moving toward a TypeScript CLI and skill pack that generates optimization-system artifacts for target repositories. The current repo still contains full optimization-system examples under `examples/python-managed-agent/optimizespec/changes/`, including scripts and eval cases for package guidance, managed-agent eval generation, and a manual self-improvement system. Those directories are useful proof points, but they are generated/application artifacts rather than core source.
+OptimizeSpec is moving toward a TypeScript CLI and skill pack that generates optimization-system artifacts for target repositories. The current repo still contains full optimization-system examples under `examples/py-claude-managed-agent/optimizespec/changes/`, including scripts and eval cases for package guidance, managed-agent eval generation, and a manual self-improvement system. Those directories are useful proof points, but they are generated/application artifacts rather than core source.
 
 The cleaner boundary is that committed reference agents are inputs used by tests and skills, while generated optimization systems are outputs produced by the CLI, skills, or test harnesses. Tests should prove that generation works by creating those outputs in temporary workspaces instead of relying on prebuilt systems checked into the repo.
 
@@ -32,7 +32,7 @@ Rationale: This makes the fixtures stable and reviewable. A reference agent is s
 
 ### 2. Optimization systems are generated outputs
 
-Full `optimizespec/changes/<change-id>/` directories, generated runners, run ledgers, optimizer traces, and `optimizespec.generated/<change-id>/` output should be produced inside temporary test workspaces or ignored local run directories.
+Full `optimizespec/changes/<change-id>/` directories, generated runners, run ledgers, optimizer traces, and optimization-system output folders should be produced inside temporary test workspaces or ignored local run directories.
 
 Rationale: If generated systems are committed as examples, tests can accidentally validate stale artifacts instead of validating the generator, CLI, and skills.
 
@@ -44,7 +44,7 @@ Rationale: Narrow snapshots catch regressions without turning generated systems 
 
 ### 4. Python reference code remains a harness, not product content
 
-The Python Managed Agents code can remain under an example or test-support directory while it is useful for regression and live smoke tests. However, tests should stop importing optimization-system scripts from `examples/python-managed-agent/optimizespec/changes/*` as canonical source. If a Python helper remains necessary, it should live in test support or reference harness code rather than inside a committed generated change.
+The Python Managed Agents code can remain under an example or test-support directory while it is useful for regression and live smoke tests. However, tests should stop importing optimization-system scripts from `examples/py-claude-managed-agent/optimizespec/changes/*` as canonical source. If a Python helper remains necessary, it should live in test support or reference harness code rather than inside a committed generated change.
 
 Rationale: The TypeScript CLI is the product surface. The Python code demonstrates and tests a real agent path, but it should not define repo-level optimization systems by default.
 
@@ -65,7 +65,7 @@ Rationale: The boundary needs an automated guard, not just documentation.
 
 1. Create `tests/fixtures/reference-agents/` and move current agent fixtures there.
 2. Replace tests that import committed optimization-system scripts with tests that generate systems in temporary workspaces.
-3. Remove or relocate `examples/python-managed-agent/optimizespec/changes/*`.
+3. Remove or relocate `examples/py-claude-managed-agent/optimizespec/changes/*`.
 4. Keep any required deterministic expected data under `tests/fixtures/expected/`.
 5. Update documentation and package checks to explain and enforce the reference-agent/generated-output split.
 6. Run deterministic Node and Python tests, then run the opt-in live Managed Agents smoke test.

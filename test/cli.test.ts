@@ -1,5 +1,5 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -93,7 +93,35 @@ describe('optimizespec cli', () => {
     expect(result.stack).toBe('typescript');
     expect(result.created).toEqual(expect.arrayContaining([expect.stringContaining('eval-runner.ts')]));
 
-    const runner = readFileSync(join(target, 'optimizespec.generated', 'typed-runner', 'eval-runner.ts'), 'utf8');
+    const runner = readFileSync(join(target, 'optimizespec', 'systems', 'typed-runner', 'eval-runner.ts'), 'utf8');
+    expect(runner).toContain('export async function runEvalCase');
+  });
+
+  it('uses the optimization-system path recorded in the proposal', () => {
+    const project = tempProject();
+    const target = tempProject();
+    run(['new', 'change', 'custom-location', '--path', project, '--json']);
+    const proposalPath = join(project, 'optimizespec', 'changes', 'custom-location', 'proposal.md');
+    const proposal = readFileSync(proposalPath, 'utf8').replace(
+      'Path: optimizespec/systems/custom-location',
+      'Path: tooling/agent-optimization/custom-location',
+    );
+    writeFileSync(proposalPath, proposal, 'utf8');
+
+    run([
+      'apply',
+      '--change',
+      'custom-location',
+      '--path',
+      project,
+      '--target',
+      target,
+      '--stack',
+      'typescript',
+      '--json',
+    ]);
+
+    const runner = readFileSync(join(target, 'tooling', 'agent-optimization', 'custom-location', 'eval-runner.ts'), 'utf8');
     expect(runner).toContain('export async function runEvalCase');
   });
 
@@ -129,9 +157,9 @@ describe('optimizespec cli', () => {
     );
 
     expect(result.created).toHaveLength(3);
-    expect(readFileSync(join(target, 'optimizespec.generated', 'reference-agent-system', 'optimizer.ts'), 'utf8')).toContain(
-      'meanScore',
-    );
+    expect(
+      readFileSync(join(target, 'optimizespec', 'systems', 'reference-agent-system', 'optimizer.ts'), 'utf8'),
+    ).toContain('meanScore');
   });
 
   it('emits structured JSON errors for invalid changes', () => {

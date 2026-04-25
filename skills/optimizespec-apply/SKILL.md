@@ -26,10 +26,12 @@ If any are missing, stop and report the blocker.
    - existing Claude Managed Agents creation/session code
    - command/CLI conventions
    - test conventions
-3. Verify the agent project uses Claude Managed Agents. If not, stop; v1 does not support other runtimes.
-4. Read `references/reference-contracts.md`, then load the apply-phase contracts for runner, evidence, grader, ASI, optimizer, runtime, and verification.
-5. Implement tasks in order, marking each checkbox complete only after implementation and local verification.
-6. Adapt `assets/python_runner/agent_self_improve.py` to the agent project when useful.
+3. Read the proposal's `Optimization System Location` section and write implementation code only in the recorded folder. If the section is missing or the path is unresolved, stop and ask for the proposal/design to be updated before editing code.
+4. Verify the recorded folder decision still matches the repo. Reuse an existing folder only if the proposal says to; otherwise create the proposed folder. Do not choose a different location during apply without updating the artifact.
+5. Verify the agent project uses Claude Managed Agents. If not, stop; v1 does not support other runtimes.
+6. Read `references/reference-contracts.md`, then load the apply-phase contracts for runner, evidence, grader, ASI, optimizer, runtime, and verification.
+7. Implement tasks in order, marking each checkbox complete only after implementation and local verification.
+8. Adapt `assets/python_runner/agent_self_improve.py` to the agent project when useful.
 
 ## Implementation Contract
 
@@ -55,3 +57,4 @@ The rollout executor must produce score plus ASI for every candidate/eval-case p
 - `references/repo-patterns.md`
 
 Never create a parallel Managed Agents path if the repo already has a factory or session runner that can be reused.
+The optimization system should import or adapt the target repo's real agent factory, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter rather than copying them into a forked agent implementation.

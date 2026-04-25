@@ -23,7 +23,7 @@ The system SHALL generate optimization-system artifacts during CLI, skill, and h
 - **THEN** the generated proposal, design, specs, tasks, runners, and evidence outputs are created in a temporary or ignored workspace
 
 #### Scenario: Generated output is accidentally committed
-- **WHEN** release-visible repository paths contain generated `optimizespec/changes/*`, `optimizespec.generated/*`, run ledgers, or optimizer traces that are not explicitly approved narrow snapshots
+- **WHEN** release-visible repository paths contain generated `optimizespec/changes/*`, generated optimization-system folders, run ledgers, or optimizer traces that are not explicitly approved narrow snapshots
 - **THEN** verification fails with guidance to move the data to a temporary run path, ignored local output, or focused expected-output fixture
 
 ### Requirement: Expected-output fixtures stay narrow

@@ -15,4 +15,6 @@ node_modules/
 .DS_Store
 .env
 runs/
+optimizespec/systems/*/runs/
+optimizespec/systems/*/evidence/runs/
 .optimizespec/
