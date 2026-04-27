@@ -59,7 +59,7 @@ The apply skill runs verification as part of implementation. If you correct the 
 
 ## How OptimizeSpec Works
 
-OptimizeSpec skills include contracts for building optimization system. Your coding agent uses those contracts to implement the runner, scorer, optimizer, adapter, evidence ledger, candidate registry, and verification flow for your agent.
+OptimizeSpec skills include contracts for building optimization systems for agents. Your coding agent uses those contracts to implement the runner, scorer, optimizer, adapter, evidence ledger, candidate registry, and verification flow for your agent.
 
 The core contracts are runtime-neutral. The skills includes a reference system for Python Claude Managed Agents, and contributions for other hosted agent runtimes and languages are welcome.
 
