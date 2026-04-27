@@ -12,6 +12,8 @@ You do not need to know the full system shape before you start. The skills draft
 - Production-equivalent evals against your real agent runtime, tools, skills, MCP servers, environment, and permissions.
 - Traceable optimization results with candidate IDs, per-case rollouts, scores, feedback, and a selected best candidate.
 
+If OptimizeSpec helps you build better agent evals and optimization loops, give us a ⭐!
+
 ## Quick Start
 
 1. Install the CLI:
@@ -115,7 +117,7 @@ An optimizer run outputs:
 
 OptimizeSpec is only possible due to all the great work [Lakshya](https://x.com/LakshyAAAgrawal) has done on GEPA.
 
-OptimizeSpec's spec-driven development approach is strongly inspired by [OpenSpec](https://github.com/Fission-AI/OpenSpec). We highly recommend it; this repo was built using OpenSpec.
+OptimizeSpec's spec-driven development approach is inspired by [OpenSpec](https://github.com/Fission-AI/OpenSpec) which we highly recommend for daily development.
 
 ## License
 
