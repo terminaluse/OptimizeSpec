@@ -50,14 +50,9 @@ Continue until all the spec artifacts are generated:
 Implement the spec:
 
 ```text
-/optimizespec-apply improve-agent-output
+/optimizespec-apply
 ```
 
-The apply skill runs verification as part of implementation. If you correct the implementation afterward, run the `verify` skill again:
-
-```text
-/optimizespec-verify improve-agent-output
-```
 
 ## How OptimizeSpec Works
 
