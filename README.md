@@ -1,10 +1,12 @@
 # OptimizeSpec: Build Eval-Driven Agent Optimization Systems
 
-OptimizeSpec helps you make an agent better in a measured way, even if you have never built an eval suite or optimization loop before.
+OptimizeSpec helps you make your agent better in a measured way, even if you have never built an eval suite or optimization loop before.
 
-You start with a plain-language goal, such as "make support-triage answers more complete." The OptimizeSpec skills guide your coding agent through turning that goal into eval cases, scoring criteria, a runner that calls your real agent, and an optimization loop.
+You start with a plain-language goal, such as "make support-triage answers more complete."
 
-You do not need to know the full system shape before you start. The skills draft the proposal, identify unknowns, ask for confirmation where needed, and then implement the eval runner, scorer, optimizer, adapter, and evidence ledger once the plan is clear.
+OptimizeSpec guides your coding agent through a spec-driven development workflow to turn your request into an eval spec, scoring criteria, and optimization code.
+
+Even if you haven’t collected evals yet, this exercise will give you an understanding of what your evals should look like and what you need to collect.
 
 ## What You Get
 
