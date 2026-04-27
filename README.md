@@ -8,7 +8,7 @@ You do not need to know the full system shape before you start. The skills draft
 
 ## What You Get
 
-- A structured workflow to work through the details of an optimization system for your agent.
+- A structured workflow for turning an improvement idea into evals, scoring, and optimization code.
 - Production-equivalent evals against your real agent runtime, tools, skills, MCP servers, environment, and permissions.
 - Traceable optimization results with candidate IDs, per-case rollouts, scores, feedback, and a selected best candidate.
 
@@ -61,7 +61,7 @@ The apply skill runs verification as part of implementation. If you correct the 
 
 OptimizeSpec skills include contracts for building optimization systems for agents. Your coding agent uses those contracts to implement the runner, scorer, optimizer, adapter, evidence ledger, candidate registry, and verification flow for your agent.
 
-The core contracts are runtime-neutral. The skills includes a reference system for Python Claude Managed Agents, and contributions for other hosted agent runtimes and languages are welcome.
+The core contracts are runtime-neutral. The skills include a reference system for Python Claude Managed Agents, and contributions for other hosted agent runtimes and languages are welcome.
 
 ### How the Self-Improvement Works
 
@@ -114,7 +114,7 @@ An optimizer run outputs:
 
 OptimizeSpec is only possible due to all the great work [Lakshya](https://x.com/LakshyAAAgrawal) has done on GEPA.
 
-OptimizeSpec's spec-driven development approach is strongly inspired by [OpenSpec](https://github.com/Fission-AI/OpenSpec) (we highly recommend it; this repo was build using OpenSpec)
+OptimizeSpec's spec-driven development approach is strongly inspired by [OpenSpec](https://github.com/Fission-AI/OpenSpec). We highly recommend it; this repo was built using OpenSpec.
 
 ## License
 

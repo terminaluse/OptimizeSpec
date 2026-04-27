@@ -1,7 +1,7 @@
 {
   "name": "optimizespec",
   "version": "0.1.0",
-  "description": "Spec-driven optimization system generator for agents.",
+  "description": "CLI and skills for building repo-local agent self-improvement systems.",
   "keywords": [
     "optimizespec",
     "agents",
