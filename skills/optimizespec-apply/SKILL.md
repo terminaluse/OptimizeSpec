@@ -33,6 +33,12 @@ If any are missing, stop and report the blocker.
 7. Implement tasks in order, marking each checkbox complete only after implementation and local verification.
 8. Use bundled runtime references when they match the artifact runtime. For Claude Managed Agents, adapt `../optimizespec-common/references/runtimes/claude-managed-agent/python-managed-agent-package/` as the primary runnable reference for live Managed Agents execution.
 
+## Test Authenticity
+
+Create only tests and verification steps that exercise real behavior through the target repo's production-equivalent runtime path. Do not add fake tests, mock-only tests, static prompt snapshots, fixture-only assertions, or placeholder checks to compensate for missing credentials, missing MCP/tool access, missing hosted runtime access, or unavailable external services.
+
+If credentials, permissions, environment configuration, hosted runtime access, MCP servers, tools, skills, or production integrations are missing, stop and ask the user for what is needed. Record the blocker clearly if the user cannot provide it. Never mark a task complete or claim verification from tests that do not exercise the real integration required by the eval contract.
+
 ## Implementation Contract
 
 The applied system must expose operations equivalent to:
