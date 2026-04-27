@@ -30,4 +30,5 @@ Verify an OptimizeSpec implementation without making unrelated changes.
 Use `references/core/reference-contracts.md` to choose verification references.
 Use `references/core/eval-system-evidence.md` as the evidence-ledger checklist.
 Use `references/runtimes/claude-managed-agent/scorers-and-asi.md` as the ASI quality checklist for Claude Managed Agents implementations.
+Use `references/runtimes/claude-managed-agent/python-managed-agent-package/README.md` and `references/runtimes/claude-managed-agent/python-managed-agent-package/src/optimizespec/runtime.py` as the live Python Managed Agents reference when checking SDK setup, stream-drain behavior, outcome capture, output retrieval, and cleanup.
 Use `references/core/verification-contract.md` for readiness reporting.

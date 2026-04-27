@@ -1,11 +1,14 @@
 dist/
 build/
 node_modules/
+__pycache__/
+*.py[cod]
+*.egg-info/
 .DS_Store
 .env
 runs/
-openspec/
-optimizespec/
+/openspec/
+/optimizespec/
 optimizespec/systems/*/runs/
 optimizespec/systems/*/evidence/runs/
-.optimizespec/
+/.optimizespec/

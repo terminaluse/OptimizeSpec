@@ -30,6 +30,7 @@ Claude Managed Agents are the only v1 apply target:
 - `references/runtimes/claude-managed-agent/managed-agents-runtime-contract.md`: SDK/header setup, invocation assumptions, rollout records, and preview caveats.
 - `references/runtimes/claude-managed-agent/managed-agents-runner.md`: Claude Managed Agents rollout lifecycle and runtime validation.
 - `references/runtimes/claude-managed-agent/scorers-and-asi.md`: scorer templates and ASI expectations for Claude Managed Agents rollouts.
+- `references/runtimes/claude-managed-agent/python-managed-agent-package/`: full runnable Python reference package with preview SDK requirements, live Managed Agents session runtime, evaluator, GEPA optimizer, CLI smoke command, and evidence-ledger writer.
 
 ## Review Questions
 

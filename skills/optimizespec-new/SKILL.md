@@ -59,3 +59,4 @@ For evidence expectations, read `references/core/eval-system-evidence.md`.
 For grader expectations, read `references/core/grader-contract.md`.
 For candidate boundaries, read `references/core/candidate-surface.md`.
 For ASI-first framing, read `references/core/gepa-reflection.md`.
+When the proposal identifies Claude Managed Agents as the likely runtime, name `references/runtimes/claude-managed-agent/python-managed-agent-package/` as the concrete live Python runner reference for later design and apply work.
