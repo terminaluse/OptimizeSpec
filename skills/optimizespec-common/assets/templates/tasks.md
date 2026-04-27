@@ -1,6 +1,6 @@
 ## 1. Setup
 
-- [ ] 1.1 Define eval change directory and artifact paths
+- [ ] 1.1 Define eval artifact paths and run-output path
 - [ ] 1.2 Add schemas for eval cases and candidates
 
 ## 2. Runner

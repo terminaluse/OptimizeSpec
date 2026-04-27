@@ -14,12 +14,12 @@ For live agent optimization systems, read `references/core/live-eval-runner-cont
 
 ## Command Inputs
 
-Commands should accept or clearly derive:
+Commands should use either explicit artifact paths or a single artifact directory that derives those paths. Do not include both unless the directory is used for additional metadata.
 
-- change or eval artifact directory
-- candidate path or candidate id
-- eval cases path
-- run directory
+- candidate path or candidate id, unless derived from an artifact directory
+- eval cases path, unless derived from an artifact directory
+- run directory, unless derived from an artifact directory
+- artifact directory, only when the runner derives candidate, cases, run-output paths, or metadata from it
 - max metric calls or budget
 - timeout
 - live runtime mode

@@ -8,7 +8,7 @@ Confirm the proposal's create-or-reuse decision, the path where optimization cod
 
 ## Runner Invocation
 
-Define direct eval, optimize, compare, and show-candidate commands or scripts.
+Define direct eval, optimize, compare, and show-candidate commands or scripts. Use explicit `--candidate`, `--cases`, and `--run-dir` paths, or use a single artifact-directory flag that derives those paths; avoid including both forms in the same command unless the directory is read for additional metadata.
 
 Direct eval and optimize must execute the real agent runtime unless a runtime blocker is explicitly recorded. For Claude Managed Agents, this means live Session rollouts.
 
