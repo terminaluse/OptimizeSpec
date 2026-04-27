@@ -24,7 +24,7 @@ Verify an OptimizeSpec implementation without making unrelated changes.
    - `scores`
    - field-specific ASI keys
 7. Run compare and confirm per-case and aggregate deltas.
-8. Confirm optimize evaluates candidates through live rollout scores, or explain missing live credentials/features/runtime support.
+8. Confirm optimizer wiring with the smallest useful production-equivalent smoke that proves candidates are evaluated through live rollout scores. Do not use fake, mock-only, no-credential, or placeholder tests. If credentials, permissions, tools, MCP servers, hosted runtime access, or environment configuration are missing, stop and ask the user instead of weakening the test.
 9. Confirm graders consume final output/report and trace evidence from the real runtime as the primary objective. Static prompt text can support diagnostics, but not live optimization scoring. For Claude Managed Agents, also check the runtime-specific ASI and scorer guidance.
 10. Separate system-loop readiness from agent-quality improvement claims.
 

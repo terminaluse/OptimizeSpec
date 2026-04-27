@@ -32,6 +32,7 @@ If any are missing, stop and report the blocker.
 6. Read `../optimizespec-common/references/core/reference-contracts.md`, then load the apply-phase core contracts, starting with `../optimizespec-common/references/core/live-eval-runner-contract.md`. Load runtime-specific references only for the identified runtime. For live Python Claude Managed Agents work, inspect `../optimizespec-common/references/runtimes/claude-managed-agent/python-managed-agent-package/README.md` and `../optimizespec-common/references/runtimes/claude-managed-agent/python-managed-agent-package/src/optimizespec/runtime.py` before implementing the runner.
 7. Implement tasks in order, marking each checkbox complete only after implementation and local verification.
 8. Use bundled runtime references when they match the artifact runtime. For Claude Managed Agents, adapt `../optimizespec-common/references/runtimes/claude-managed-agent/python-managed-agent-package/` as the primary runnable reference for live Managed Agents execution.
+9. After implementation and local validation, run the verify workflow by default unless the user has said not to run live or expensive commands. Do not run the full optimize loop during apply. If verification passes, ask whether the user wants to run the full optimize loop.
 
 ## Test Authenticity
 
