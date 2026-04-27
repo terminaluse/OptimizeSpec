@@ -36,7 +36,7 @@ Now create or update your optimization system with the skills:
 
 ```text
 /optimizespec-new
-Create a change named improve-agent-output that improves the agent's answer quality on support triage tasks.
+Create an optimization system to improve the agent in this folder
 ```
 
 Continue until all the spec artifacts are generated:
