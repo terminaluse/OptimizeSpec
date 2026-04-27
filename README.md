@@ -88,12 +88,13 @@ The proposal records where the durable optimization-system code will live:
 
 - Decision: create new folder|use existing folder
 - Path: <repo-relative path>
+- Import/runtime access plan: <how generated code imports or invokes the real agent modules>
 ```
 
 `$optimizespec-apply <change-name>` writes runner, scorer, optimizer, adapter, and evidence code to that recorded path.
 
 > [!NOTE]
-> Choose the path based on your repo's structure. The optimization system should live where it can call into the real agent, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter, so optimization runs evaluate the same integrations your production agent uses.
+> Choose the path based on your repo's structure. The optimization system should live where it can import or invoke the real agent, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter, so optimization runs evaluate the same integrations your production agent uses.
 
 ### What a Run Produces
 

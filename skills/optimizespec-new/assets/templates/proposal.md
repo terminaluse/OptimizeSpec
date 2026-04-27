@@ -11,6 +11,7 @@
 - Decision: create new folder|use existing folder
 - Path:
 - Why this path fits the repo:
+- Import/runtime access plan:
 - Existing agent code to reuse:
 - Existing tools, skills, MCP servers, env vars, or permissions to reuse:
 - Run outputs path:

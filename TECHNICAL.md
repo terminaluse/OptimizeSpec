@@ -51,7 +51,7 @@ $optimizespec-apply <change-name>
 
 That skill writes files to the optimization-system path recorded in the proposal's `Optimization System Location` section.
 
-Generated code is deliberately local to the project being improved. The optimization system should import or adapt the project's real agent factory, tools, environment configuration, and command conventions through a narrow adapter, so projects keep their own runtime, language, and dependency choices.
+Generated code is deliberately local to the project being improved. The optimization system should import or adapt the project's real agent factory, tools, environment configuration, and command conventions through a narrow adapter, so projects keep their own runtime, language, and dependency choices. The recorded location is valid only when the proposal also explains how code there can import or invoke the production modules.
 
 ## Artifact Layout
 
@@ -65,7 +65,7 @@ optimizespec/changes/<change-name>/
   tasks.md
 ```
 
-`proposal.md` must include an `Optimization System Location` section with a create-or-reuse decision, the repo-relative path where implementation code will live, why that path fits the repo, and which existing agent code/dependencies the system will reuse.
+`proposal.md` must include an `Optimization System Location` section with a create-or-reuse decision, the repo-relative path where implementation code will live, why that path fits the repo, how code in that location will import or invoke the production agent modules, and which existing agent code/dependencies the system will reuse.
 
 Specs use OpenSpec-style requirement blocks:
 

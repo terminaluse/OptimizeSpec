@@ -10,6 +10,8 @@ Represent mutable candidate state as structured fields or files with stable iden
 
 Reuse the project's existing agent factories, tool wiring, environment setup, session or request execution, event streaming, output collection, and cleanup conventions. Prefer the existing runtime path when the project has one.
 
+The optimization-system location is valid only when code there can import or invoke the production agent through the project's normal package boundary. Record the command root and module/import strategy explicitly. If a standalone `optimizespec/systems/...` folder would need ad hoc import hacks, choose an existing eval/test/package-adjacent folder or define a project-supported command that makes the modules importable.
+
 ## Evaluator Shape
 
 Each rollout should return a numeric score plus Actionable Side Information. Failed rollouts still need scored failure records, captured errors, and enough context for the optimizer or reviewer to understand the failure.

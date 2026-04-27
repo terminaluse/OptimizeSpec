@@ -18,7 +18,7 @@ Every runner invocation must accept or derive:
 - Credential and environment configuration, including required env vars, runtime beta/header settings, tool permissions, resource paths, and source fixture paths.
 - Adapter configuration that tells the runner how to create or update the real agent, mount resources, send input, collect final output, and clean up runtime resources.
 
-Path resolution must be explicit. Runners should work from the repo root, the optimization-system folder, and CI by resolving candidate paths, eval-case paths, source fixtures, run outputs, credentials, and environment configuration from a known project root or explicit flags.
+Path and import resolution must be explicit. Runners should work from the repo root, the optimization-system folder, and CI by resolving candidate paths, eval-case paths, source fixtures, run outputs, credentials, and environment configuration from a known project root or explicit flags. The chosen optimization-system location must also include a concrete import/runtime access plan, such as running through the repo's package command, installing the project in editable mode, using the workspace's module resolution, or documenting the required module path.
 
 ## Rollout Record
 
