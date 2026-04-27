@@ -29,6 +29,8 @@ Commands should use either explicit artifact paths or a single artifact director
 
 Each operation should print a concise structured summary and write durable files. Outputs must identify the run directory, candidate ids, aggregate result, failures, live credential/runtime blockers, and next inspection path.
 
+Long-running commands must expose progress while they run, preferably through both human-readable stdout progress and a durable progress or events file under the run directory.
+
 ## Rollout Lifecycle
 
 A rollout is one candidate on one eval case. It loads the candidate, compiles mutable fields into runtime behavior, invokes the real agent, captures final output or report plus runtime evidence, scores the result, builds ASI, writes per-case files, and cleans up or records cleanup warnings.
