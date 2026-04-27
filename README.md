@@ -60,13 +60,17 @@ OptimizeSpec skills include contracts for building optimization systems for agen
 
 The core contracts are runtime-neutral. The skills include a reference system for Python Claude Managed Agents, and contributions for other hosted agent runtimes and languages are welcome.
 
-### How the Self-Improvement Works
+<details>
+<summary> How Optimization Works</summary>
 
-The generated self-improvement system uses GEPA's Optimize Anything API as the optimization engine. OptimizeSpec defines the eval runner, scorer, candidate surface, ASI feedback, and evidence ledger; GEPA uses those pieces to evaluate candidates, reflect on live failures, propose mutations, and select better candidates.
+The generated optimization system uses GEPA's Optimize Anything API as the optimization engine. OptimizeSpec defines the eval runner, scorer, candidate surface, ASI feedback, and evidence ledger; GEPA uses those pieces to evaluate candidates, reflect on live failures, propose mutations, and select better candidates.
 
 GEPA is a reflective evolutionary optimizer: it improves text-representable candidates by combining scores, traces, feedback, and Pareto-efficient search. Read [How GEPA Works](https://mintlify.wiki/gepa-ai/gepa/concepts/how-it-works) for the underlying optimization loop.
 
-### What Spec Artifacts Get Created
+</details>
+
+<details>
+<summary> What Spec Artifacts Get Created </summary>
 
 OptimizeSpec keeps planning artifacts in one root folder:
 
@@ -93,13 +97,19 @@ The proposal records where the optimization-system code will live and where run 
 
 > [!NOTE]
 > Choose the path based on your repo's structure. The executable optimization system should usually live in an existing eval, test, tooling, or agent package-adjacent folder, where it can import or invoke the real agent, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter.
-### What a Run Produces
+
+</details>
+
+<details>
+<summary>What a Run Produces</summary>
 
 An optimizer run outputs:
 
 - `optimizer-summary.json` records the selected candidate, score summary, per-case live scores, budgets, and artifact paths.
 - `candidates.json` records every candidate with stable candidate IDs so scores can be traced back to prompts or other candidate surfaces.
 - `rollout.json`, `score.json`, and `side_info.json` capture per-case execution evidence, grader output, feedback, errors, and ASI inputs.
+
+</details>
 
 ## Learn More
 
