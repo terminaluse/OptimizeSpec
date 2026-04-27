@@ -5,7 +5,6 @@ from difflib import unified_diff
 import json
 from pathlib import Path
 from statistics import mean
-import time
 from typing import Any, Callable, Literal, Protocol
 
 import gepa.optimize_anything as oa
@@ -40,12 +39,19 @@ class EvalCase:
 class RolloutResult:
     case_id: str
     actual: Any | None
+    status: str = "completed"
     final_answer: str | None = None
     generated_files: dict[str, str] = field(default_factory=dict)
     trajectory: list[dict[str, Any]] = field(default_factory=list)
+    tool_activity: list[dict[str, Any]] = field(default_factory=list)
     runtime_ids: dict[str, Any] = field(default_factory=dict)
+    runtime_metadata: dict[str, Any] = field(default_factory=dict)
     usage: dict[str, int] = field(default_factory=dict)
     errors: list[str] = field(default_factory=list)
+    cleanup_warnings: list[str] = field(default_factory=list)
+    timeout_seconds: float | None = None
+    timed_out: bool = False
+    interrupted: bool = False
     started_at: float | None = None
     ended_at: float | None = None
 
@@ -205,11 +211,22 @@ def build_asi(
         "Error": rollout.errors or None,
         "Agent Trajectory": rollout.trajectory,
         "Runtime": {
+            "setup_error": "; ".join(rollout.errors) if rollout.errors and not rollout.actual else None,
             "case_id": case.case_id,
             "runtime_ids": rollout.runtime_ids,
+            "runtime_metadata": rollout.runtime_metadata,
             "usage": rollout.usage,
             "generated_files": sorted(rollout.generated_files),
             "elapsed_seconds": elapsed,
+            "timeout": {
+                "configured_seconds": rollout.timeout_seconds,
+                "timed_out": rollout.timed_out,
+                "interrupted": rollout.interrupted,
+            },
+            "cleanup": {
+                "status": "completed" if not rollout.cleanup_warnings else "partial",
+                "warnings": rollout.cleanup_warnings,
+            },
         },
         "scores": scores,
     }
@@ -252,26 +269,69 @@ def persist_rollout(
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "candidate.json").write_text(json.dumps(candidate, indent=2, sort_keys=True), encoding="utf-8")
     (out_dir / "score.json").write_text(
-        json.dumps({"score": score.score, "feedback": score.feedback, "subscores": score.subscores}, indent=2, sort_keys=True),
-        encoding="utf-8",
-    )
-    (out_dir / "side_info.json").write_text(json.dumps(side_info, indent=2, sort_keys=True), encoding="utf-8")
-    (out_dir / "rollout.json").write_text(
         json.dumps(
             {
-                "actual": rollout.actual,
-                "final_answer": rollout.final_answer,
-                "generated_files": rollout.generated_files,
-                "trajectory": rollout.trajectory,
-                "runtime_ids": rollout.runtime_ids,
-                "usage": rollout.usage,
-                "errors": rollout.errors,
+                "candidate_id": candidate_id,
+                "eval_case_id": case.case_id,
+                "score": score.score,
+                "feedback": score.feedback,
+                "subscores": score.subscores,
+                "rollout_evidence_path": "rollout.json",
+                "side_info_path": "side_info.json",
             },
             indent=2,
             sort_keys=True,
         ),
         encoding="utf-8",
     )
+    (out_dir / "side_info.json").write_text(json.dumps(side_info, indent=2, sort_keys=True), encoding="utf-8")
+    (out_dir / "rollout.json").write_text(
+        json.dumps(build_runtime_neutral_rollout_record(candidate_id, case, rollout), indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+
+
+def build_runtime_neutral_rollout_record(
+    candidate_id: str,
+    case: EvalCase,
+    rollout: RolloutResult,
+) -> dict[str, Any]:
+    cleanup_warnings = list(rollout.cleanup_warnings)
+    return {
+        "candidate_id": candidate_id,
+        "eval_case_id": case.case_id,
+        "status": rollout.status if not rollout.timed_out else "timeout",
+        "final_output": rollout.actual if rollout.actual is not None else rollout.final_answer,
+        "trace_summary": rollout.trajectory,
+        "tool_activity": rollout.tool_activity,
+        "usage": rollout.usage,
+        "errors": rollout.errors,
+        "timeout": {
+            "configured_seconds": rollout.timeout_seconds,
+            "timed_out": rollout.timed_out,
+            "interrupted": rollout.interrupted,
+        },
+        "cleanup": {
+            "status": "completed" if not cleanup_warnings else "partial",
+            "warnings": cleanup_warnings,
+        },
+        "timestamps": {
+            "started_at": rollout.started_at,
+            "ended_at": rollout.ended_at,
+        },
+        "score_inputs": {
+            "expected_output": case.expected if case.expected is not None else case.expected_shape,
+            "final_output_ref": "rollout.json#final_output",
+            "trace_ref": "rollout.json#trace_summary",
+            "runtime_metadata_ref": "rollout.json#runtime_metadata",
+            "side_info_ref": "side_info.json",
+        },
+        "runtime_metadata": {
+            "runtime_ids": rollout.runtime_ids,
+            "generated_files": rollout.generated_files,
+            **rollout.runtime_metadata,
+        },
+    }
 
 
 def evaluate_candidate(
@@ -488,29 +548,3 @@ def stable_candidate_id(candidate: dict[str, str]) -> str:
 
     payload = json.dumps(candidate, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
-
-
-class TemplateEchoExecutor:
-    """Small fixture executor used by tests and generated smoke examples."""
-
-    def run(self, candidate: dict[str, str], case: EvalCase, *, timeout_seconds: float) -> RolloutResult:
-        started = time.monotonic()
-        template = candidate.get("answer_template", "{input}")
-        try:
-            actual = template.format(input=case.input, expected=case.expected)
-            errors: list[str] = []
-        except Exception as exc:
-            actual = None
-            errors = [str(exc)]
-        ended = time.monotonic()
-        return RolloutResult(
-            case_id=case.case_id,
-            actual=actual,
-            final_answer=str(actual) if actual is not None else None,
-            trajectory=[{"action": "render_template", "template": template, "input": case.input, "output": actual}],
-            runtime_ids={"executor": "template-echo"},
-            usage={"input_tokens": len(str(case.input).split()), "output_tokens": len(str(actual).split()) if actual else 0},
-            errors=errors,
-            started_at=started,
-            ended_at=ended,
-        )

@@ -1,6 +1,6 @@
 ---
 name: optimizespec-apply
-description: Apply a completed OptimizeSpec self-improvement plan to a supported agent repository. Use when the user asks to implement eval cases, rollouts, scorers, ASI, direct eval, compare, or GEPA optimization from completed artifacts. V1 apply support targets Claude Managed Agents.
+description: Apply a completed OptimizeSpec self-improvement plan to an agent repository. Use when the user asks to implement eval cases, rollouts, scorers, ASI, direct eval, compare, or GEPA optimization from completed artifacts. Includes a concrete Python Claude Managed Agents reference, while the core contracts are runtime-neutral.
 ---
 
 # OptimizeSpec Apply
@@ -27,11 +27,11 @@ If any are missing, stop and report the blocker.
    - command/CLI conventions
    - test conventions
 3. Read the proposal's `Optimization System Location` section and write implementation code only in the recorded folder. If the section is missing or the path is unresolved, stop and ask for the proposal/design to be updated before editing code.
-4. Verify the recorded folder decision still matches the repo. Reuse an existing folder only if the proposal says to; otherwise create the proposed folder. Do not choose a different location during apply without updating the artifact.
-5. Verify the artifacts and repo identify a supported runtime. V1 supports Claude Managed Agents only. If runtime is unsupported or ambiguous, stop and record the blocker instead of creating a parallel runtime path.
-6. Read `references/core/reference-contracts.md`, then load the apply-phase core contracts and the `references/runtimes/claude-managed-agent/` runtime contracts. For live Python Claude Managed Agents work, inspect `references/runtimes/claude-managed-agent/python-managed-agent-package/README.md` and `references/runtimes/claude-managed-agent/python-managed-agent-package/src/optimizespec/runtime.py` before implementing the runner.
+4. Verify the recorded folder decision still matches the repo. Reuse an existing folder only if the proposal says to; otherwise create the proposed folder. A different location requires updating the artifact first.
+5. Verify the artifacts and repo identify the target runtime or clearly record runtime unknowns. If no bundled runtime reference exists, continue from the core contracts and record the production adapter assumptions for the target runtime.
+6. Read `references/core/reference-contracts.md`, then load the apply-phase core contracts, starting with `references/core/live-eval-runner-contract.md`. Load runtime-specific references only for the identified runtime. For live Python Claude Managed Agents work, inspect `references/runtimes/claude-managed-agent/python-managed-agent-package/README.md` and `references/runtimes/claude-managed-agent/python-managed-agent-package/src/optimizespec/runtime.py` before implementing the runner.
 7. Implement tasks in order, marking each checkbox complete only after implementation and local verification.
-8. Adapt `references/runtimes/claude-managed-agent/python-managed-agent-package/` as the primary runnable reference for live Managed Agents execution. Use `assets/python_runner/agent_self_improve.py` only when a smaller portable runner template is more appropriate.
+8. Use bundled runtime references when they match the artifact runtime. For Claude Managed Agents, adapt `references/runtimes/claude-managed-agent/python-managed-agent-package/` as the primary runnable reference for live Managed Agents execution.
 
 ## Implementation Contract
 
@@ -42,20 +42,25 @@ The applied system must expose operations equivalent to:
 - compare
 - show candidate
 
-The rollout executor must produce score plus ASI for every candidate/eval-case pair. The applied system must persist a durable evidence ledger with run manifest, candidate registry, per-case scores, judge records when present, ASI, rollout records, comparison records, optimizer lineage, leaderboard, and promotion or no-promotion decision. Read:
+The rollout executor must run the real agent runtime for live eval cases and produce score plus ASI for every candidate/eval-case pair. The applied system must persist a durable evidence ledger with run manifest, candidate registry, runtime-neutral rollout records, per-case scores, judge records when present, ASI, comparison records, optimizer lineage, leaderboard, selected best candidate, and optional promotion or no-promotion evidence. Read:
 
+- `references/core/live-eval-runner-contract.md`
 - `references/core/eval-system-evidence.md`
 - `references/core/runner-contract.md`
 - `references/core/grader-contract.md`
 - `references/core/asi-contract.md`
 - `references/core/candidate-surface.md`
 - `references/core/optimizer-contract.md`
-- `references/runtimes/claude-managed-agent/managed-agents-runtime-contract.md`
 - `references/core/verification-contract.md`
+- `references/core/repo-patterns.md`
+
+For Claude Managed Agents, also read:
+
+- `references/runtimes/claude-managed-agent/managed-agents-runtime-contract.md`
 - `references/runtimes/claude-managed-agent/managed-agents-runner.md`
 - `references/runtimes/claude-managed-agent/scorers-and-asi.md`
 - `references/runtimes/claude-managed-agent/python-managed-agent-package/`
-- `references/core/repo-patterns.md`
 
-Never create a parallel runtime path if the repo already has a factory or session runner that can be reused.
-The optimization system should import or adapt the target repo's real agent factory, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter rather than copying them into a forked agent implementation.
+Use the target repo's existing factory or session runner when available.
+The optimization system should import or adapt the target repo's real agent factory, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter so live evals use production-equivalent integrations.
+The core optimization loop is live eval only: static prompt scoring, fixture execution, dry-run evaluation, preflight/readiness tiers, and promotion decisions are not alternate eval modes. Runtime setup failures must be separated from candidate-quality feedback, and best-candidate selection must come from live rollout scores.

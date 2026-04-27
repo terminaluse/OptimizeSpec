@@ -1,6 +1,6 @@
 # Workflow Reference
 
-Use OpenSpec as product motivation: lightweight repo-local artifacts, iterative planning, readable Markdown contracts, and an apply step that turns approved artifacts into implementation. Do not copy OpenSpec feature-for-feature.
+Use OpenSpec as product motivation: lightweight repo-local artifacts, iterative planning, readable Markdown contracts, and an apply step that turns approved artifacts into implementation. OptimizeSpec keeps those ideas focused on agent self-improvement loops.
 
 ## Default Directory
 

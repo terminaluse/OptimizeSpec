@@ -38,7 +38,7 @@ The layout can be adapted to the agent project, but the same records must remain
 
 ## Evidence Boundaries
 
-System-loop evidence proves the machinery ran: commands executed, files were written, scorers returned, and optimizer calls completed. Agent-quality evidence proves the agent improved on user-meaningful criteria. Do not claim agent improvement from system-loop success alone.
+System-loop evidence proves the machinery ran: commands executed, files were written, scorers returned, and optimizer calls completed. Agent-quality evidence proves the agent improved on user-meaningful criteria. System-loop success alone supports readiness, not improvement claims.
 
 ## Review Checklist
 

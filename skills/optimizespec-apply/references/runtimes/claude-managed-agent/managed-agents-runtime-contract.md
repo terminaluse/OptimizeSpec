@@ -1,6 +1,6 @@
-# Managed Agents Runtime Contract
+# Managed Agents Runtime Reference
 
-Claude Managed Agents are the only supported v1 apply runtime. If the agent project does not use Claude Managed Agents, record the blocker and do not implement a parallel runtime path.
+This is the included runtime reference for projects that use Claude Managed Agents. It is an implementation guide for the runtime-neutral contracts. If the agent project uses another hosted runtime or language, apply `references/core/live-eval-runner-contract.md` and the other core contracts to that runtime, then record the adapter assumptions and any missing runtime-specific reference coverage.
 
 ## SDK and Headers
 
@@ -23,7 +23,17 @@ Reuse existing factories and session runners when available.
 
 ## Rollout Records
 
-Each live rollout should record Agent id and version, Environment id, Session id, input attachment method, event summary, tool calls, generated files, usage, errors, timeouts, and cleanup or archive warnings.
+Each live rollout must follow `references/core/live-eval-runner-contract.md`: runtime-neutral top-level fields and Claude-specific details under `runtime_metadata`.
+
+Top-level rollout fields include candidate id, eval case id, status, final output or report, trace summary, tool activity, usage, errors, timeout status, cleanup status, timestamps, and score input references.
+
+Claude-specific runtime metadata includes Agent id and version, Environment id, Session id and status, input attachment method, event types, beta/header assumptions, mounted files/resources, generated file ids, resolved skills, callable agents, archive attempts, cleanup warnings, and preview SDK details.
+
+The grader must consume live final outputs/reports and trace evidence. Prompt text coverage, fixture execution, and dry-run output are outside Managed Agents eval modes.
+
+## Lifecycle Helpers
+
+Managed Agents runners should handle stream draining, bounded settle polling after idle, timeout/interrupt, output retrieval, session archive retries, Agent/Environment cleanup, and cleanup-warning recording. If credentials, preview SDK surfaces, permissions, or environment config are missing, fail clearly and clean up any live resources that were created.
 
 ## Preview Caveats
 

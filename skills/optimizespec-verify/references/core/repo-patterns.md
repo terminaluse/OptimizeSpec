@@ -1,6 +1,6 @@
 # Agent Project Patterns
 
-Use these patterns when adapting OptimizeSpec to an agent project. They are intentionally described here instead of linking to files outside this installed skill folder.
+Use these patterns when adapting OptimizeSpec to an agent project. They are included here so each installed skill folder has the context it needs.
 
 ## Candidate Surface
 
@@ -8,7 +8,7 @@ Represent mutable candidate state as structured fields or files with stable iden
 
 ## Runtime Integration
 
-Reuse the project's existing agent factories, tool wiring, environment setup, session or request execution, event streaming, output collection, and cleanup conventions. Do not create a parallel runtime path when the project already has one.
+Reuse the project's existing agent factories, tool wiring, environment setup, session or request execution, event streaming, output collection, and cleanup conventions. Prefer the existing runtime path when the project has one.
 
 ## Evaluator Shape
 
@@ -20,4 +20,4 @@ Keep train and validation cases separate. Record optimizer inputs, candidate mut
 
 ## Adaptation Rule
 
-Use these as reference patterns. Do not blindly copy the package layout into agent projects. Reuse each project's existing factories, commands, test conventions, and dependency management.
+Adapt these patterns to the target project's factories, commands, test conventions, and dependency management.

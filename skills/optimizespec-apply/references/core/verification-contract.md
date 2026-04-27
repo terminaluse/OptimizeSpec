@@ -2,9 +2,9 @@
 
 Verification decides whether an OptimizeSpec system is ready to use. It must inspect emitted evidence, not only command exit codes or printed aggregate scores.
 
-## Deterministic Smoke
+## Live Smoke
 
-Run local checks that require no live Anthropic credentials. A deterministic smoke should verify:
+Verification requires live credentials and runtime access for the inferred agent runtime. Run the smallest useful live smoke and verify:
 
 - required commands can be invoked
 - run manifest exists
@@ -15,13 +15,11 @@ Run local checks that require no live Anthropic credentials. A deterministic smo
 - promotion or no-promotion decision exists
 - verification output states residual risks
 
-## Live Smoke
-
-When live credentials and runtime access are available, run the smallest useful live smoke for the inferred runtime. Inspect run manifest, rollout records, per-case scores, judge output when present, ASI, optimizer lineage, and promotion decision before reporting readiness.
+Live verification evidence must come from the real runtime. Local fixture, dry-run, static prompt, template-output, or no-credential checks can support readiness diagnostics, but they do not replace live optimization evidence.
 
 ## Readiness Reporting
 
-Report system-loop readiness separately from agent-quality improvement. If only deterministic machinery checks ran, say that live agent-quality evidence is still pending. If evidence is missing, verification fails even when commands returned zero.
+Report readiness only from live evidence. If credentials or runtime access are missing, verification fails with a runtime blocker. If evidence is missing, verification fails even when commands returned zero.
 
 ## Failure Report
 

@@ -10,6 +10,8 @@ Confirm the proposal's create-or-reuse decision, the path where optimization cod
 
 Define direct eval, optimize, compare, and show-candidate commands or scripts.
 
+Direct eval and optimize must execute the real agent runtime unless a runtime blocker is explicitly recorded. For Claude Managed Agents, this means live Session rollouts.
+
 ## Contract References
 
 List the reference contracts used for runner, evidence, grader, ASI, candidate surface, optimizer, runtime, and verification decisions.
@@ -33,7 +35,7 @@ Describe one candidate x eval case execution from input preparation to cleanup.
 
 ## Runtime-Specific Plan
 
-Name the runtime contracts used for this design. For Claude Managed Agents, include Agent, Environment, Session, resources, event streaming or polling, tools, skills, MCP servers, permissions, and cleanup behavior. For unsupported runtimes, record the v1 implementation blocker.
+Name the core contracts and any runtime references used for this design. For Claude Managed Agents, include Agent, Environment, Session, resources, event streaming or polling, tools, skills, MCP servers, permissions, and cleanup behavior. For runtimes without a bundled reference, record the adapter assumptions, production integrations to reuse, and missing runtime-specific reference coverage.
 
 ## Trace Capture
 
@@ -41,7 +43,7 @@ List outputs, event summaries, tool calls, usage, runtime IDs, generated files, 
 
 ## Evidence Ledger
 
-Define the run directory, manifest, candidate registry, evaluation summary, per-case score records, judge records, ASI records, rollout records, comparison records, optimizer records, and promotion decision. Explain how reviewers inspect missing or failed evidence.
+Define the run directory, manifest, candidate registry, evaluation summary, per-case score records, judge records, ASI records, rollout records, comparison records, optimizer records, best-candidate evidence, and any optional promotion decision. Explain how reviewers inspect missing or failed evidence.
 
 ## Scoring and ASI
 
@@ -61,21 +63,22 @@ Define train/val split, objective, background, reflection model, component selec
 
 ## Optimizer Lineage
 
-Define candidate ids, parent ids, mutation summaries, leaderboard records, optimizer event logs, selected candidate, rejected candidates, and rollback path.
+Define candidate ids, parent ids, mutation summaries, live-score leaderboard records, optimizer event logs, selected candidate, rejected candidates, budgets, evidence locations, and rollback path.
 
 ## Optimizer Acceptance
 
 - Optimized metric:
 - Diagnostic metrics:
 - Guardrail metrics:
-- Promotion rule:
+- Best-candidate selection rule:
+- Optional promotion or release rule:
 - Regression tolerance:
 - Required evidence:
 
 ## Verification Plan
 
-Define deterministic smoke checks, runtime-specific live checks if credentials are available, emitted evidence inspection, and readiness reporting.
+Define live runtime checks, emitted evidence inspection, runtime blocker behavior when credentials are missing, and readiness reporting.
 
 ## Risks and Blockers
 
-Include unsupported runtime or missing credential concerns.
+Include missing runtime reference, missing credential, or missing production-integration concerns.

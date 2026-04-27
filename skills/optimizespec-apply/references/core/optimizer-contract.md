@@ -23,4 +23,4 @@ Promotion requires a recorded decision. The decision must cite compared candidat
 
 ## Budget and Safety
 
-Record metric-call budget, timeout, reflection model, component selector, and any live-credential requirement. Do not spend live budget unless the user or environment explicitly enables it.
+Record metric-call budget, timeout, reflection model, component selector, and any live-credential requirement. Spend live budget only when the user or environment explicitly enables it.

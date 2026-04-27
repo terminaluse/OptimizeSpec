@@ -1,6 +1,6 @@
 # Criteria-First Evals
 
-Criteria-first does not mean more user-facing steps. It means the agent does more eval-design work inside the proposal and design stages.
+Criteria-first keeps the user workflow short while moving more eval-design work into the proposal and design stages.
 
 ## Lightweight Intake
 
@@ -12,7 +12,7 @@ Ask for plain-language intent and examples. If details are missing, ask at most 
 - What would make an answer clearly bad?
 - Which concerns matter most: correctness, formatting, safety, cost, speed, or tool use?
 
-Then draft the eval contract and ask the user to confirm or correct it. Do not make the user fill out primary metrics, diagnostics, guardrails, task distribution, grader calibration, and promotion rules from scratch.
+Then draft the eval contract and ask the user to confirm or correct it. Give the user a concrete draft of the inferred metrics, diagnostics, guardrails, task distribution, grader calibration, and promotion rules.
 
 Keep the first proposal concise. Use short bullets, include only the examples needed to confirm the eval direction, and defer deeper runner mechanics, calibration details, and implementation design to `design.md`. The proposal is a confirmation artifact, not the full technical plan.
 
@@ -28,7 +28,7 @@ Every proposal should identify:
 - non-goals
 - blind spots
 
-If the user has not supplied these, infer a draft and list unknowns. Do not silently turn vague intent into a runnable optimization plan.
+If the user has not supplied these, infer a draft and list unknowns before turning vague intent into a runnable optimization plan.
 
 ## Eval Categories
 

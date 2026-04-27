@@ -27,7 +27,8 @@ Describe the behavior GEPA should improve and why it matters.
 - Guardrails:
 - Acceptable threshold:
 - Good threshold:
-- Promotion threshold:
+- Best-candidate threshold:
+- Optional promotion threshold:
 - Non-goals:
 - Blind spots:
 
@@ -76,7 +77,8 @@ List fields GEPA may mutate. Include only fields that can affect runtime behavio
 - Optimized metric:
 - Diagnostic metrics:
 - Guardrail metrics:
-- Promotion rule:
+- Best-candidate selection rule:
+- Optional promotion or release rule:
 - Regression tolerance:
 - Required evidence:
 
@@ -89,7 +91,8 @@ List fields GEPA may mutate. Include only fields that can affect runtime behavio
 - ASI records:
 - Rollout evidence:
 - Optimizer lineage:
-- Promotion evidence:
+- Best-candidate evidence:
+- Optional promotion evidence:
 - Unknowns:
 
 ## Contract References
@@ -105,4 +108,4 @@ List top-level ASI fields and field-specific ASI needs.
 
 ## Unknowns
 
-List missing agent, scorer, example, or runtime details to resolve in design. If runtime cannot be inferred from repo inspection, record the evidence gap instead of guessing.
+List missing agent, scorer, example, or runtime details to resolve in design. If runtime cannot be inferred from repo inspection, record the evidence gap for design follow-up.

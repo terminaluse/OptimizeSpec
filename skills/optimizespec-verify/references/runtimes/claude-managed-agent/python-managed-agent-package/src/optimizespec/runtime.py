@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime, timezone
 import os
 from pathlib import Path
 import time
@@ -30,6 +31,9 @@ PREVIEW_SDK_INSTALL_COMMAND = "uv pip install -r requirements-managed-agents-pre
 class RunArtifacts:
     candidate_id: str
     task_id: str
+    status: str
+    started_at: str
+    ended_at: str
     agent_id: str
     agent_version: int
     environment_id: str
@@ -43,6 +47,10 @@ class RunArtifacts:
     event_types: list[str]
     usage: dict[str, int]
     errors: list[str]
+    timeout_seconds: float
+    timed_out: bool
+    interrupted: bool
+    cleanup_status: str
     cleanup_warnings: list[str]
     resolved_skills: list[dict[str, Any]]
     subagents: list[dict[str, Any]]
@@ -71,6 +79,7 @@ class ManagedAgentRuntime:
         use_outcomes: bool = True,
         max_runtime_seconds: float = 45.0,
     ) -> RunArtifacts:
+        wall_started_at = _utc_now()
         suffix = f"{bundle.candidate_id}-{task.task_id}-{uuid4().hex[:8]}"
         uploaded_file = self.client.beta.files.upload(
             file=(Path(task.input_path).name, task.input_text.encode("utf-8"), "text/plain")
@@ -124,6 +133,8 @@ class ManagedAgentRuntime:
         outcome_explanation: str | None = None
         session_status: str | None = "running"
         started_at = time.monotonic()
+        timed_out = False
+        interrupted = False
         outcome_evaluation_in_progress = False
 
         with self.client.beta.sessions.events.stream(session_id=session.id, betas=STREAM_BETAS) as stream:
@@ -135,6 +146,8 @@ class ManagedAgentRuntime:
                 if time.monotonic() - started_at > max_runtime_seconds:
                     errors.append(f"session exceeded max_runtime_seconds={max_runtime_seconds}")
                     self._interrupt_session(session.id)
+                    timed_out = True
+                    interrupted = True
                     break
                 event_types.append(event.type)
                 if event.type in {"agent.tool_use", "agent.tool_result"}:
@@ -180,10 +193,15 @@ class ManagedAgentRuntime:
         self._best_effort_archive_environment(environment.id, cleanup_warnings=cleanup_warnings)
         for subagent in subagent_records:
             self._best_effort_archive_agent(subagent["id"], cleanup_warnings=cleanup_warnings)
+        cleanup_status = "completed" if not cleanup_warnings else "partial"
+        status = "timeout" if timed_out else "failed" if errors or output_text is None else "completed"
 
         return RunArtifacts(
             candidate_id=bundle.candidate_id,
             task_id=task.task_id,
+            status=status,
+            started_at=wall_started_at,
+            ended_at=_utc_now(),
             agent_id=agent.id,
             agent_version=agent.version,
             environment_id=environment.id,
@@ -197,6 +215,10 @@ class ManagedAgentRuntime:
             event_types=event_types,
             usage=usage,
             errors=errors,
+            timeout_seconds=max_runtime_seconds,
+            timed_out=timed_out,
+            interrupted=interrupted,
+            cleanup_status=cleanup_status,
             cleanup_warnings=cleanup_warnings,
             resolved_skills=root_skill_events,
             subagents=subagent_records,
@@ -586,6 +608,10 @@ def _resolve_feature_flag(explicit_value: bool | None, env_var: str) -> bool:
         return explicit_value
     raw_value = os.environ.get(env_var, "")
     return raw_value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 def _require_managed_agents_preview_sdk(client: anthropic.Anthropic) -> None:

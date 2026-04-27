@@ -31,5 +31,6 @@ cases:
           - latency_inv
           - cost_inv
         guardrail_metrics: []
-        promotion_rule: "Promote only when correctness improves or stays at 1.0 without guardrail regressions."
+        selection_rule: "Select the best candidate by live score without guardrail regressions."
+        optional_promotion_rule: "Promote only after separate release review confirms evidence completeness."
         regression_tolerance: 0.0

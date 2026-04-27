@@ -25,9 +25,11 @@
   "files": [
     "bin",
     "dist",
+    "scripts",
     "skills",
     "README.md",
     "TECHNICAL.md",
+    "DEVELOPMENT.md",
     "LICENSE"
   ],
   "scripts": {
@@ -35,6 +37,8 @@
     "dev": "bunx tsc --watch",
     "dev:cli": "bun run build && bun bin/optimizespec.js",
     "test": "bun run build && bunx vitest run",
+    "example:py:setup": "scripts/setup-python-managed-agent-example.sh",
+    "example:py:test": "scripts/test-python-managed-agent-example.sh",
     "pack:check": "npm pack --dry-run --json",
     "prepack": "bun run build",
     "prepublishOnly": "bun run test && bun run pack:check"
