@@ -20,7 +20,6 @@ done
 
 for required in \
   "$PACKAGE_DIR/pyproject.toml" \
-  "$PACKAGE_DIR/README.md" \
   "$PACKAGE_DIR/requirements-managed-agents-preview.txt" \
   "$PACKAGE_DIR/src/optimizespec/cli.py"; do
   if [[ ! -f "$required" ]]; then

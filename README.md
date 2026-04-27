@@ -1,11 +1,14 @@
 # OptimizeSpec
 
+OptimizeSpec helps you make an agent better in a measured way, even if you have never built an eval suite or optimization loop before.
+
+You start with a plain-language goal, such as "make support-triage answers more complete." The OptimizeSpec skills guide your coding agent through turning that goal into eval cases, scoring criteria, a runner that calls your real agent, and an optimization loop.
+
+You do not need to know the full system shape before you start. The skills draft the proposal, identify unknowns, ask for confirmation where needed, and then implement the eval runner, scorer, optimizer, adapter, and evidence ledger once the plan is clear.
+
 ## What You Get
 
-A self-improvement system for your agent.
-
-Other useful things:
-- A reviewable plan with proposal, design, tasks, eval criteria, and a clear definition of what can be optimized.
+- A structured workflow to work through the details of an optimization system for your agent.
 - Production-equivalent evals against your real agent runtime, tools, skills, MCP servers, environment, and permissions.
 - Traceable optimization results with candidate IDs, per-case rollouts, scores, feedback, and a selected best candidate.
 
@@ -29,7 +32,7 @@ npx skills add terminaluse/optimizespec --skill '*'
 optimizespec init
 ```
 
-1. Drive the workflow through the coding-agent skills:
+Now create or update your optimization system with the skills:
 
 ```text
 /optimizespec-new
@@ -56,9 +59,9 @@ The apply skill runs verification as part of implementation. If you correct the 
 
 ## How OptimizeSpec Works
 
-OptimizeSpec includes contracts for building self-improvement systems in the skills. Your coding agent uses those contracts to implement the runner, scorer, optimizer, adapter, evidence ledger, candidate registry, and verification flow for your agent.
+OptimizeSpec skills include contracts for building optimization system. Your coding agent uses those contracts to implement the runner, scorer, optimizer, adapter, evidence ledger, candidate registry, and verification flow for your agent.
 
-The core contracts are runtime-neutral. The skill pack includes a reference self-improvement system for Python Claude Managed Agents, and contributions for other hosted agent runtimes and languages are welcome.
+The core contracts are runtime-neutral. The skills includes a reference system for Python Claude Managed Agents, and contributions for other hosted agent runtimes and languages are welcome.
 
 ### How the Self-Improvement Works
 
@@ -102,16 +105,16 @@ An optimizer run outputs:
 
 ## Learn More
 
-- [Contract references](skills/optimizespec-common/references/core/reference-contracts.md) for runner, grader, ASI, candidate, optimizer, runtime, evidence, and verification contracts.
+- [Contract references](skills/optimizespec-common/references/core/reference-contracts.md) for runner, grader, candidate, optimizer, and runtime contracts.
 - [TECHNICAL.md](TECHNICAL.md) for architecture, package boundaries, and release notes.
 - [How GEPA Works](https://mintlify.wiki/gepa-ai/gepa/concepts/how-it-works) for GEPA's reflective evolutionary optimization loop.
-- [DEVELOPMENT.md](DEVELOPMENT.md) for local development, package checks, and live reference test commands.
+- [DEVELOPMENT.md](DEVELOPMENT.md) for local development.
 
 ## Acknowledgements
 
-OptimizeSpec wouldn't be possible without all the great work [Lakshya](https://x.com/LakshyAAAgrawal) has done on GEPA.
-Further, OptimizeSpec's spec-driven development approach is strongly inspired by [OpenSpec](https://github.com/Fission-AI/OpenSpec) (we highly recommend it; this repo was build using OpenSpec)
+OptimizeSpec is only possible due to all the great work [Lakshya](https://x.com/LakshyAAAgrawal) has done on GEPA.
 
+OptimizeSpec's spec-driven development approach is strongly inspired by [OpenSpec](https://github.com/Fission-AI/OpenSpec) (we highly recommend it; this repo was build using OpenSpec)
 
 ## License
 
