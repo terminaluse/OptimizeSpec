@@ -9,13 +9,13 @@
     "optimization",
     "cli"
   ],
-  "homepage": "https://github.com/terminal-use/OptimizeSpec#readme",
+  "homepage": "https://github.com/terminaluse/OptimizeSpec#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/terminal-use/OptimizeSpec.git"
+    "url": "git+https://github.com/terminaluse/OptimizeSpec.git"
   },
   "bugs": {
-    "url": "https://github.com/terminal-use/OptimizeSpec/issues"
+    "url": "https://github.com/terminaluse/OptimizeSpec/issues"
   },
   "license": "MIT",
   "type": "module",
