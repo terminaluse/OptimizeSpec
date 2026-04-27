@@ -81,21 +81,21 @@ optimizespec/changes/<change-name>/
   tasks.md
 ```
 
-The proposal records where the durable optimization-system code will live:
+The proposal records where the optimization-system code will live and where run evidence will be written:
 
 ```text
 ## Optimization System Location
 
 - Decision: create new folder|use existing folder
-- Path: <repo-relative path>
+- Path: <repo-relative eval, tooling, or package-adjacent path>
 - Import/runtime access plan: <how generated code imports or invokes the real agent modules>
+- Run outputs path: runs/
 ```
 
-`$optimizespec-apply <change-name>` writes runner, scorer, optimizer, adapter, and evidence code to that recorded path.
+`$optimizespec-apply <change-name>` writes runner, scorer, optimizer, adapter, and evidence-ledger code to the recorded executable path.
 
 > [!NOTE]
-> Choose the path based on your repo's structure. The optimization system should live where it can import or invoke the real agent, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter, so optimization runs evaluate the same integrations your production agent uses.
-
+> Choose the path based on your repo's structure. The executable optimization system should usually live in an existing eval, test, tooling, or agent package-adjacent folder, where it can import or invoke the real agent, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter.
 ### What a Run Produces
 
 An optimizer run outputs:

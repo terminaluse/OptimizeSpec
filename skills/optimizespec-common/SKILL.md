@@ -36,7 +36,7 @@ Keep loading progressive: use only the references needed for the current phase, 
 - `references/runtimes/claude-managed-agent/managed-agents-runner.md`: Claude Managed Agents rollout lifecycle.
 - `references/runtimes/claude-managed-agent/scorers-and-asi.md`: scorer templates and ASI shape.
 - `references/runtimes/claude-managed-agent/python-managed-agent-package/`: full runnable Python Managed Agents reference package with preview SDK requirements, live session runtime, evaluator, GEPA optimizer, CLI smoke command, and evidence-ledger writer.
-- `references/core/repo-patterns.md`: local `optimizespec` prototype patterns to adapt.
+- `references/core/repo-patterns.md`: repo adaptation patterns for production-equivalent optimization systems.
 
 ## Assets
 

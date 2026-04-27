@@ -51,7 +51,7 @@ $optimizespec-apply <change-name>
 
 That skill writes files to the optimization-system path recorded in the proposal's `Optimization System Location` section.
 
-Generated code is deliberately local to the project being improved. The optimization system should import or adapt the project's real agent factory, tools, environment configuration, and command conventions through a narrow adapter, so projects keep their own runtime, language, and dependency choices. The recorded location is valid only when the proposal also explains how code there can import or invoke the production modules.
+Generated code is deliberately local to the project being improved. The optimization system should live in the project's normal executable surface, such as an existing eval, test, tooling, or agent package-adjacent folder, and import or adapt the project's real agent factory, tools, environment configuration, and command conventions through a narrow adapter. The recorded location is valid only when the proposal also explains how code there can import or invoke the production modules.
 
 ## Artifact Layout
 
@@ -88,7 +88,7 @@ The skill pack remains repo-local and packageable:
 - `skills/optimizespec-verify`
 - `skills/optimizespec-common`
 
-Shared contracts originate under `skills/optimizespec-common/references/`, and phase skills vendor the references they need so each installed skill folder is self-contained. Runtime-neutral contracts live under `references/core/`; runtime-specific contracts live under `references/runtimes/<runtime-id>/`. The bundled concrete runtime reference is Python Claude Managed Agents under `references/runtimes/claude-managed-agent/`, while the core proposal, live eval runner, evidence, grader, ASI, candidate, optimizer, runner, and verification contracts stay runtime-neutral for other hosted agent runtimes and implementation languages.
+Shared contracts live under `skills/optimizespec-common/references/`. Phase skills load those sibling references instead of carrying duplicate copies, so install the skill pack together with `--skill '*'`. Runtime-neutral contracts live under `references/core/`; runtime-specific contracts live under `references/runtimes/<runtime-id>/`. The bundled concrete runtime reference is Python Claude Managed Agents under `references/runtimes/claude-managed-agent/`, while the core proposal, live eval runner, evidence, grader, ASI, candidate, optimizer, runner, and verification contracts stay runtime-neutral for other hosted agent runtimes and implementation languages.
 
 The most important contract is the evidence ledger: applied systems should persist run manifest, candidate registry, per-case scores, judge records when present, ASI, rollout records, comparison records, optimizer lineage, and promotion decisions.
 

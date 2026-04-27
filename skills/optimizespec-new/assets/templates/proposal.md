@@ -9,12 +9,12 @@
 ## Optimization System Location
 
 - Decision: create new folder|use existing folder
-- Path:
+- Path: <repo-relative eval, tooling, or package-adjacent executable code path>
 - Why this path fits the repo:
 - Import/runtime access plan:
 - Existing agent code to reuse:
 - Existing tools, skills, MCP servers, env vars, or permissions to reuse:
-- Run outputs path:
+- Run outputs path: `/runs`
 
 ## Improvement Target
 

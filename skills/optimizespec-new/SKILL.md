@@ -14,11 +14,11 @@ optimizespec/changes/<change-name>/
 ## Workflow
 
 1. Derive or confirm a kebab-case change name.
-2. Read `references/core/reference-contracts.md`, then load only the proposal-phase core references it names: criteria-first, candidate surface, grader, evidence, and live eval runner. Load runtime-specific references only when repo evidence identifies the target runtime.
+2. Read `../optimizespec-common/references/core/reference-contracts.md`, then load only the proposal-phase core references it names: criteria-first, candidate surface, grader, evidence, and live eval runner. Load runtime-specific references only when repo evidence identifies the target runtime.
 3. Create `optimizespec/changes/<change-name>/proposal.md`.
 4. Use `assets/templates/proposal.md` as the structure.
-5. Inspect the repository enough to identify the target agent's likely runtime, code location, dependency boundary, import/package setup, existing eval/test folders, tool wiring, environment needs, and command conventions.
-6. Keep all OptimizeSpec artifacts under the repo-root `optimizespec/changes/<change-name>/` tree. In the proposal, record where the durable optimization-system code should be created or which existing folder should be reused, and how code in that location will import or invoke the real agent modules.
+5. Inspect the repository enough to identify the target agent's likely runtime, code location, dependency boundary, import/package setup, existing eval/test/tooling folders, agent package-adjacent module options, tool wiring, environment needs, and command conventions.
+6. Keep all OptimizeSpec artifacts under the repo-root `optimizespec/changes/<change-name>/` tree. In the proposal, record where the executable optimization-system code should be created or which existing folder should be reused, and how code in that location will import or invoke the real agent modules.
 7. Capture known details without inventing missing information.
 8. Start from plain-language user intent and examples, then draft the eval design for review.
 9. If the user has not provided enough information after repo inspection, ask at most 3-5 focused questions before drafting. Prefer questions like:
@@ -38,7 +38,7 @@ optimizespec/changes/<change-name>/
 ## Required Proposal Content
 
 - Agent and inferred runtime context, including evidence, confidence, and unknowns.
-- Optimization-system location decision: create or reuse, path, rationale, import/runtime access plan, existing agent code to reuse, existing tools/skills/MCP/env/permissions to reuse, and run-output path.
+- Optimization-system location decision: create or reuse, executable code path outside the OptimizeSpec artifact tree by default, rationale, import/runtime access plan, existing agent code to reuse, existing tools/skills/MCP/env/permissions to reuse, and run-output path.
 - Behavior to improve.
 - Candidate fields GEPA may mutate, if known.
 - Success criteria: user outcome, primary criterion, secondary criteria, guardrails, thresholds, non-goals, and blind spots.
@@ -53,10 +53,10 @@ optimizespec/changes/<change-name>/
 - ASI fields needed for reflection.
 - Unknowns to resolve in design.
 
-For workflow motivation, read `references/core/workflow.md`.
-For criteria-first eval design, read `references/core/criteria-first-evals.md`.
-For evidence expectations, read `references/core/eval-system-evidence.md`.
-For grader expectations, read `references/core/grader-contract.md`.
-For candidate boundaries, read `references/core/candidate-surface.md`.
-For ASI-first framing, read `references/core/gepa-reflection.md`.
-Name `references/core/live-eval-runner-contract.md` as the contract source of truth for live optimization. When the proposal identifies Claude Managed Agents as the likely runtime, also name `references/runtimes/claude-managed-agent/python-managed-agent-package/` as the concrete live Python runner implementation reference for later design and apply work. For other runtimes, record the missing runtime-specific reference coverage and the production adapter assumptions. The primary optimizer objective should be live rollout scoring.
+For workflow motivation, read `../optimizespec-common/references/core/workflow.md`.
+For criteria-first eval design, read `../optimizespec-common/references/core/criteria-first-evals.md`.
+For evidence expectations, read `../optimizespec-common/references/core/eval-system-evidence.md`.
+For grader expectations, read `../optimizespec-common/references/core/grader-contract.md`.
+For candidate boundaries, read `../optimizespec-common/references/core/candidate-surface.md`.
+For ASI-first framing, read `../optimizespec-common/references/core/gepa-reflection.md`.
+Name `../optimizespec-common/references/core/live-eval-runner-contract.md` as the contract source of truth for live optimization. When the proposal identifies Claude Managed Agents as the likely runtime, also name `../optimizespec-common/references/runtimes/claude-managed-agent/python-managed-agent-package/` as the concrete live Python runner implementation reference for later design and apply work. For other runtimes, record the missing runtime-specific reference coverage and the production adapter assumptions. The primary optimizer objective should be live rollout scoring.

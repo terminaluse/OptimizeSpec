@@ -26,12 +26,12 @@ If any are missing, stop and report the blocker.
    - runtime indicators, including Claude Managed Agents creation/session code when present
    - command/CLI conventions
    - test conventions
-3. Read the proposal's `Optimization System Location` section and write implementation code only in the recorded folder. If the section is missing, the path is unresolved, or the import/runtime access plan is missing, stop and ask for the proposal/design to be updated before editing code.
-4. Verify the recorded folder decision still matches the repo and that code in that folder can import or invoke the real agent modules using the repo's package setup, repo-root command, editable install, workspace command, or documented `PYTHONPATH`/module path. Reuse an existing folder only if the proposal says to; otherwise create the proposed folder. A different location requires updating the artifact first.
+3. Read the proposal's `Optimization System Location` section and write implementation code only in the recorded executable-code folder. If the section is missing, the path is unresolved, or the import/runtime access plan is missing, stop and ask for the proposal/design to be updated before editing code.
+4. Verify the recorded folder decision still matches the repo and that code in that folder can import or invoke the real agent modules using the repo's package setup, repo-root command, editable install, workspace command, or documented `PYTHONPATH`/module path. Reuse an existing folder only if the proposal says to; otherwise create the proposed folder.
 5. Verify the artifacts and repo identify the target runtime or clearly record runtime unknowns. If no bundled runtime reference exists, continue from the core contracts and record the production adapter assumptions for the target runtime.
-6. Read `references/core/reference-contracts.md`, then load the apply-phase core contracts, starting with `references/core/live-eval-runner-contract.md`. Load runtime-specific references only for the identified runtime. For live Python Claude Managed Agents work, inspect `references/runtimes/claude-managed-agent/python-managed-agent-package/README.md` and `references/runtimes/claude-managed-agent/python-managed-agent-package/src/optimizespec/runtime.py` before implementing the runner.
+6. Read `../optimizespec-common/references/core/reference-contracts.md`, then load the apply-phase core contracts, starting with `../optimizespec-common/references/core/live-eval-runner-contract.md`. Load runtime-specific references only for the identified runtime. For live Python Claude Managed Agents work, inspect `../optimizespec-common/references/runtimes/claude-managed-agent/python-managed-agent-package/README.md` and `../optimizespec-common/references/runtimes/claude-managed-agent/python-managed-agent-package/src/optimizespec/runtime.py` before implementing the runner.
 7. Implement tasks in order, marking each checkbox complete only after implementation and local verification.
-8. Use bundled runtime references when they match the artifact runtime. For Claude Managed Agents, adapt `references/runtimes/claude-managed-agent/python-managed-agent-package/` as the primary runnable reference for live Managed Agents execution.
+8. Use bundled runtime references when they match the artifact runtime. For Claude Managed Agents, adapt `../optimizespec-common/references/runtimes/claude-managed-agent/python-managed-agent-package/` as the primary runnable reference for live Managed Agents execution.
 
 ## Implementation Contract
 
@@ -44,22 +44,22 @@ The applied system must expose operations equivalent to:
 
 The rollout executor must run the real agent runtime for live eval cases and produce score plus ASI for every candidate/eval-case pair. The applied system must persist a durable evidence ledger with run manifest, candidate registry, runtime-neutral rollout records, per-case scores, judge records when present, ASI, comparison records, optimizer lineage, leaderboard, selected best candidate, and optional promotion or no-promotion evidence. Read:
 
-- `references/core/live-eval-runner-contract.md`
-- `references/core/eval-system-evidence.md`
-- `references/core/runner-contract.md`
-- `references/core/grader-contract.md`
-- `references/core/asi-contract.md`
-- `references/core/candidate-surface.md`
-- `references/core/optimizer-contract.md`
-- `references/core/verification-contract.md`
-- `references/core/repo-patterns.md`
+- `../optimizespec-common/references/core/live-eval-runner-contract.md`
+- `../optimizespec-common/references/core/eval-system-evidence.md`
+- `../optimizespec-common/references/core/runner-contract.md`
+- `../optimizespec-common/references/core/grader-contract.md`
+- `../optimizespec-common/references/core/asi-contract.md`
+- `../optimizespec-common/references/core/candidate-surface.md`
+- `../optimizespec-common/references/core/optimizer-contract.md`
+- `../optimizespec-common/references/core/verification-contract.md`
+- `../optimizespec-common/references/core/repo-patterns.md`
 
 For Claude Managed Agents, also read:
 
-- `references/runtimes/claude-managed-agent/managed-agents-runtime-contract.md`
-- `references/runtimes/claude-managed-agent/managed-agents-runner.md`
-- `references/runtimes/claude-managed-agent/scorers-and-asi.md`
-- `references/runtimes/claude-managed-agent/python-managed-agent-package/`
+- `../optimizespec-common/references/runtimes/claude-managed-agent/managed-agents-runtime-contract.md`
+- `../optimizespec-common/references/runtimes/claude-managed-agent/managed-agents-runner.md`
+- `../optimizespec-common/references/runtimes/claude-managed-agent/scorers-and-asi.md`
+- `../optimizespec-common/references/runtimes/claude-managed-agent/python-managed-agent-package/`
 
 Use the target repo's existing factory or session runner when available.
 The optimization system should import or adapt the target repo's real agent factory, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter so live evals use production-equivalent integrations.

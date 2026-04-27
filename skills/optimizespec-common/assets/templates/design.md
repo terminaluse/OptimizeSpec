@@ -4,7 +4,7 @@ Summarize what you found in the agent project and describe the inferred target r
 
 ## Optimization System Location
 
-Confirm the proposal's create-or-reuse decision, the path where optimization code will live, the existing agent code it will import or adapt, how modules and runtime dependencies will be importable from that path, and where run outputs will be written.
+Confirm the proposal's create-or-reuse decision, the path where executable optimization code will live, why that path belongs in the repo's eval, test, tooling, or agent package-adjacent surface, the existing agent code it will import or adapt, how modules and runtime dependencies will be importable from that path, and where run outputs will be written.
 
 ## Runner Invocation
 
