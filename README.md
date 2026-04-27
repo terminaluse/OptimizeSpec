@@ -1,4 +1,4 @@
-# OptimizeSpec
+# OptimizeSpec: Build Eval-Driven Agent Optimization Systems
 
 OptimizeSpec helps you make an agent better in a measured way, even if you have never built an eval suite or optimization loop before.
 
@@ -95,8 +95,7 @@ The proposal records where the optimization-system code will live and where run 
 
 `$optimizespec-apply <change-name>` writes runner, scorer, optimizer, adapter, and evidence-ledger code to the recorded executable path.
 
-> [!NOTE]
-> Choose the path based on your repo's structure. The executable optimization system should usually live in an existing eval, test, tooling, or agent package-adjacent folder, where it can import or invoke the real agent, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter.
+**Note:** Choose the path based on your repo's structure. The executable optimization system should usually live in an existing eval, test, tooling, or agent package-adjacent folder, where it can import or invoke the real agent, tools, skills, MCP servers, environment configuration, and permissions through a narrow adapter.
 
 </details>
 
