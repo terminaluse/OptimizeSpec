@@ -1,4 +1,4 @@
-# OptimizeSpec: A plugin to build agent optimizion systems
+# OptimizeSpec: A plugin to build agent optimization systems
 
 OptimizeSpec helps you make your agent better in a measured way, even if you have never built an eval suite or optimization loop before.
 
